@@ -220,8 +220,6 @@ export default function PlannerPage() {
         className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10 shadow-xl"
       >
         {/* Decorative floating shapes */}
-        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
         <div className="absolute top-4 right-8 flex gap-2">
           {["\u2728", "\uD83D\uDCC5", "\uD83D\uDE80"].map((em, i) => (
             <span
@@ -245,7 +243,7 @@ export default function PlannerPage() {
       {/* ===== Premium Loading Overlay ===== */}
       {generating && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#F8FBF8]/95 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#F8FBF8]/95"
         >
           <div className="w-full max-w-2xl mx-auto px-6">
             <div
@@ -533,8 +531,6 @@ export default function PlannerPage() {
           <div
             className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-r from-[#004D26] via-[#006C35] to-[#00A352] p-8 shadow-xl"
           >
-            <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
-            <div className="absolute bottom-0 left-0 h-20 w-40 rounded-full bg-white/5 blur-xl" />
             <div className="relative z-10">
               <h2
                 className="text-3xl md:text-4xl font-extrabold text-white font-['Cairo'] drop-shadow-lg"

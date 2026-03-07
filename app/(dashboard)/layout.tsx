@@ -7,7 +7,6 @@ import {
   BarChart3, Building2, Calendar, ChevronLeft, ChevronRight,
   FolderOpen, Hash, ImageIcon, LogOut, Menu, Search, Settings, Sparkles, TrendingUp, X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/lib/store";
 import { signOut } from "@/lib/auth-actions";
@@ -65,13 +64,11 @@ function NavLinks({
             )}
           >
             {isActive && (
-              <motion.div
-                layoutId="activeNavItem"
+              <div
                 className={cn(
                   "absolute top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-[#006C35] to-[#00A352]",
                   isRtl ? "right-0" : "left-0"
                 )}
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
               />
             )}
             <Icon className={cn("h-7 w-7 shrink-0 transition-colors", isActive && "text-[#006C35]")} />
@@ -111,13 +108,11 @@ function NavLinks({
             )}
           >
             {isActive && (
-              <motion.div
-                layoutId="activeNavItem"
+              <div
                 className={cn(
                   "absolute top-0 bottom-0 w-[3px] rounded-full bg-gradient-to-b from-[#006C35] to-[#00A352]",
                   isRtl ? "right-0" : "left-0"
                 )}
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
               />
             )}
             <Icon className={cn("h-7 w-7 shrink-0 transition-colors", isActive && "text-[#006C35]")} />
@@ -198,13 +193,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen bg-[#F8FBF8] text-[#0A1F0F] text-base">
 
       {/* ═══ Desktop Sidebar (lg+) ═══ */}
-      <motion.aside
-        initial={false}
-        animate={{ width: sidebarWidth }}
+      <aside
         className={cn(
-          "fixed top-0 z-40 hidden lg:flex h-full flex-col overflow-hidden bg-white border-[#D4EBD9]",
+          "fixed top-0 z-40 hidden lg:flex h-full flex-col overflow-hidden bg-white border-[#D4EBD9] transition-[width] duration-300",
           isRtl ? "right-0 border-l-2" : "left-0 border-r-2"
         )}
+        style={{ width: sidebarWidth }}
       >
         {/* Logo */}
         <div className="flex h-24 items-center justify-between border-b-2 border-[#D4EBD9] px-5">
@@ -240,75 +234,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           locale={locale}
         />
         <SidebarBottom t={t} collapsed={collapsed} />
-      </motion.aside>
+      </aside>
 
       {/* ═══ Mobile Overlay Sidebar (below lg) ═══ */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
-              onClick={() => setMobileOpen(false)}
+      {mobileOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity duration-200"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside
+            className={cn(
+              "fixed top-0 z-[60] flex h-full w-72 flex-col overflow-hidden bg-white shadow-2xl lg:hidden transition-transform duration-300",
+              isRtl ? "right-0 border-l-2 border-[#D4EBD9]" : "left-0 border-r-2 border-[#D4EBD9]"
+            )}
+          >
+            {/* Logo + close */}
+            <div className="flex h-24 items-center justify-between border-b-2 border-[#D4EBD9] px-5">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3"
+                onClick={() => setMobileOpen(false)}
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-[0_4px_12px_rgba(0,108,53,0.25)]">
+                  <Sparkles className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-2xl font-bold text-[#004D26]">
+                  {locale === "ar" ? "\u0646\u0648\u0627\u0629" : "Nawaa"}{" "}
+                  <span className="text-[#00A352]">AI</span>
+                </span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F7F2] text-[#5A8A6A] hover:text-[#006C35] transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <NavLinks
+              collapsed={false}
+              pathname={pathname}
+              t={t}
+              isRtl={isRtl}
+              locale={locale}
+              onNavClick={() => setMobileOpen(false)}
             />
-            <motion.aside
-              key="mobile-drawer"
-              initial={{ x: isRtl ? 288 : -288 }}
-              animate={{ x: 0 }}
-              exit={{ x: isRtl ? 288 : -288 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className={cn(
-                "fixed top-0 z-[60] flex h-full w-72 flex-col overflow-hidden bg-white shadow-2xl lg:hidden",
-                isRtl ? "right-0 border-l-2 border-[#D4EBD9]" : "left-0 border-r-2 border-[#D4EBD9]"
-              )}
-            >
-              {/* Logo + close */}
-              <div className="flex h-24 items-center justify-between border-b-2 border-[#D4EBD9] px-5">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-3"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-[0_4px_12px_rgba(0,108,53,0.25)]">
-                    <Sparkles className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="text-2xl font-bold text-[#004D26]">
-                    {locale === "ar" ? "\u0646\u0648\u0627\u0629" : "Nawaa"}{" "}
-                    <span className="text-[#00A352]">AI</span>
-                  </span>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F7F2] text-[#5A8A6A] hover:text-[#006C35] transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+            <SidebarBottom t={t} collapsed={false} onNavClick={() => setMobileOpen(false)} />
+          </aside>
+        </>
+      )}
 
-              <NavLinks
-                collapsed={false}
-                pathname={pathname}
-                t={t}
-                isRtl={isRtl}
-                locale={locale}
-                onNavClick={() => setMobileOpen(false)}
-              />
-              <SidebarBottom t={t} collapsed={false} onNavClick={() => setMobileOpen(false)} />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* ═══ Main Content ═══
-           On desktop (lg+) we offset by the sidebar width.
-           On mobile the sidebar is hidden, so no offset needed.
-      ═══ */}
-      {/* ── Main content: full width on mobile, sidebar-offset on lg+ ── */}
+      {/* ═══ Main Content ═══ */}
       <div
         className="flex flex-1 flex-col min-w-0 transition-[margin] duration-300"
         style={isRtl
@@ -316,7 +294,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           : { marginLeft: 0 }
         }
       >
-        {/* Inject desktop margin override via CSS var + media query trick */}
         <style>{`
           @media (min-width: 1024px) {
             .nawaa-desktop-content {
@@ -326,7 +303,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         `}</style>
         <div className="nawaa-desktop-content flex flex-1 flex-col min-w-0">
           {/* ── Topbar Header ── */}
-          <header className="sticky top-0 z-30 flex h-20 sm:h-24 items-center gap-3 sm:gap-4 border-b-2 border-[#D4EBD9] bg-white/80 backdrop-blur-lg px-4 sm:px-8">
+          <header className="sticky top-0 z-30 flex h-20 sm:h-24 items-center gap-3 sm:gap-4 border-b-2 border-[#D4EBD9] bg-white/80 px-4 sm:px-8">
             {/* Hamburger — visible only on mobile */}
             <button
               type="button"

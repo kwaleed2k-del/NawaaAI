@@ -230,7 +230,7 @@ export default function DashboardPage() {
 
           <div className="relative z-10">
             <div
-              className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 backdrop-blur-sm"
+              className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5"
             >
               <Sparkles className="h-4 w-4 text-yellow-200" />
               <span className="text-lg font-medium text-white/90">

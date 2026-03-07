@@ -378,7 +378,7 @@ export default function MyPlansPage() {
 
           {/* Count badge */}
           <div
-            className="flex items-center gap-2 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 px-5 py-3"
+            className="flex items-center gap-2 rounded-2xl bg-white/20 border border-white/30 px-5 py-3"
           >
             <FolderOpen className="h-6 w-6 text-white" />
             <span className="text-2xl font-extrabold text-white">{plans.length}</span>
@@ -608,7 +608,7 @@ export default function MyPlansPage() {
                 <div className="relative flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm border border-white/30">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 border border-white/30">
                         <Calendar className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -628,7 +628,7 @@ export default function MyPlansPage() {
 
                     {/* Weekly strategy */}
                     {expandedPlan.plan_data?.weeklyStrategy && (
-                      <div className="mt-5 max-w-2xl rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 p-4">
+                      <div className="mt-5 max-w-2xl rounded-xl bg-white/15 border border-white/25 p-4">
                         <p className="text-sm font-bold uppercase tracking-wider text-white/90 mb-1.5">
                           {isAr ? "\u0627\u0633\u062A\u0631\u0627\u062A\u064A\u062C\u064A\u0629 \u0627\u0644\u0623\u0633\u0628\u0648\u0639" : "Weekly Strategy"}
                         </p>
@@ -641,7 +641,7 @@ export default function MyPlansPage() {
 
                   <Button
                     onClick={() => setExpandedPlanId(null)}
-                    className="h-12 px-5 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 transition-all text-base font-bold"
+                    className="h-12 px-5 rounded-xl bg-white/20 border border-white/30 text-white hover:bg-white/30 transition-all text-base font-bold"
                   >
                     <ChevronUp className="mr-2 h-5 w-5" />
                     {isAr ? "\u0625\u063A\u0644\u0627\u0642" : "Close"}

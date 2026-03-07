@@ -112,8 +112,6 @@ export default function HashtagsPage() {
         className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10 shadow-xl"
       >
         {/* Decorative floating shapes */}
-        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
         <div className="absolute top-4 right-8 flex gap-2">
           {["#️⃣", "🔥", "🚀"].map((em, i) => (
             <span
@@ -164,7 +162,7 @@ export default function HashtagsPage() {
                   <div className="absolute inset-0 bg-white/0 hover:bg-white/10 transition-all duration-300 rounded-2xl" />
                   <span className="text-3xl leading-none">🔥</span>
                   <span className="text-lg font-extrabold leading-tight text-center drop-shadow-sm relative z-10">{t.tag}</span>
-                  <span className="inline-flex items-center rounded-full bg-white/25 backdrop-blur-sm px-3 py-1 text-sm font-bold relative z-10">
+                  <span className="inline-flex items-center rounded-full bg-white/25 px-3 py-1 text-sm font-bold relative z-10">
                     {t.reach}
                   </span>
                   <span className="inline-flex items-center rounded-full bg-black/15 px-2.5 py-0.5 text-xs font-semibold relative z-10">

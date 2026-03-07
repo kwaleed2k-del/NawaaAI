@@ -621,8 +621,6 @@ export default function CompaniesPage() {
         className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10 shadow-xl"
       >
         {/* Decorative shapes */}
-        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
         <div className="absolute top-4 right-8 flex gap-2">
           {["\uD83C\uDFE2", "\u2728", "\uD83D\uDE80"].map((em, i) => (
             <span key={i} className="text-2xl md:text-3xl">{em}</span>
@@ -645,7 +643,7 @@ export default function CompaniesPage() {
             {/* Count badge */}
             {companies.length > 0 && (
               <div
-                className="flex items-center gap-2 rounded-2xl bg-white/20 backdrop-blur-sm px-5 py-3 border border-white/30"
+                className="flex items-center gap-2 rounded-2xl bg-white/20 px-5 py-3 border border-white/30"
               >
                 <Building2 className="h-6 w-6 text-white" />
                 <span className="text-2xl font-extrabold text-white">{companies.length}</span>
@@ -670,8 +668,6 @@ export default function CompaniesPage() {
           className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-br from-[#F8FBF8] via-white to-[#F0F7F2] py-20 px-8 overflow-hidden"
         >
           {/* Background decorative elements */}
-          <div className="absolute top-10 left-10 h-24 w-24 rounded-full bg-[#006C35]/5 blur-xl" />
-          <div className="absolute bottom-10 right-10 h-32 w-32 rounded-full bg-[#C9A84C]/5 blur-xl" />
 
           {/* Animated building icon */}
           <div
@@ -752,7 +748,6 @@ export default function CompaniesPage() {
                         </div>
                         {/* Glow behind logo */}
                         <div
-                          className="absolute inset-0 -z-10 rounded-2xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity"
                           style={{ backgroundColor: c.brand_colors?.[0] ?? "#006C35" }}
                         />
                       </div>
@@ -858,8 +853,6 @@ export default function CompaniesPage() {
           >
             <div className="relative flex h-full min-h-[320px] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] bg-gradient-to-br from-[#F8FBF8] to-white overflow-hidden transition-all duration-300 hover:border-[#00A352] hover:bg-gradient-to-br hover:from-[#F0F7F2] hover:to-[#F8FBF8] hover:shadow-[0_20px_50px_rgba(0,108,53,0.12)]">
               {/* Decorative gradients */}
-              <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-[#006C35]/5 blur-2xl group-hover:bg-[#006C35]/10 transition-all" />
-              <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-[#C9A84C]/5 blur-2xl group-hover:bg-[#C9A84C]/10 transition-all" />
 
               <div
                 className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg group-hover:shadow-[0_0_30px_rgba(0,108,53,0.3)] transition-shadow"
@@ -880,11 +873,9 @@ export default function CompaniesPage() {
           {/* Gradient header bar */}
           <div className="sticky top-0 z-10 bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-4 sm:px-8 py-5 sm:py-7 rounded-t-lg overflow-hidden">
             {/* Decorative shapes */}
-            <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/10 blur-xl" />
-            <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-[#C9A84C]/20 blur-xl" />
             <div className="flex items-center gap-4 relative z-10">
               <div
-                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30"
+                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 border border-white/30"
               >
                 <Building2 className="h-8 w-8 text-white" />
               </div>
@@ -1012,7 +1003,6 @@ export default function CompaniesPage() {
                       <div className="rounded-2xl p-[3px] bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#C9A84C]">
                         <img src={form.logo_url} alt="" className="h-24 w-24 rounded-[14px] object-cover" />
                       </div>
-                      <div className="absolute inset-0 -z-10 rounded-2xl blur-xl opacity-25 bg-[#006C35]" />
                     </div>
                   ) : (
                     <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-3 border-dashed border-[#D4EBD9] bg-white shadow-inner hover:border-[#00A352] transition-colors">
@@ -1244,7 +1234,7 @@ export default function CompaniesPage() {
             </section>
 
             {/* ─── Footer Actions ─── */}
-            <div className="sticky bottom-0 bg-white/90 backdrop-blur-xl border-t-2 border-[#D4EBD9] rounded-b-lg -mx-8 px-8 py-5 flex justify-end gap-4 mt-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+            <div className="sticky bottom-0 bg-white/90 border-t-2 border-[#D4EBD9] rounded-b-lg -mx-8 px-8 py-5 flex justify-end gap-4 mt-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
               <div>
                 <Button
                   variant="outline"
@@ -1280,13 +1270,11 @@ export default function CompaniesPage() {
               <>
                 {/* Header with gradient + company logo */}
                 <div className="relative bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-4 sm:px-8 py-6 sm:py-10 overflow-hidden">
-                  <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-                  <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
 
                   {/* Close button */}
                   <button
                     onClick={() => setViewingCompany(null)}
-                    className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all"
+                    className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -1295,7 +1283,7 @@ export default function CompaniesPage() {
                     {/* Logo */}
                     <div
                     >
-                      <div className="rounded-2xl p-[3px] bg-white/30 backdrop-blur-sm shadow-2xl">
+                      <div className="rounded-2xl p-[3px] bg-white/30 shadow-2xl">
                         <div
                           className="flex h-24 w-24 md:h-28 md:w-28 shrink-0 items-center justify-center rounded-[14px] text-4xl font-extrabold text-white"
                           style={{ backgroundColor: vc.brand_colors?.[0] ?? "#006C35" }}
@@ -1320,17 +1308,17 @@ export default function CompaniesPage() {
                       )}
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         {vc.industry && (
-                          <span className="rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-1.5 text-sm font-semibold text-white">
+                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-sm font-semibold text-white">
                             {TAG_STYLES.industry.emoji} {vc.industry}
                           </span>
                         )}
                         {vc.tone && (
-                          <span className="rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-1.5 text-sm font-semibold text-white">
+                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-sm font-semibold text-white">
                             {TAG_STYLES.tone.emoji} {vc.tone}
                           </span>
                         )}
                         {vc.website && (
-                          <span className="rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-1.5 text-sm font-semibold text-white flex items-center gap-1.5">
+                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-sm font-semibold text-white flex items-center gap-1.5">
                             <Globe className="h-4 w-4" /> {vc.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                           </span>
                         )}

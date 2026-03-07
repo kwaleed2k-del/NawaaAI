@@ -212,9 +212,6 @@ export default function MyGenerationsPage() {
           className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 shadow-lg"
         >
           {/* Decorative floating shapes */}
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-8 left-20 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
-          <div className="pointer-events-none absolute right-1/4 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[#C9A84C]/15 blur-xl" />
 
           <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -230,7 +227,7 @@ export default function MyGenerationsPage() {
             {/* Count badge */}
             {generations.length > 0 && (
               <div
-                className="flex items-center gap-3 self-start rounded-2xl border border-white/20 bg-white/15 px-5 py-3 backdrop-blur-sm"
+                className="flex items-center gap-3 self-start rounded-2xl border border-white/20 bg-white/15 px-5 py-3"
               >
                 <span className="text-lg font-semibold text-white">
                   {totalImages}
@@ -368,7 +365,7 @@ export default function MyGenerationsPage() {
                               }}
                             />
                             {/* Gradient hover overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-t from-[#004D26]/70 via-[#006C35]/40 to-transparent opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover/img:opacity-100">
+                            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-t from-[#004D26]/70 via-[#006C35]/40 to-transparent opacity-0 transition-all duration-300 group-hover/img:opacity-100">
                               <button
                                 type="button"
                                 onClick={() => setLightboxUrl(url)}
@@ -401,7 +398,7 @@ export default function MyGenerationsPage() {
       {/* ========== Lightbox Overlay ========== */}
       {lightboxUrl && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#004D26]/90 via-black/85 to-[#0A1F0F]/90 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#004D26]/90 via-black/85 to-[#0A1F0F]/90 p-4"
           onClick={() => setLightboxUrl(null)}
         >
           <div

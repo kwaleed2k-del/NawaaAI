@@ -249,8 +249,6 @@ export default function VisionStudioPage() {
         className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10 shadow-xl"
       >
         {/* Decorative floating shapes */}
-        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
         <div className="absolute top-4 right-8 flex gap-2">
           {["\uD83C\uDFA8", "\u2728", "\uD83D\uDCF8"].map((em, i) => (
             <span
@@ -752,7 +750,7 @@ export default function VisionStudioPage() {
                           <button
                             type="button"
                             onClick={() => setLightboxUrl(img.url!)}
-                            className="rounded-2xl bg-white/95 backdrop-blur-sm border-2 border-[#D4EBD9] px-5 py-3 text-lg font-bold text-[#004D26] flex items-center gap-2.5 shadow-xl"
+                            className="rounded-2xl bg-white/95 border-2 border-[#D4EBD9] px-5 py-3 text-lg font-bold text-[#004D26] flex items-center gap-2.5 shadow-xl"
                           >
                             <Maximize2 className="h-5 w-5" /> {tv.fullScreen}
                           </button>
@@ -765,7 +763,7 @@ export default function VisionStudioPage() {
                           </a>
                         </div>
                       )}
-                      <span className="absolute bottom-3 left-3 rounded-xl bg-white/95 backdrop-blur-sm border-2 border-[#D4EBD9] px-4 py-2 text-base font-bold text-[#004D26] shadow-md">
+                      <span className="absolute bottom-3 left-3 rounded-xl bg-white/95 border-2 border-[#D4EBD9] px-4 py-2 text-base font-bold text-[#004D26] shadow-md">
                         {img.style_label}
                       </span>
                     </div>
@@ -814,7 +812,7 @@ export default function VisionStudioPage() {
           onClick={() => setLightboxUrl(null)}
         >
           {/* Gradient backdrop tint */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#004D26]/90 via-black/80 to-[#004D26]/90 backdrop-blur-md" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#004D26]/90 via-black/80 to-[#004D26]/90" />
           <div
             className="relative max-h-[90vh] max-w-[90vw]"
             onClick={(e) => e.stopPropagation()}
