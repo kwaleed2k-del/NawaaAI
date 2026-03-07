@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Sparkles, Loader2, Download, ImageIcon, Maximize2, ImagePlus, X, Upload, Check, Camera, Paintbrush, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useAppStore, type Company } from "@/lib/store";
@@ -21,7 +21,7 @@ type ContentPlanRow = {
 };
 
 /* ── Animation variants ── */
-const container = {
+const container: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -29,9 +29,9 @@ const container = {
   },
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120, damping: 14 } },
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 120, damping: 14 } },
 };
 
 /* ── Platform emoji map for day buttons ── */
@@ -237,7 +237,7 @@ export default function VisionStudioPage() {
     return (
       <div className="space-y-8">
         <Skeleton className="h-40 w-full rounded-2xl" style={{ backgroundColor: "#D4EBD9" }} />
-        <div className="grid gap-6 lg:grid-cols-5">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-5">
           <div className="space-y-6 lg:col-span-2">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-44 rounded-2xl" style={{ backgroundColor: "#F0F7F2", border: "2px solid #D4EBD9" }} />
@@ -289,7 +289,7 @@ export default function VisionStudioPage() {
       </motion.div>
 
       {/* ===== MAIN GRID ===== */}
-      <div className="grid gap-8 lg:grid-cols-5">
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-5">
         {/* ── LEFT COLUMN: Controls ── */}
         <motion.div variants={container} initial="hidden" animate="show" className="space-y-8 lg:col-span-2">
 
@@ -297,7 +297,7 @@ export default function VisionStudioPage() {
           <motion.div variants={item}>
             <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#006C35] via-[#C9A84C] to-[#00A352]" />
-              <CardHeader className="p-8 pb-4">
+              <CardHeader className="p-5 sm:p-8 pb-4">
                 <CardTitle className="flex items-center gap-4 text-2xl font-extrabold text-[#004D26] font-['Cairo']">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg">
                     <Camera className="h-7 w-7 text-white" />
@@ -305,7 +305,7 @@ export default function VisionStudioPage() {
                   {tv.company}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-8 pt-2">
+              <CardContent className="p-5 sm:p-8 pt-2">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none z-10">
                     <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352]">
@@ -343,7 +343,7 @@ export default function VisionStudioPage() {
           <motion.div variants={item}>
             <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#C9A84C] via-[#E8D5A0] to-[#C9A84C]" />
-              <CardHeader className="p-8 pb-4">
+              <CardHeader className="p-5 sm:p-8 pb-4">
                 <CardTitle className="flex items-center gap-4 text-2xl font-extrabold text-[#004D26] font-['Cairo']">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg">
                     <ImageIcon className="h-7 w-7 text-white" />
@@ -351,7 +351,7 @@ export default function VisionStudioPage() {
                   {tv.contentDay}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5 p-8 pt-2">
+              <CardContent className="space-y-5 p-5 sm:p-8 pt-2">
                 <select
                   value={selectedPlan?.id ?? ""}
                   onChange={(e) => { const p = plans.find((x) => x.id === e.target.value); setSelectedPlan(p ?? null); setSelectedDayIndex(0); }}
@@ -423,7 +423,7 @@ export default function VisionStudioPage() {
           <motion.div variants={item}>
             <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C]" />
-              <CardHeader className="p-8 pb-4">
+              <CardHeader className="p-5 sm:p-8 pb-4">
                 <div className="flex items-center gap-4">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#C9A84C] shadow-lg">
                     <Upload className="h-7 w-7 text-white" />
@@ -438,8 +438,8 @@ export default function VisionStudioPage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-8 pt-2">
-                <div className="grid grid-cols-3 gap-4">
+              <CardContent className="p-5 sm:p-8 pt-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {referenceImages.map((img, i) => (
                     <motion.div
                       key={i}
@@ -496,7 +496,7 @@ export default function VisionStudioPage() {
           <motion.div variants={item}>
             <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#C9A84C] via-[#006C35] to-[#C9A84C]" />
-              <CardHeader className="p-8 pb-4">
+              <CardHeader className="p-5 sm:p-8 pb-4">
                 <CardTitle className="flex items-center gap-4 text-2xl font-extrabold text-[#004D26] font-['Cairo']">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg">
                     <Paintbrush className="h-7 w-7 text-white" />
@@ -504,7 +504,7 @@ export default function VisionStudioPage() {
                   {tv.style}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-4 p-8 pt-2">
+              <CardContent className="grid grid-cols-2 gap-4 p-5 sm:p-8 pt-2">
                 {STYLES.map((s, i) => {
                   const selected = style === s.id;
                   return (
@@ -690,7 +690,7 @@ export default function VisionStudioPage() {
         <motion.div variants={item} className="lg:col-span-3">
           <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
             <div className="h-1.5 w-full bg-gradient-to-r from-[#006C35] via-[#C9A84C] to-[#00A352]" />
-            <CardHeader className="p-8 pb-4">
+            <CardHeader className="p-5 sm:p-8 pb-4">
               <CardTitle className="flex items-center gap-4 text-2xl md:text-3xl font-extrabold text-[#004D26] font-['Cairo']">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg">
                   <ImageIcon className="h-7 w-7 text-white" />
@@ -698,7 +698,7 @@ export default function VisionStudioPage() {
                 {tv.generatedImages}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8 pt-2">
+            <CardContent className="p-5 sm:p-8 pt-2">
               {images.length === 0 && !generating ? (
                 /* ── Empty State ── */
                 <motion.div

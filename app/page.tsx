@@ -249,12 +249,12 @@ export default function LandingPage() {
       >
         <div className="mx-3 mt-3 sm:mx-6 sm:mt-4">
           <div className="landing-glass-nav rounded-2xl">
-            <div className="mx-auto flex h-24 max-w-[100rem] w-full items-center justify-between px-5 sm:px-8">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] flex items-center justify-center shadow-[0_4px_16px_rgba(0,108,53,0.3)]">
-                  <Sparkles className="h-7 w-7 text-white" />
+            <div className="mx-auto flex h-20 sm:h-24 max-w-[100rem] w-full items-center justify-between px-4 sm:px-8">
+              <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] flex items-center justify-center shadow-[0_4px_16px_rgba(0,108,53,0.3)]">
+                  <Sparkles className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-[#004D26]">
+                <span className="text-xl sm:text-2xl font-bold text-[#004D26]">
                   {isRtl ? "نواة" : "Nawaa"}{" "}
                   <span className="text-[#00A352]">AI</span>
                 </span>
@@ -279,15 +279,15 @@ export default function LandingPage() {
                 ))}
               </nav>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <button
                   type="button"
                   onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
-                  className="rounded-xl border border-[#D4EBD9] px-5 py-2.5 text-lg font-medium text-[#2D5A3D] hover:bg-[#F0F7F2] transition-colors"
+                  className="rounded-xl border border-[#D4EBD9] px-3 py-2 sm:px-5 sm:py-2.5 text-base sm:text-lg font-medium text-[#2D5A3D] hover:bg-[#F0F7F2] transition-colors"
                 >
-                  {locale === "ar" ? "English" : "العربية"}
+                  {locale === "ar" ? "EN" : "عر"}
                 </button>
-                <Link href="/login">
+                <Link href="/login" className="hidden sm:block">
                   <Button
                     variant="ghost"
                     className="text-[#2D5A3D] hover:text-[#006C35] hover:bg-[#F0F7F2] text-lg"
@@ -297,7 +297,7 @@ export default function LandingPage() {
                 </Link>
                 <Link href="/signup">
                   <Button
-                    className="rounded-xl font-semibold text-white text-lg h-14 px-8"
+                    className="rounded-xl font-semibold text-white text-base sm:text-lg h-10 sm:h-14 px-5 sm:px-8"
                     style={{
                       backgroundColor: "#006C35",
                       boxShadow: "0 4px 16px rgba(0,108,53,0.3)",
@@ -317,42 +317,43 @@ export default function LandingPage() {
          ═══════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-10 pt-36 pb-32">
         <div className="mx-auto max-w-[100rem] w-full">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-            {/* Left side — 55% */}
+          {/* Badge — full width */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="text-center lg:text-start"
+          >
+            <span className="pill-badge bg-[#006C35] text-white text-lg px-6 py-2.5">
+              {L.heroBadge}
+            </span>
+          </motion.div>
+
+          {/* Headline — full width, massive text */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="mt-8 leading-[1.05] text-center lg:text-start w-full"
+            style={{
+              fontFamily: "var(--font-cairo)",
+              fontSize: "clamp(36px, 10vw, 128px)",
+              fontWeight: 900,
+            }}
+          >
+            <span className="block text-[#004D26]">{L.heroLine1}</span>
+            <span className="block bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] bg-clip-text text-transparent">{L.heroLine2}</span>
+          </motion.h1>
+
+          {/* Content row: subtitle + CTA on left, preview on right */}
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mt-10">
             <div className="flex-1 lg:max-w-[55%]">
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-              >
-                <span className="pill-badge bg-[#006C35] text-white">
-                  {L.heroBadge}
-                </span>
-              </motion.div>
-
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="mt-6 leading-[1.1]"
-                style={{
-                  fontFamily: "var(--font-cairo)",
-                  fontSize: "clamp(52px, 8vw, 96px)",
-                  fontWeight: 900,
-                }}
-              >
-                <span className="block text-[#004D26]">{L.heroLine1}</span>
-                <span className="block text-[#00A352]">{L.heroLine2}</span>
-              </motion.h1>
-
               {/* Subtitle */}
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.5 }}
-                className="mt-6 text-2xl text-[#2D5A3D] max-w-xl leading-relaxed"
+                className="text-2xl lg:text-3xl text-[#2D5A3D] max-w-2xl leading-relaxed font-medium"
                 style={{ fontFamily: "var(--font-plus-jakarta)" }}
               >
                 {L.heroSub}
@@ -369,31 +370,32 @@ export default function LandingPage() {
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    className="h-16 rounded-[14px] px-12 text-xl font-bold text-white transition-all"
+                    className="relative h-16 rounded-2xl px-10 sm:px-14 text-xl sm:text-2xl font-extrabold text-white transition-all overflow-hidden"
                     style={{
                       backgroundColor: "#006C35",
-                      boxShadow: "0 8px 32px rgba(0,108,53,0.35)",
+                      boxShadow: "0 8px 40px rgba(0,108,53,0.4)",
                     }}
                   >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite] pointer-events-none" />
                     {L.startFreeBilingual}
                   </motion.button>
                 </Link>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="h-16 rounded-[14px] px-10 text-xl font-semibold text-[#006C35] border-2 border-[#D4EBD9] hover:border-[#00A352] hover:bg-[#F0F7F2] transition-all flex items-center gap-3"
+                  className="h-16 rounded-2xl px-8 text-xl font-bold text-[#006C35] border-2 border-[#D4EBD9] hover:border-[#00A352] hover:bg-[#F0F7F2] transition-all flex items-center gap-3"
                 >
                   <Play className="h-8 w-8 fill-[#006C35]" />
                   {L.watchDemo}
                 </motion.button>
               </motion.div>
 
-              {/* Trust Stats — larger with icons */}
+              {/* Trust Stats */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
-                className="mt-12 flex items-center gap-8 flex-wrap"
+                className="mt-14 grid grid-cols-1 sm:flex sm:items-center sm:flex-wrap gap-6 sm:gap-8"
               >
                 {[
                   { value: 500, suffix: "+", label: L.statBrands, Icon: Building2 },
@@ -408,26 +410,26 @@ export default function LandingPage() {
                     className="flex items-center gap-4"
                   >
                     {i > 0 && (
-                      <div className="h-12 w-px bg-[#D4EBD9] hidden sm:block" />
+                      <div className="h-14 w-px bg-[#D4EBD9] hidden sm:block" />
                     )}
                     <div
                       className="h-16 w-16 rounded-2xl flex items-center justify-center flex-shrink-0"
                       style={{
                         background: "linear-gradient(135deg, #006C35, #00A352)",
-                        boxShadow: "0 6px 20px rgba(0,108,53,0.25)",
+                        boxShadow: "0 8px 24px rgba(0,108,53,0.3)",
                       }}
                     >
                       <stat.Icon className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <p className="text-4xl font-bold text-[#006C35] leading-none">
+                      <p className="text-3xl lg:text-4xl xl:text-5xl font-extrabold text-[#006C35] leading-none">
                         <AnimatedCounter
                           end={stat.value}
                           suffix={stat.suffix}
                           duration={2000}
                         />
                       </p>
-                      <p className="text-lg text-[#5A8A6A] mt-1 font-medium">
+                      <p className="text-lg text-[#5A8A6A] mt-1 font-semibold">
                         {stat.label}
                       </p>
                     </div>
@@ -436,7 +438,7 @@ export default function LandingPage() {
               </motion.div>
             </div>
 
-            {/* Right side — 45% */}
+            {/* Right side — preview */}
             <motion.div
               initial={{ opacity: 0, x: isRtl ? -40 : 40 }}
               animate={{ opacity: 1, x: 0 }}
@@ -736,7 +738,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl p-16 text-center"
+            className="relative overflow-hidden rounded-3xl p-8 sm:p-12 lg:p-16 text-center"
             style={{
               background: "linear-gradient(135deg, #006C35, #004D26)",
               boxShadow: "0 20px 60px rgba(0,108,53,0.3)",
@@ -757,7 +759,7 @@ export default function LandingPage() {
             />
 
             <h2
-              className="relative text-5xl sm:text-6xl font-bold text-white mb-6"
+              className="relative text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-6"
               style={{ fontFamily: "var(--font-cairo)" }}
             >
               {L.ctaTitle}

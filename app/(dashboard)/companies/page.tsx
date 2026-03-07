@@ -928,9 +928,9 @@ export default function CompaniesPage() {
 
       {/* ===== ADD/EDIT DIALOG ===== */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="sm:max-w-[95vw] lg:max-w-[85vw] max-h-[95vh] overflow-y-auto bg-white border-2 border-[#D4EBD9] text-[#0A1F0F] scrollbar-nawaa p-0">
+        <DialogContent className="max-w-[95vw] lg:max-w-[85vw] max-h-[95vh] overflow-y-auto bg-white border-2 border-[#D4EBD9] text-[#0A1F0F] scrollbar-nawaa p-0">
           {/* Gradient header bar */}
-          <div className="sticky top-0 z-10 bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-8 py-7 rounded-t-lg overflow-hidden">
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-4 sm:px-8 py-5 sm:py-7 rounded-t-lg overflow-hidden">
             {/* Decorative shapes */}
             <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/10 blur-xl" />
             <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-[#C9A84C]/20 blur-xl" />
@@ -957,7 +957,7 @@ export default function CompaniesPage() {
             </div>
           </div>
 
-          <div className="px-8 py-6 space-y-0">
+          <div className="px-4 sm:px-8 py-6 space-y-0">
             {/* ─── Section 1: Basic Info ─── */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -994,7 +994,7 @@ export default function CompaniesPage() {
                   <Label className="text-lg font-bold text-[#004D26] mb-2 block">{tc.industry}</Label>
                   <Select
                     value={form.industry}
-                    onValueChange={(v) => setForm((f) => ({ ...f, industry: v }))}
+                    onValueChange={(v) => setForm((f) => ({ ...f, industry: v ?? "" }))}
                   >
                     <SelectTrigger className="h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] focus:border-[#006C35] rounded-2xl text-lg px-5">
                       <SelectValue placeholder={tc.selectIndustry} />
@@ -1109,7 +1109,7 @@ export default function CompaniesPage() {
               {/* Tone */}
               <div>
                 <Label className="text-lg font-bold text-[#004D26] mb-2 block">{tc.tone}</Label>
-                <Select value={form.tone} onValueChange={(v) => setForm((f) => ({ ...f, tone: v }))}>
+                <Select value={form.tone} onValueChange={(v) => setForm((f) => ({ ...f, tone: v ?? "" }))}>
                   <SelectTrigger className="h-14 border-2 border-[#D4EBD9] bg-white text-[#0A1F0F] focus:border-[#006C35] rounded-2xl text-lg px-5">
                     <SelectValue placeholder={tc.selectTone} />
                   </SelectTrigger>
@@ -1345,7 +1345,7 @@ export default function CompaniesPage() {
 
       {/* ===== COMPANY DETAIL VIEW DIALOG ===== */}
       <Dialog open={!!viewingCompany} onOpenChange={(open) => !open && setViewingCompany(null)}>
-        <DialogContent className="sm:max-w-[95vw] lg:max-w-[80vw] max-h-[95vh] overflow-y-auto bg-white border-2 border-[#D4EBD9] text-[#0A1F0F] scrollbar-nawaa p-0">
+        <DialogContent className="max-w-[95vw] lg:max-w-[80vw] max-h-[95vh] overflow-y-auto bg-white border-2 border-[#D4EBD9] text-[#0A1F0F] scrollbar-nawaa p-0">
           {viewingCompany && (() => {
             const vc = viewingCompany;
             const analysisCount = vc.analysis_count ?? 0;
@@ -1354,7 +1354,7 @@ export default function CompaniesPage() {
             return (
               <>
                 {/* Header with gradient + company logo */}
-                <div className="relative bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-8 py-10 overflow-hidden">
+                <div className="relative bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-4 sm:px-8 py-6 sm:py-10 overflow-hidden">
                   <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
                   <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C9A84C]/20 blur-2xl" />
 
@@ -1366,7 +1366,7 @@ export default function CompaniesPage() {
                     <X className="h-5 w-5" />
                   </button>
 
-                  <div className="relative z-10 flex items-center gap-6">
+                  <div className="relative z-10 flex items-center gap-4 sm:gap-6 flex-wrap">
                     {/* Logo */}
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -1391,7 +1391,7 @@ export default function CompaniesPage() {
                       <motion.h2
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="font-['Cairo'] text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg"
+                        className="font-['Cairo'] text-2xl sm:text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg"
                       >
                         {vc.name}
                       </motion.h2>
@@ -1420,7 +1420,7 @@ export default function CompaniesPage() {
                 </div>
 
                 {/* Body */}
-                <div className="px-8 py-8 space-y-8">
+                <div className="px-4 sm:px-8 py-6 sm:py-8 space-y-8">
                   {/* Company Info Grid */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}

@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { TrendingUp, BarChart3, PieChart, Activity, Sparkles } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { messages } from "@/lib/i18n";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -13,9 +13,9 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
 };
 
 export default function InsightsPage() {
@@ -150,7 +150,7 @@ export default function InsightsPage() {
                 animate={{ scale: [1, 1.08, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
-                <TrendingUp className="h-18 w-18 text-white" style={{ width: 72, height: 72 }} />
+                <TrendingUp className="text-white" style={{ width: 72, height: 72 }} />
                 {/* Outer ring pulse */}
                 <motion.div
                   className="absolute inset-0 rounded-full border-4 border-[#006C35]/30"

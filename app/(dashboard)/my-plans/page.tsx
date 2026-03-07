@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   FolderOpen,
   Calendar,
@@ -150,7 +150,7 @@ function formatWeekRange(weekStart: string): string {
 
 /* ── Stagger animation variants ── */
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -158,13 +158,13 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 24, scale: 0.96 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: "spring", stiffness: 260, damping: 20 },
+    transition: { type: "spring" as const, stiffness: 260, damping: 20 },
   },
 };
 

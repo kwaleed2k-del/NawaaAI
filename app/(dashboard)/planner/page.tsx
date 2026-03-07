@@ -343,7 +343,7 @@ export default function PlannerPage() {
           <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
             {/* Card top accent bar */}
             <div className="h-1.5 w-full bg-gradient-to-r from-[#006C35] via-[#C9A84C] to-[#00A352]" />
-            <CardHeader className="p-8 pb-4">
+            <CardHeader className="p-5 sm:p-8 pb-4">
               <div className="flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg">
                   <Calendar className="h-7 w-7 text-white" />
@@ -355,7 +355,7 @@ export default function PlannerPage() {
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-8 p-8 pt-4">
+            <CardContent className="space-y-8 p-5 sm:p-8 pt-4">
               {/* ── Section 1: Company ── */}
               <motion.div
                 initial={{ opacity: 0, x: -10 }}

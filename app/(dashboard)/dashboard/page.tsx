@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   Building2,
   Calendar,
@@ -51,7 +51,7 @@ const PLATFORM_CONFIG: Record<string, { emoji: string; gradient: string; text: s
 };
 
 /* ---------- Animation variants ---------- */
-const container = {
+const container: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -59,15 +59,15 @@ const container = {
   },
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120, damping: 14 } },
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 120, damping: 14 } },
 };
 
-const floatingVariant = {
+const floatingVariant: Variants = {
   animate: {
     y: [0, -8, 0],
-    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   },
 };
 
@@ -308,7 +308,7 @@ export default function DashboardPage() {
               </span>
             </motion.div>
 
-            <h1 className="font-cairo text-4xl font-extrabold text-white md:text-5xl lg:text-6xl drop-shadow-lg">
+            <h1 className="font-cairo text-2xl font-extrabold text-white sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-lg">
               {t.greeting}, {displayName} {"\ud83d\udc4b"}
             </h1>
 
@@ -352,11 +352,11 @@ export default function DashboardPage() {
             whileHover={{ y: -6, scale: 1.03 }}
           >
             <GlowCard glowColor={s.glowColor} className="!bg-white !border-2 !border-[#D4EBD9] !rounded-2xl">
-              <CardContent className="flex flex-col items-center gap-4 p-7 text-center">
+              <CardContent className="flex flex-col items-center gap-4 p-5 sm:p-7 text-center">
                 {/* Gradient icon circle with bounce */}
                 <motion.div
                   className={cn(
-                    "flex h-18 w-18 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg",
+                    "flex items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg",
                     s.gradient
                   )}
                   style={{ height: 72, width: 72, boxShadow: `0 8px 24px ${s.shadowColor}` }}
@@ -386,7 +386,7 @@ export default function DashboardPage() {
       {/* ================= LATEST PLAN -- Calendar-style ================= */}
       <motion.div variants={item}>
         <Card className="overflow-hidden rounded-2xl border-2 bg-white shadow-sm" style={{ borderColor: "#D4EBD9" }}>
-          <CardHeader className="flex flex-row items-center justify-between p-7">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 p-5 sm:p-7">
             <div className="flex items-center gap-3">
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352]"
@@ -410,7 +410,7 @@ export default function DashboardPage() {
             )}
           </CardHeader>
 
-          <CardContent className="p-7 pt-0">
+          <CardContent className="p-5 sm:p-7 pt-0">
             {days.length > 0 ? (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
                 {days.map((d, i) => {
@@ -699,7 +699,7 @@ export default function DashboardPage() {
         </div>
 
         {recentImages.length > 0 ? (
-          <div className="grid grid-cols-5 gap-5 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 w-full">
             {recentImages
               .map((img) => ({
                 url: img.image_urls?.[0],

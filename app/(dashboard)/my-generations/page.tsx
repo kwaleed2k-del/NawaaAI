@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { ImageIcon, Trash2, Download, Maximize2, X, Sparkles, Loader2, Calendar } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/lib/store";
@@ -43,7 +43,7 @@ const cardShadowHover = [
 ];
 
 /* ---------- Framer Motion Variants ---------- */
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -53,14 +53,14 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 30, scale: 0.96 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 260,
       damping: 20,
     },
@@ -307,15 +307,13 @@ export default function MyGenerationsPage() {
 
             <p className="mt-8 text-2xl font-bold text-[#004D26]">{noGenerations}</p>
             <p className="mt-2 text-lg text-[#5A8A6A]/70">{noGenerationsSub}</p>
-            <Button
-              asChild
-              className="mt-8 h-14 rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-10 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#00A352]/25"
+            <a
+              href="/vision-studio"
+              className="mt-8 inline-flex h-14 items-center rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-10 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#00A352]/25"
             >
-              <a href="/vision-studio">
-                <Sparkles className="mr-2 h-6 w-6" />
-                {locale === "ar" ? "افتح استوديو الرؤية" : "Open Vision Studio"}
-              </a>
-            </Button>
+              <Sparkles className="mr-2 h-6 w-6" />
+              {locale === "ar" ? "افتح استوديو الرؤية" : "Open Vision Studio"}
+            </a>
           </motion.div>
         ) : (
           /* ========== Generation Cards Grid ========== */

@@ -149,7 +149,7 @@ export default function HashtagsPage() {
         <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
           {/* Top accent bar */}
           <div className="h-1.5 w-full bg-gradient-to-r from-[#006C35] via-[#C9A84C] to-[#00A352]" />
-          <CardHeader className="p-8 pb-4">
+          <CardHeader className="p-5 sm:p-8 pb-4">
             <CardTitle className="flex items-center gap-4 text-2xl md:text-3xl font-extrabold text-[#004D26] font-['Cairo']">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg">
                 <TrendingUp className="h-7 w-7 text-white" />
@@ -157,7 +157,7 @@ export default function HashtagsPage() {
               {th.trendingKSA}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8 pt-2">
+          <CardContent className="p-5 sm:p-8 pt-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {TRENDING_PLACEHOLDER.map((t, i) => (
                 <motion.button
@@ -201,7 +201,7 @@ export default function HashtagsPage() {
         <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
           {/* Top accent bar */}
           <div className="h-1.5 w-full bg-gradient-to-r from-[#C9A84C] via-[#E8D5A0] to-[#C9A84C]" />
-          <CardHeader className="p-8 pb-4">
+          <CardHeader className="p-5 sm:p-8 pb-4">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg">
                 <Hash className="h-7 w-7 text-white" />
@@ -215,7 +215,7 @@ export default function HashtagsPage() {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-8 p-8 pt-4">
+          <CardContent className="space-y-8 p-5 sm:p-8 pt-4">
             {/* ── Platform Selector Cards ── */}
             <motion.div
               initial={{ opacity: 0, x: -10 }}
@@ -408,7 +408,7 @@ export default function HashtagsPage() {
           <Card className="rounded-2xl border-2 border-[#D4EBD9] bg-white shadow-lg overflow-hidden">
             {/* Top accent bar */}
             <div className="h-1.5 w-full bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C]" />
-            <CardHeader className="p-8 pb-4">
+            <CardHeader className="p-5 sm:p-8 pb-4">
               <CardTitle className="flex items-center gap-4 text-2xl md:text-3xl font-extrabold text-[#004D26] font-['Cairo']">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#C9A84C] shadow-lg">
                   <Hash className="h-7 w-7 text-white" />
@@ -416,7 +416,7 @@ export default function HashtagsPage() {
                 {th.brandHashtags}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8 pt-2">
+            <CardContent className="p-5 sm:p-8 pt-2">
               <div className="flex flex-wrap gap-4">
                 {brandHashtags.map((tag, i) => (
                   <motion.button
