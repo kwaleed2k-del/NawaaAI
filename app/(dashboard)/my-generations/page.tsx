@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ImageIcon, Trash2, Download, Maximize2, X, Sparkles, Loader2 } from "lucide-react";
+import { ImageIcon, Trash2, Download, Maximize2, X, Sparkles, Loader2, Calendar } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/lib/store";
 import { messages } from "@/lib/i18n";
@@ -18,6 +18,53 @@ type GenerationRow = {
   prompt_used: string | null;
   company_id: string | null;
   created_at: string;
+};
+
+/* ---------- Accent gradient palette cycling per card ---------- */
+const cardAccents = [
+  "from-[#006C35] via-[#00A352] to-[#2DD17A]",   // green
+  "from-[#C9A84C] via-[#E0C068] to-[#F5DC8A]",   // gold
+  "from-[#1E6DB8] via-[#3B9AE8] to-[#70C0F5]",   // blue
+  "from-[#7B3FA0] via-[#A855F7] to-[#D09CF7]",   // purple
+];
+
+const cardBorderHover = [
+  "hover:border-[#00A352]",
+  "hover:border-[#C9A84C]",
+  "hover:border-[#3B9AE8]",
+  "hover:border-[#A855F7]",
+];
+
+const cardShadowHover = [
+  "hover:shadow-[0_8px_40px_-8px_rgba(0,163,82,0.35)]",
+  "hover:shadow-[0_8px_40px_-8px_rgba(201,168,76,0.35)]",
+  "hover:shadow-[0_8px_40px_-8px_rgba(59,154,232,0.35)]",
+  "hover:shadow-[0_8px_40px_-8px_rgba(168,85,247,0.35)]",
+];
+
+/* ---------- Framer Motion Variants ---------- */
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.96 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+    },
+  },
 };
 
 export default function MyGenerationsPage() {
@@ -100,182 +147,319 @@ export default function MyGenerationsPage() {
     }
   }
 
-  /* ---------- Loading skeleton ---------- */
+  /* ---------- Loading skeleton with animated gradient sweep ---------- */
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8FBF8] p-6">
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="h-10 w-64 animate-pulse rounded-xl bg-[#D4EBD9]/50" />
-            <div className="h-5 w-96 animate-pulse rounded-xl bg-[#D4EBD9]/30" />
+        <div className="mx-auto max-w-7xl space-y-8">
+          {/* Header skeleton */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8">
+            <div className="space-y-3">
+              <div className="relative h-10 w-72 overflow-hidden rounded-xl bg-white/20">
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              </div>
+              <div className="relative h-6 w-96 overflow-hidden rounded-xl bg-white/15">
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite_0.3s] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+              </div>
+            </div>
           </div>
+          {/* Card skeletons */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="h-[400px] animate-pulse rounded-2xl border-2 border-[#D4EBD9] bg-white"
-              />
+                className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-white"
+              >
+                {/* Accent bar skeleton */}
+                <div className="relative h-1.5 overflow-hidden bg-gradient-to-r from-[#D4EBD9] via-[#A8D5B8] to-[#D4EBD9]">
+                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                </div>
+                <div className="p-5 space-y-4">
+                  {/* Date badge skeleton */}
+                  <div className="flex items-center justify-between">
+                    <div className="relative h-8 w-48 overflow-hidden rounded-full bg-[#D4EBD9]/40">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
+                    </div>
+                    <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-[#D4EBD9]/40">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-red-200/30 to-transparent" />
+                    </div>
+                  </div>
+                  {/* Title skeleton */}
+                  <div className="relative h-7 w-40 overflow-hidden rounded-lg bg-[#D4EBD9]/30">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite_0.2s] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
+                  </div>
+                  {/* Image grid skeleton */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[1, 2, 3, 4].map((j) => (
+                      <div
+                        key={j}
+                        className="relative aspect-square overflow-hidden rounded-2xl bg-[#D4EBD9]/25"
+                      >
+                        <div
+                          className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#00A352]/8 to-transparent"
+                          style={{
+                            animation: `shimmer 2s infinite ${j * 0.15}s`,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
+        {/* Shimmer keyframe injected via style tag */}
+        <style>{`
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `}</style>
       </div>
     );
   }
 
+  /* ---------- Total image count across all generations ---------- */
+  const totalImages = generations.reduce(
+    (sum, g) => sum + (g.image_urls?.length ?? 0),
+    0
+  );
+
   return (
     <div className="min-h-screen bg-[#F8FBF8]">
-      <div className="space-y-8">
-        {/* Header */}
+      <div className="mx-auto max-w-7xl space-y-10">
+        {/* ========== Gradient Banner Header ========== */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.5, type: "spring", stiffness: 200, damping: 20 }}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 shadow-lg"
         >
-          <h1 className="font-['Cairo'] text-3xl font-bold text-[#004D26] md:text-4xl">
-            {title}
-          </h1>
-          <p className="mt-2 text-lg text-[#5A8A6A]">{subtitle}</p>
+          {/* Decorative floating shapes */}
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-8 left-20 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
+          <div className="pointer-events-none absolute right-1/4 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[#C9A84C]/15 blur-xl" />
+
+          <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="font-['Cairo'] text-3xl font-bold text-white drop-shadow-sm md:text-4xl">
+                {title}
+              </h1>
+              <p className="mt-2 flex items-center gap-2 text-lg text-white/80">
+                <ImageIcon className="h-5 w-5" />
+                <span>{subtitle}</span>
+                <Sparkles className="h-5 w-5 text-[#C9A84C]" />
+              </p>
+            </div>
+            {/* Count badge */}
+            {generations.length > 0 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.3 }}
+                className="flex items-center gap-3 self-start rounded-2xl border border-white/20 bg-white/15 px-5 py-3 backdrop-blur-sm"
+              >
+                <span className="text-lg font-semibold text-white">
+                  {totalImages}
+                </span>
+                <span className="text-lg text-white/70">
+                  {locale === "ar" ? "صورة" : "images"}
+                </span>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
 
-        {/* Empty state */}
+        {/* ========== Empty State ========== */}
         {generations.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] bg-white py-24"
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] bg-white py-28"
           >
-            <div className="flex h-28 w-28 items-center justify-center rounded-2xl bg-[#F0F7F2]">
-              <ImageIcon className="h-14 w-14 text-[#5A8A6A]" />
-            </div>
-            <p className="mt-6 text-xl font-medium text-[#5A8A6A]">{noGenerations}</p>
-            <p className="mt-1 text-base text-[#5A8A6A]/60">{noGenerationsSub}</p>
+            {/* Animated floating icon in gradient circle */}
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="relative"
+            >
+              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#006C35]/15 via-[#00A352]/10 to-[#C9A84C]/15">
+                <ImageIcon className="h-16 w-16 text-[#00A352]" />
+              </div>
+              {/* Pulsing sparkles */}
+              <motion.div
+                animate={{ opacity: [0.4, 1, 0.4], scale: [0.8, 1.1, 0.8] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -right-2 -top-2"
+              >
+                <Sparkles className="h-7 w-7 text-[#C9A84C]" />
+              </motion.div>
+              <motion.div
+                animate={{ opacity: [0.3, 0.9, 0.3], scale: [0.9, 1.2, 0.9] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                className="absolute -bottom-1 -left-3"
+              >
+                <Sparkles className="h-5 w-5 text-[#00A352]" />
+              </motion.div>
+            </motion.div>
+
+            <p className="mt-8 text-2xl font-bold text-[#004D26]">{noGenerations}</p>
+            <p className="mt-2 text-lg text-[#5A8A6A]/70">{noGenerationsSub}</p>
             <Button
               asChild
-              className="mt-6 h-12 rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] px-8 text-base font-semibold text-white shadow-md"
+              className="mt-8 h-14 rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-10 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#00A352]/25"
             >
               <a href="/vision-studio">
-                <Sparkles className="mr-2 h-5 w-5" />
+                <Sparkles className="mr-2 h-6 w-6" />
                 {locale === "ar" ? "افتح استوديو الرؤية" : "Open Vision Studio"}
               </a>
             </Button>
           </motion.div>
         ) : (
-          /* Generation groups grid */
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {generations.map((gen, idx) => (
-              <motion.div
-                key={gen.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.06, duration: 0.35 }}
-              >
-                <Card className="group relative overflow-hidden border-2 border-[#D4EBD9] bg-white shadow-sm transition-shadow hover:shadow-md rounded-2xl">
-                  <CardHeader className="p-5 pb-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-[#5A8A6A]">
-                          {formatCreatedAt(gen.created_at)}
-                        </p>
-                        {gen.day_label && (
-                          <CardTitle className="mt-1 truncate font-['Cairo'] text-lg font-semibold text-[#004D26]">
-                            {gen.day_label}
-                          </CardTitle>
-                        )}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled={deletingId === gen.id}
-                        onClick={() => handleDelete(gen.id)}
-                        className="h-10 w-10 shrink-0 rounded-xl bg-red-500 text-white hover:bg-red-600"
-                        title={deleteLabel}
-                      >
-                        {deletingId === gen.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </CardHeader>
+          /* ========== Generation Cards Grid ========== */
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {generations.map((gen, idx) => {
+              const accentIdx = idx % 4;
+              return (
+                <motion.div key={gen.id} variants={cardVariants}>
+                  <Card
+                    className={cn(
+                      "group relative overflow-hidden border-2 border-[#D4EBD9] bg-white rounded-2xl transition-all duration-500",
+                      "hover:-translate-y-1.5",
+                      cardBorderHover[accentIdx],
+                      cardShadowHover[accentIdx]
+                    )}
+                  >
+                    {/* Gradient accent bar at top */}
+                    <div
+                      className={cn(
+                        "h-1.5 w-full bg-gradient-to-r",
+                        cardAccents[accentIdx]
+                      )}
+                    />
 
-                  <CardContent className="p-5 pt-0">
-                    {/* 2x2 image grid */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {(gen.image_urls ?? []).map((url, imgIdx) => (
-                        <div
-                          key={imgIdx}
-                          className="group/img relative aspect-square overflow-hidden rounded-xl border-2 border-[#D4EBD9] bg-[#F8FBF8]"
-                        >
-                          <img
-                            src={url}
-                            alt={`${gen.day_label || "Generation"} - ${imgIdx + 1}`}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = "none";
-                              const parent = target.parentElement;
-                              if (parent) {
-                                const fallback = document.createElement("div");
-                                fallback.className =
-                                  "absolute inset-0 flex items-center justify-center bg-[#F0F7F2]";
-                                fallback.innerHTML =
-                                  '<p class="text-[#5A8A6A] text-sm text-center px-2">Failed to load</p>';
-                                parent.appendChild(fallback);
-                              }
-                            }}
-                          />
-                          {/* Hover overlay for each image */}
-                          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover/img:opacity-100">
-                            <motion.button
-                              type="button"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => setLightboxUrl(url)}
-                              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-[#004D26] shadow-md transition-colors hover:bg-white"
-                              title={fullScreenLabel}
-                            >
-                              <Maximize2 className="h-4 w-4" />
-                            </motion.button>
-                            <motion.button
-                              type="button"
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleDownload(url)}
-                              className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] text-white shadow-md"
-                              title={downloadLabel}
-                            >
-                              <Download className="h-4 w-4" />
-                            </motion.button>
+                    <CardHeader className="p-5 pb-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1 space-y-2">
+                          {/* Date badge */}
+                          <div className="inline-flex items-center gap-2 rounded-full border border-[#D4EBD9] bg-[#F0F7F2] px-3 py-1.5">
+                            <Calendar className="h-4 w-4 text-[#00A352]" />
+                            <span className="text-sm font-medium text-[#5A8A6A]">
+                              {formatCreatedAt(gen.created_at)}
+                            </span>
                           </div>
+                          {gen.day_label && (
+                            <CardTitle className="truncate font-['Cairo'] text-xl font-bold text-[#004D26]">
+                              {gen.day_label}
+                            </CardTitle>
+                          )}
                         </div>
-                      ))}
+                        {/* Delete button with hover animation */}
+                        <motion.div
+                          whileHover={{ scale: 1.15 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={deletingId === gen.id}
+                            onClick={() => handleDelete(gen.id)}
+                            className="h-9 w-9 shrink-0 rounded-xl bg-red-50 text-red-500 transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30"
+                            title={deleteLabel}
+                          >
+                            {deletingId === gen.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </motion.div>
+                      </div>
+                    </CardHeader>
 
-                    </div>
-
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                    <CardContent className="p-5 pt-0">
+                      {/* 2x2 image grid */}
+                      <div className="grid grid-cols-2 gap-3">
+                        {(gen.image_urls ?? []).map((url, imgIdx) => (
+                          <div
+                            key={imgIdx}
+                            className="group/img relative aspect-square overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-[#F8FBF8] transition-all duration-300 hover:border-[#00A352]/50"
+                          >
+                            <img
+                              src={url}
+                              alt={`${gen.day_label || "Generation"} - ${imgIdx + 1}`}
+                              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-110"
+                              loading="lazy"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = "none";
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  const fallback = document.createElement("div");
+                                  fallback.className =
+                                    "absolute inset-0 flex items-center justify-center bg-[#F0F7F2]";
+                                  fallback.innerHTML =
+                                    '<p class="text-[#5A8A6A] text-sm text-center px-2">Failed to load</p>';
+                                  parent.appendChild(fallback);
+                                }
+                              }}
+                            />
+                            {/* Gradient hover overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-t from-[#004D26]/70 via-[#006C35]/40 to-transparent opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover/img:opacity-100">
+                              <motion.button
+                                type="button"
+                                whileHover={{ scale: 1.15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setLightboxUrl(url)}
+                                className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-white/30 bg-white/90 text-[#004D26] shadow-lg transition-colors hover:bg-white"
+                                title={fullScreenLabel}
+                              >
+                                <Maximize2 className="h-5 w-5" />
+                              </motion.button>
+                              <motion.button
+                                type="button"
+                                whileHover={{ scale: 1.15 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => handleDownload(url)}
+                                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] text-white shadow-lg transition-shadow hover:shadow-[#00A352]/40"
+                                title={downloadLabel}
+                              >
+                                <Download className="h-5 w-5" />
+                              </motion.button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         )}
       </div>
 
-      {/* Lightbox overlay */}
+      {/* ========== Lightbox Overlay ========== */}
       <AnimatePresence>
         {lightboxUrl && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#004D26]/90 via-black/85 to-[#0A1F0F]/90 p-4 backdrop-blur-md"
             onClick={() => setLightboxUrl(null)}
           >
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.7, opacity: 0, rotate: -2 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.7, opacity: 0, rotate: 2 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="relative max-h-[90vh] max-w-[90vw]"
               onClick={(e) => e.stopPropagation()}
@@ -283,29 +467,37 @@ export default function MyGenerationsPage() {
               <img
                 src={lightboxUrl}
                 alt=""
-                className="max-h-[85vh] max-w-[85vw] rounded-2xl object-contain shadow-2xl"
+                className="max-h-[85vh] max-w-[85vw] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10"
               />
 
-              {/* Close button */}
-              <button
-                type="button"
-                onClick={() => setLightboxUrl(null)}
-                className="absolute -right-4 -top-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#D4EBD9] bg-white text-[#004D26] shadow-lg transition-colors hover:bg-[#F0F7F2]"
-              >
-                <X className="h-6 w-6" />
-              </button>
-
-              {/* Download button */}
+              {/* Close button with gradient border and hover rotate */}
               <motion.button
                 type="button"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setLightboxUrl(null)}
+                className="absolute -right-4 -top-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-transparent bg-white text-[#004D26] shadow-xl transition-colors hover:bg-[#F0F7F2]"
+                style={{
+                  backgroundClip: "padding-box",
+                  borderImage: "linear-gradient(135deg, #006C35, #C9A84C) 1",
+                  borderImageSlice: 1,
+                }}
+              >
+                <X className="h-6 w-6" />
+              </motion.button>
+
+              {/* Download button - bigger, gradient, hover scale */}
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDownload(lightboxUrl);
                 }}
-                className="absolute bottom-4 right-4 flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] px-5 py-3 text-base font-semibold text-white shadow-lg"
+                className="absolute bottom-6 right-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-7 py-4 text-lg font-bold text-white shadow-xl transition-shadow hover:shadow-2xl hover:shadow-[#00A352]/30"
               >
-                <Download className="h-5 w-5" />
+                <Download className="h-6 w-6" />
                 {downloadLabel}
               </motion.button>
             </motion.div>

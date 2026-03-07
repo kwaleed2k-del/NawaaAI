@@ -106,7 +106,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative flex items-center gap-4 rounded-xl px-4 py-3.5 text-lg font-medium transition-all duration-200",
+                  "relative flex items-center gap-4 rounded-xl px-4 py-3.5 text-lg font-bold transition-all duration-200",
                   isActive
                     ? "bg-[#F0F7F2] text-[#006C35]"
                     : "text-[#5A8A6A] hover:bg-[#F0F7F2] hover:text-[#004D26]"
@@ -152,7 +152,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative flex items-center gap-4 rounded-xl px-4 py-3.5 text-lg font-medium transition-all duration-200",
+                  "relative flex items-center gap-4 rounded-xl px-4 py-3.5 text-lg font-bold transition-all duration-200",
                   isActive
                     ? "bg-[#F0F7F2] text-[#006C35]"
                     : "text-[#5A8A6A] hover:bg-[#F0F7F2] hover:text-[#004D26]"

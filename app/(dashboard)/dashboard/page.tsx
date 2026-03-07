@@ -136,12 +136,12 @@ export default function DashboardPage() {
         setLoading(false);
         return;
       }
-      const [companiesRes, plansRes, imagesRes, plansCountRes, imagesCountRes] = await Promise.all([
+      const [companiesRes, plansRes, imagesRes, plansCountRes, allImagesRes] = await Promise.all([
         supabase.from("companies").select("*").eq("user_id", u.id).order("created_at", { ascending: false }),
         supabase.from("content_plans").select("*").eq("user_id", u.id).order("created_at", { ascending: false }).limit(1),
         supabase.from("generated_images").select("*").eq("user_id", u.id).order("created_at", { ascending: false }).limit(4),
         supabase.from("content_plans").select("id", { count: "exact", head: true }).eq("user_id", u.id),
-        supabase.from("generated_images").select("id", { count: "exact", head: true }).eq("user_id", u.id),
+        supabase.from("generated_images").select("image_urls").eq("user_id", u.id),
       ]);
       const comps = (companiesRes.data || []) as Company[];
       setCompanies(comps);
@@ -151,10 +151,12 @@ export default function DashboardPage() {
       setRecentImages((imagesRes.data || []) as GeneratedImage[]);
       const platformSet = new Set<string>();
       comps.forEach((c) => (c.platforms || []).forEach((p) => platformSet.add(p)));
+      // Count total individual images across all rows
+      const totalImages = (allImagesRes.data || []).reduce((sum: number, row: { image_urls: string[] | null }) => sum + (row.image_urls?.length ?? 0), 0);
       setStats({
         companies: comps.length,
         plans: plansCountRes.count ?? 0,
-        images: imagesCountRes.count ?? 0,
+        images: totalImages,
         platforms: platformSet.size,
       });
       setLoading(false);
