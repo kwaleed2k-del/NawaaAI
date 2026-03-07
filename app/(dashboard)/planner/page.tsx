@@ -132,14 +132,32 @@ export default function PlannerPage() {
     setGenerating(true);
     setPlan(null);
     try {
+      // Send only essential company fields to avoid exceeding token limits
+      const companySlim = {
+        name: selectedCompany.name,
+        name_ar: selectedCompany.name_ar,
+        industry: selectedCompany.industry,
+        description: (selectedCompany.description || "").slice(0, 1500),
+        brand_colors: selectedCompany.brand_colors,
+      };
+      // Trim brand analysis to summary-level data only
+      const ba = selectedCompany.brand_analysis as Record<string, unknown> | undefined;
+      const brandAnalysisSlim = ba ? {
+        brandPersonality: (ba.brandPersonality as Record<string, unknown>)?.summary ?? "",
+        contentPillars: Array.isArray(ba.contentPillars) ? (ba.contentPillars as Array<Record<string, unknown>>).map((p) => p.name) : [],
+        toneGuide: (ba.toneGuide as Record<string, unknown>)?.doUse ?? [],
+        vision2030Alignment: ba.vision2030Alignment ?? "",
+      } : undefined;
+
       const res = await fetch("/api/generate-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          company: selectedCompany,
+          company: companySlim,
           platforms: platforms.length ? platforms : PLATFORMS.map((p) => p.id),
           weekStart,
           userPrompt: userPrompt.trim() || undefined,
+          brandAnalysis: brandAnalysisSlim,
           outputLanguage,
         }),
       });

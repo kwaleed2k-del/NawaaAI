@@ -81,14 +81,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Trim company data to essential fields to stay within token limits
+    const companySlim = {
+      name: company.name,
+      name_ar: company.name_ar,
+      industry: company.industry,
+      description: typeof company.description === "string" ? company.description.slice(0, 1500) : "",
+      brand_colors: company.brand_colors,
+    };
+
+    // Trim brand analysis to summary-level data
+    const brandAnalysisSlim = brandAnalysis ? {
+      summary: brandAnalysis.brandPersonality?.summary ?? brandAnalysis.summary ?? "",
+      pillars: Array.isArray(brandAnalysis.contentPillars) ? brandAnalysis.contentPillars.map((p: { name?: string }) => p.name) : [],
+      tone: brandAnalysis.toneGuide?.doUse ?? [],
+      vision2030: brandAnalysis.vision2030Alignment ?? "",
+    } : null;
+
     const userMessage = [
-      `Company: ${JSON.stringify(company)}`,
+      `Company: ${JSON.stringify(companySlim)}`,
       `Platforms to use: ${platforms.join(", ") || "all"}`,
       `Week start (Saturday): ${weekStart}`,
       `Output language: ${outputLanguage}`,
       `IMPORTANT: The output language is "${outputLanguage}". ${outputLanguage === "ar" ? "Write ALL captions, topics, strategy, and tips in Arabic only. No English mixing in captions." : "Write ALL captions, topics, strategy, and tips in English only. No Arabic mixing in captions."}`,
       userPrompt ? `Special focus: ${userPrompt}` : "",
-      brandAnalysis ? `Brand analysis (use for strategy): ${JSON.stringify(brandAnalysis)}` : "",
+      brandAnalysisSlim ? `Brand analysis summary: ${JSON.stringify(brandAnalysisSlim)}` : "",
     ]
       .filter(Boolean)
       .join("\n");

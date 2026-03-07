@@ -59,7 +59,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userMessage = `Company data:\n${JSON.stringify(company, null, 2)}\n\nOutput language: ${outputLanguage}. Return JSON only.`;
+    // Trim description to avoid exceeding token limits
+    const companyTrimmed = { ...company };
+    if (typeof companyTrimmed.description === "string" && companyTrimmed.description.length > 2000) {
+      companyTrimmed.description = companyTrimmed.description.slice(0, 2000) + "...";
+    }
+    // Remove any nested brand_analysis to avoid circular bloat
+    delete companyTrimmed.brand_analysis;
+
+    const userMessage = `Company data:\n${JSON.stringify(companyTrimmed, null, 2)}\n\nOutput language: ${outputLanguage}. Return JSON only.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
