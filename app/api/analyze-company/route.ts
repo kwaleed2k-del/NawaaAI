@@ -1,6 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
 
+async function scrapeWebsite(url: string): Promise<string | null> {
+  try {
+    // Normalize URL
+    let finalUrl = url.trim();
+    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = "https://" + finalUrl;
+
+    const res = await fetch(finalUrl, {
+      signal: AbortSignal.timeout(8000),
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; NawaaBot/1.0; brand-analysis)",
+        "Accept": "text/html",
+      },
+    });
+
+    if (!res.ok) return null;
+
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("text/html")) return null;
+
+    const html = await res.text();
+
+    // Strip script, style, nav, footer, header tags and their content
+    let text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+      .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+      .replace(/<header[\s\S]*?<\/header>/gi, " ")
+      .replace(/<[^>]+>/g, " ")               // Strip remaining HTML tags
+      .replace(/&[a-zA-Z]+;/g, " ")           // Strip HTML entities
+      .replace(/\s+/g, " ")                   // Collapse whitespace
+      .trim();
+
+    if (text.length < 50) return null; // Too little content
+    return text.slice(0, 3000);
+  } catch {
+    return null;
+  }
+}
+
 const SYSTEM_PROMPT = `You are Saudi Arabia's most elite brand strategist and marketing consultant. You have 20 years of experience working with the Kingdom's top brands, deep knowledge of Saudi consumer behavior, cultural nuances, Vision 2030, and the Gulf market. You speak both Arabic and English fluently.
 
 Your task is to analyze a brand and return a structured JSON brand DNA analysis.
@@ -46,6 +86,8 @@ Return ONLY valid JSON, no markdown, no explanation outside the JSON. Structure:
   "vision2030Alignment": "How this brand aligns with Saudi Vision 2030 (1-2 sentences)"
 }
 
+If website content is provided, use it to deeply understand the brand's real offerings, tone, and positioning. Extract key products/services, taglines, brand messaging, and value propositions from the actual site content. This is the most reliable source of truth about the brand.
+
 If outputLanguage is "ar", write summary, descriptions, exampleCaption, and saudiSpecific in Arabic (Saudi/Jeddah-appropriate tone where natural).`;
 
 export async function POST(request: NextRequest) {
@@ -67,7 +109,18 @@ export async function POST(request: NextRequest) {
     // Remove any nested brand_analysis to avoid circular bloat
     delete companyTrimmed.brand_analysis;
 
-    const userMessage = `Company data:\n${JSON.stringify(companyTrimmed, null, 2)}\n\nOutput language: ${outputLanguage}. Return JSON only.`;
+    // Scrape website content if URL provided
+    const websiteContent = companyTrimmed.website
+      ? await scrapeWebsite(companyTrimmed.website)
+      : null;
+
+    const userMessage = [
+      `Company data:\n${JSON.stringify(companyTrimmed, null, 2)}`,
+      websiteContent
+        ? `\nWebsite content (scraped from ${companyTrimmed.website}):\n${websiteContent}`
+        : "",
+      `\nOutput language: ${outputLanguage}. Return JSON only.`,
+    ].join("");
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
