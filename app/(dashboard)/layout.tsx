@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   BarChart3, Building2, Calendar, ChevronLeft, ChevronRight,
   FolderOpen, Hash, ImageIcon, LogOut, Menu, Search, Settings, Sparkles, TrendingUp, X,
@@ -151,6 +151,13 @@ function SidebarBottom({ t, collapsed, onNavClick }: {
       </form>
     </div>
   );
+}
+
+function ClientOnly({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return fallback ?? null;
+  return children;
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -343,26 +350,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 AI Credits: <span className="text-[#006C35] font-bold">47</span>{" "}
                 {messages[locale].dashboard.creditsRemaining}
               </span>
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] text-lg font-bold text-white shadow-[0_4px_16px_rgba(0,108,53,0.25)] transition-shadow hover:shadow-[0_6px_20px_rgba(0,108,53,0.35)]"
-                >
+              <ClientOnly fallback={
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] text-lg font-bold text-white shadow-[0_4px_16px_rgba(0,108,53,0.25)]">
                   {extractInitials(displayName)}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="border-2 border-[#D4EBD9] bg-white text-[#0A1F0F] rounded-xl p-2"
-                >
-                  <DropdownMenuItem className="focus:bg-[#F0F7F2] rounded-lg px-3 py-2.5 text-lg">
-                    {displayName}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="rounded-lg px-3 py-2.5 text-lg p-0">
-                    <form action={signOut} className="w-full">
-                      <button type="submit" className="w-full text-left px-3 py-2.5">{t.logout}</button>
-                    </form>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </div>
+              }>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#006C35] to-[#00A352] text-lg font-bold text-white shadow-[0_4px_16px_rgba(0,108,53,0.25)] transition-shadow hover:shadow-[0_6px_20px_rgba(0,108,53,0.35)]"
+                  >
+                    {extractInitials(displayName)}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="border-2 border-[#D4EBD9] bg-white text-[#0A1F0F] rounded-xl p-2"
+                  >
+                    <DropdownMenuItem className="focus:bg-[#F0F7F2] rounded-lg px-3 py-2.5 text-lg">
+                      {displayName}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="rounded-lg px-3 py-2.5 text-lg p-0">
+                      <form action={signOut} className="w-full">
+                        <button type="submit" className="w-full text-left px-3 py-2.5">{t.logout}</button>
+                      </form>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </ClientOnly>
             </div>
           </header>
 
