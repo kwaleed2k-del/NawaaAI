@@ -34,6 +34,22 @@ interface CompetitorResult {
   audienceProfile?: string;
   contentCalendar?: string;
   paidStrategy?: string;
+  companyOverview?: string;
+  productsAndServices?: string;
+  targetMarket?: string;
+  brandPositioning?: string;
+  websiteAnalysis?: string;
+  digitalPresence?: string;
+  pricingStrategy?: string;
+  customerReviews?: string;
+  technologyStack?: string;
+}
+
+interface IndustryAnalysis {
+  marketOverview: string;
+  competitiveLandscape: string;
+  consumerTrends: string;
+  futureOutlook: string;
 }
 
 interface AnalysisData {
@@ -68,6 +84,7 @@ interface AnalysisData {
     localOpportunities?: string;
     ramadanStrategy?: string;
   };
+  industryAnalysis?: IndustryAnalysis;
 }
 
 type Locale = "en" | "ar";
@@ -157,7 +174,19 @@ function renderCompetitorPage(comp: CompetitorResult, locale: Locale, pageNum: n
   const isAr = locale === "ar";
   const tc = threatColor(comp.threatLevel);
 
-  const detailRows = [
+  const businessRows = [
+    ...(comp.companyOverview ? [{ label: isAr ? "نظرة عامة" : "Company Overview", value: comp.companyOverview }] : []),
+    ...(comp.productsAndServices ? [{ label: isAr ? "المنتجات والخدمات" : "Products & Services", value: comp.productsAndServices }] : []),
+    ...(comp.targetMarket ? [{ label: isAr ? "السوق المستهدف" : "Target Market", value: comp.targetMarket }] : []),
+    ...(comp.brandPositioning ? [{ label: isAr ? "التموضع" : "Brand Positioning", value: comp.brandPositioning }] : []),
+    ...(comp.websiteAnalysis ? [{ label: isAr ? "الموقع الإلكتروني" : "Website Analysis", value: comp.websiteAnalysis }] : []),
+    ...(comp.digitalPresence ? [{ label: isAr ? "الحضور الرقمي" : "Digital Presence", value: comp.digitalPresence }] : []),
+    ...(comp.pricingStrategy ? [{ label: isAr ? "التسعير" : "Pricing Strategy", value: comp.pricingStrategy }] : []),
+    ...(comp.customerReviews ? [{ label: isAr ? "مراجعات العملاء" : "Customer Reviews", value: comp.customerReviews }] : []),
+    ...(comp.technologyStack ? [{ label: isAr ? "البنية التقنية" : "Tech Stack", value: comp.technologyStack }] : []),
+  ];
+
+  const marketingRows = [
     { label: isAr ? "تكرار النشر" : "Posting Frequency", value: comp.postingFrequency },
     { label: isAr ? "التفاعل" : "Engagement", value: comp.engagementLevel },
     { label: isAr ? "الهاشتاقات" : "Hashtags", value: comp.hashtagStrategy },
@@ -178,40 +207,50 @@ function renderCompetitorPage(comp: CompetitorResult, locale: Locale, pageNum: n
       </div>
     </div>
 
-    <div style="padding:24px 48px;">
-      <div style="display:flex;gap:24px;">
-        <!-- Left: Content analysis -->
+    <div style="padding:20px 48px;">
+      ${businessRows.length > 0 ? `
+      <!-- Business Intelligence -->
+      <h3 style="font-size:15px;font-weight:800;color:#006C35;margin:0 0 10px;">${isAr ? "معلومات الأعمال" : "Business Intelligence"}</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        ${businessRows.map(r => `<div style="background:white;border:1px solid #D4EBD9;border-radius:10px;padding:10px 14px;">
+          <span style="font-size:10px;color:#006C35;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">${r.label}</span>
+          <p style="font-size:11px;color:#2D5A3D;margin:3px 0 0;line-height:1.5;">${r.value}</p>
+        </div>`).join("")}
+      </div>` : ""}
+
+      <div style="display:flex;gap:20px;">
+        <!-- Left: Marketing analysis -->
         <div style="flex:1;">
-          <h3 style="font-size:16px;font-weight:800;color:#006C35;margin:0 0 12px;">${isAr ? "تحليل المحتوى" : "Content Analysis"}</h3>
-          ${detailRows.map(r => `<div style="margin-bottom:8px;">
-            <span style="font-size:11px;color:#5A8A6A;font-weight:600;">${r.label}:</span>
-            <p style="font-size:12px;color:#2D5A3D;margin:2px 0 0;line-height:1.6;">${r.value}</p>
+          <h3 style="font-size:14px;font-weight:800;color:#006C35;margin:0 0 8px;">${isAr ? "تحليل المحتوى" : "Content Analysis"}</h3>
+          ${marketingRows.map(r => `<div style="margin-bottom:6px;">
+            <span style="font-size:10px;color:#5A8A6A;font-weight:600;">${r.label}:</span>
+            <p style="font-size:11px;color:#2D5A3D;margin:2px 0 0;line-height:1.5;">${r.value}</p>
           </div>`).join("")}
         </div>
 
         <!-- Right: Strengths & Weaknesses -->
         <div style="flex:1;">
-          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-            <h4 style="font-size:13px;font-weight:800;color:#006C35;margin:0 0 6px;">${isAr ? "نقاط القوة" : "Strengths"}</h4>
-            ${comp.strengths.map(s => `<p style="font-size:11px;color:#2D5A3D;margin:3px 0;line-height:1.5;">+ ${s}</p>`).join("")}
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:10px 12px;margin-bottom:10px;">
+            <h4 style="font-size:12px;font-weight:800;color:#006C35;margin:0 0 4px;">${isAr ? "نقاط القوة" : "Strengths"}</h4>
+            ${comp.strengths.map(s => `<p style="font-size:10px;color:#2D5A3D;margin:2px 0;line-height:1.4;">+ ${s}</p>`).join("")}
           </div>
-          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:12px 14px;">
-            <h4 style="font-size:13px;font-weight:800;color:#DC2626;margin:0 0 6px;">${isAr ? "نقاط الضعف" : "Weaknesses"}</h4>
-            ${comp.weakPoints.map(w => `<p style="font-size:11px;color:#2D5A3D;margin:3px 0;line-height:1.5;">- ${w}</p>`).join("")}
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;">
+            <h4 style="font-size:12px;font-weight:800;color:#DC2626;margin:0 0 4px;">${isAr ? "نقاط الضعف" : "Weaknesses"}</h4>
+            ${comp.weakPoints.map(w => `<p style="font-size:10px;color:#2D5A3D;margin:2px 0;line-height:1.4;">- ${w}</p>`).join("")}
           </div>
         </div>
       </div>
 
       <!-- Key Insight -->
-      <div style="margin-top:16px;background:#F0F7F2;border:2px solid #D4EBD9;border-radius:12px;padding:14px 18px;">
-        <span style="font-size:11px;font-weight:800;color:#006C35;text-transform:uppercase;letter-spacing:1px;">${isAr ? "الرؤية الرئيسية" : "KEY INSIGHT"}</span>
-        <p style="font-size:13px;color:#0A1F0F;margin:4px 0 0;line-height:1.7;">${comp.keyInsight}</p>
+      <div style="margin-top:12px;background:#F0F7F2;border:2px solid #D4EBD9;border-radius:10px;padding:10px 14px;">
+        <span style="font-size:10px;font-weight:800;color:#006C35;text-transform:uppercase;letter-spacing:1px;">${isAr ? "الرؤية الرئيسية" : "KEY INSIGHT"}</span>
+        <p style="font-size:12px;color:#0A1F0F;margin:4px 0 0;line-height:1.6;">${comp.keyInsight}</p>
       </div>
 
       ${comp.stealThisMove ? `
-      <div style="margin-top:12px;background:rgba(201,168,76,0.08);border:2px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 18px;">
-        <span style="font-size:11px;font-weight:800;color:#C9A84C;text-transform:uppercase;letter-spacing:1px;">${isAr ? "اسرق هذه الحركة" : "STEAL THIS MOVE"}</span>
-        <p style="font-size:13px;color:#0A1F0F;margin:4px 0 0;line-height:1.7;">${comp.stealThisMove}</p>
+      <div style="margin-top:8px;background:rgba(201,168,76,0.08);border:2px solid rgba(201,168,76,0.2);border-radius:10px;padding:10px 14px;">
+        <span style="font-size:10px;font-weight:800;color:#C9A84C;text-transform:uppercase;letter-spacing:1px;">${isAr ? "اسرق هذه الحركة" : "STEAL THIS MOVE"}</span>
+        <p style="font-size:12px;color:#0A1F0F;margin:4px 0 0;line-height:1.6;">${comp.stealThisMove}</p>
       </div>` : ""}
     </div>
 
@@ -377,6 +416,46 @@ function renderSaudiPage(data: AnalysisData, locale: Locale, pageNum: number): s
   </div>`;
 }
 
+/* ═══ Industry Analysis Page ═══ */
+function renderIndustryPage(data: AnalysisData, locale: Locale, pageNum: number): string {
+  if (!data.industryAnalysis) return "";
+  const dir = locale === "ar" ? "rtl" : "ltr";
+  const isAr = locale === "ar";
+  const ia = data.industryAnalysis;
+
+  return `<div style="width:1120px;min-height:780px;padding:0;background:#F8FBF8;font-family:'Cairo','Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.5;direction:${dir};box-sizing:border-box;">
+    <div style="background:#0A1F0F;padding:14px 48px;color:white;">
+      <div style="font-size:20px;font-weight:800;">${isAr ? "تحليل الصناعة" : "Industry Analysis"}</div>
+    </div>
+
+    <div style="padding:32px 48px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div style="background:white;border:2px solid #D4EBD9;border-radius:16px;padding:20px;">
+          <h3 style="font-size:15px;font-weight:800;color:#006C35;margin:0 0 8px;">${isAr ? "نظرة عامة على السوق" : "Market Overview"}</h3>
+          <p style="font-size:13px;color:#2D5A3D;margin:0;line-height:1.8;">${ia.marketOverview}</p>
+        </div>
+        <div style="background:white;border:2px solid #D4EBD9;border-radius:16px;padding:20px;">
+          <h3 style="font-size:15px;font-weight:800;color:#006C35;margin:0 0 8px;">${isAr ? "المشهد التنافسي" : "Competitive Landscape"}</h3>
+          <p style="font-size:13px;color:#2D5A3D;margin:0;line-height:1.8;">${ia.competitiveLandscape}</p>
+        </div>
+        <div style="background:white;border:2px solid #D4EBD9;border-radius:16px;padding:20px;">
+          <h3 style="font-size:15px;font-weight:800;color:#006C35;margin:0 0 8px;">${isAr ? "اتجاهات المستهلكين" : "Consumer Trends"}</h3>
+          <p style="font-size:13px;color:#2D5A3D;margin:0;line-height:1.8;">${ia.consumerTrends}</p>
+        </div>
+        <div style="background:white;border:2px solid #D4EBD9;border-radius:16px;padding:20px;">
+          <h3 style="font-size:15px;font-weight:800;color:#006C35;margin:0 0 8px;">${isAr ? "التوقعات المستقبلية" : "Future Outlook"}</h3>
+          <p style="font-size:13px;color:#2D5A3D;margin:0;line-height:1.8;">${ia.futureOutlook}</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:8px 48px;font-size:10px;color:#5A8A6A;display:flex;justify-content:space-between;">
+      <span>${isAr ? "نواة AI — تقرير تحليل المنافسين" : "Nawaa AI — Competitor Analysis Report"}</span>
+      <span>${pageNum}</span>
+    </div>
+  </div>`;
+}
+
 /* ═══ Render HTML to PDF page via html2canvas ═══ */
 async function addHtmlPage(pdf: jsPDF, html: string, isFirst: boolean) {
   if (!isFirst) pdf.addPage();
@@ -431,6 +510,12 @@ export async function exportCompetitorPdf(
   // Winning Strategy page
   pageNum++;
   await addHtmlPage(pdf, renderStrategyPage(data, locale, pageNum), false);
+
+  // Industry Analysis page (if available)
+  if (data.industryAnalysis) {
+    pageNum++;
+    await addHtmlPage(pdf, renderIndustryPage(data, locale, pageNum), false);
+  }
 
   // Saudi Market Insights page
   pageNum++;

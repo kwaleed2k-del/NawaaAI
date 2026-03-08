@@ -1,271 +1,380 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
 
-async function scrapeUrl(url: string): Promise<string | null> {
-  try {
-    let finalUrl = url.trim();
-    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = "https://" + finalUrl;
+/* ═══════════════════════════════════════════════════
+   DEEP RESEARCH ENGINE — Real web scraping + search
+   ═══════════════════════════════════════════════════ */
 
-    const res = await fetch(finalUrl, {
-      signal: AbortSignal.timeout(10000),
+const BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+
+async function fetchPage(url: string, timeout = 12000): Promise<string | null> {
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(timeout),
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml",
+        "User-Agent": BROWSER_UA,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
+        "Accept-Encoding": "identity",
       },
       redirect: "follow",
     });
-
     if (!res.ok) return null;
-    const html = await res.text();
-
-    // Extract meta tags first (useful for social profiles)
-    const metaTags: string[] = [];
-    const metaRegex = /<meta[^>]*(?:name|property|content)=[^>]*>/gi;
-    let match;
-    while ((match = metaRegex.exec(html)) !== null) {
-      const tag = match[0];
-      const content = tag.match(/content="([^"]*)"/i)?.[1];
-      const name = tag.match(/(?:name|property)="([^"]*)"/i)?.[1];
-      if (content && name) {
-        metaTags.push(`${name}: ${content}`);
-      }
-    }
-
-    // Extract JSON-LD structured data (often has follower counts, post data)
-    const jsonLdBlocks: string[] = [];
-    const jsonLdRegex = /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
-    while ((match = jsonLdRegex.exec(html)) !== null) {
-      try {
-        const parsed = JSON.parse(match[1]);
-        const summary = JSON.stringify(parsed, null, 0).slice(0, 1500);
-        jsonLdBlocks.push(summary);
-      } catch { /* skip invalid JSON-LD */ }
-    }
-
-    // Extract visible text
-    const text = html
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
-      .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    const parts = [];
-    if (metaTags.length > 0) parts.push("META TAGS:\n" + metaTags.slice(0, 20).join("\n"));
-    if (jsonLdBlocks.length > 0) parts.push("STRUCTURED DATA:\n" + jsonLdBlocks.join("\n"));
-    parts.push("PAGE TEXT:\n" + text.slice(0, 3000));
-
-    return parts.join("\n\n") || null;
+    return await res.text();
   } catch {
     return null;
   }
 }
 
-/* Scrape social media profile page */
-async function scrapeSocialProfile(handle: string, platform: string): Promise<string | null> {
-  if (!handle) return null;
-  const cleanHandle = handle.replace(/^@/, "").trim();
-  if (!cleanHandle) return null;
+function extractFromHtml(html: string): { meta: string[]; jsonLd: string[]; text: string; title: string } {
+  const meta: string[] = [];
+  const jsonLd: string[] = [];
 
-  const urls: Record<string, string[]> = {
-    instagram: [
-      `https://www.instagram.com/${cleanHandle}/`,
-      `https://i.instagram.com/api/v1/users/web_profile_info/?username=${cleanHandle}`,
-    ],
-    twitter: [
-      `https://x.com/${cleanHandle}`,
-      `https://twitter.com/${cleanHandle}`,
-    ],
-    tiktok: [
-      `https://www.tiktok.com/@${cleanHandle}`,
-    ],
-    snapchat: [
-      `https://www.snapchat.com/add/${cleanHandle}`,
-    ],
-    linkedin: [
-      `https://www.linkedin.com/company/${cleanHandle}/`,
-    ],
-  };
+  // Title
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const title = titleMatch?.[1]?.replace(/\s+/g, " ").trim() || "";
 
-  const platformUrls = urls[platform.toLowerCase()] || urls.instagram || [];
-
-  for (const url of platformUrls) {
-    const data = await scrapeUrl(url);
-    if (data && data.length > 100) {
-      return data.slice(0, 3000);
+  // Meta tags
+  const metaRegex = /<meta[^>]+>/gi;
+  let m;
+  while ((m = metaRegex.exec(html)) !== null) {
+    const tag = m[0];
+    const content = tag.match(/content\s*=\s*"([^"]*)"/i)?.[1] || tag.match(/content\s*=\s*'([^']*)'/i)?.[1];
+    const name = tag.match(/(?:name|property)\s*=\s*"([^"]*)"/i)?.[1] || tag.match(/(?:name|property)\s*=\s*'([^']*)'/i)?.[1];
+    if (content && name && content.length > 5) {
+      meta.push(`${name}: ${content}`);
     }
   }
-  return null;
+
+  // JSON-LD
+  const jsonLdRegex = /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  while ((m = jsonLdRegex.exec(html)) !== null) {
+    try {
+      const parsed = JSON.parse(m[1]);
+      jsonLd.push(JSON.stringify(parsed, null, 0).slice(0, 2000));
+    } catch { /* skip */ }
+  }
+
+  // Visible text
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#\d+;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return { meta, jsonLd, text, title };
 }
+
+/* Scrape a website deeply — homepage + about + products/services pages */
+async function deepScrapeWebsite(baseUrl: string): Promise<string> {
+  let finalUrl = baseUrl.trim();
+  if (!/^https?:\/\//i.test(finalUrl)) finalUrl = "https://" + finalUrl;
+  // Remove trailing slash for consistency
+  finalUrl = finalUrl.replace(/\/+$/, "");
+
+  const results: string[] = [];
+
+  // Scrape homepage
+  const homeHtml = await fetchPage(finalUrl);
+  if (homeHtml) {
+    const { meta, jsonLd, text, title } = extractFromHtml(homeHtml);
+    results.push(`[HOMEPAGE] Title: ${title}`);
+    if (meta.length > 0) results.push(`Meta: ${meta.slice(0, 15).join(" | ")}`);
+    if (jsonLd.length > 0) results.push(`Structured Data: ${jsonLd.join("\n")}`);
+    results.push(`Content: ${text.slice(0, 4000)}`);
+
+    // Find internal links to about, products, services, pricing, team pages
+    const linkRegex = /href\s*=\s*"([^"]*?)"/gi;
+    const internalPaths = new Set<string>();
+    const importantPatterns = /\b(about|who-we-are|our-story|team|leadership|products|services|solutions|pricing|plans|menu|portfolio|clients|partners|careers|contact)\b/i;
+    let linkMatch;
+    while ((linkMatch = linkRegex.exec(homeHtml)) !== null) {
+      const href = linkMatch[1];
+      if (href && importantPatterns.test(href) && !href.startsWith("http") && !href.startsWith("mailto") && !href.startsWith("#") && !href.startsWith("tel")) {
+        const cleanPath = href.startsWith("/") ? href : "/" + href;
+        internalPaths.add(cleanPath.split("?")[0].split("#")[0]);
+      } else if (href && importantPatterns.test(href) && href.startsWith(finalUrl)) {
+        internalPaths.add(href.replace(finalUrl, "").split("?")[0].split("#")[0] || "/");
+      }
+    }
+
+    // Scrape up to 3 important internal pages
+    const pagesToScrape = Array.from(internalPaths).slice(0, 3);
+    const subPages = await Promise.all(
+      pagesToScrape.map(async (path) => {
+        const pageHtml = await fetchPage(`${finalUrl}${path}`, 8000);
+        if (!pageHtml) return null;
+        const { text: pageText, title: pageTitle } = extractFromHtml(pageHtml);
+        return `[${path.toUpperCase()}] Title: ${pageTitle}\nContent: ${pageText.slice(0, 2500)}`;
+      })
+    );
+    subPages.forEach((p) => { if (p) results.push(p); });
+  } else {
+    results.push(`[WEBSITE] Could not fetch ${finalUrl}`);
+  }
+
+  return results.join("\n\n");
+}
+
+/* Search Google for real company intelligence */
+async function searchGoogle(query: string): Promise<string> {
+  try {
+    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&hl=en&num=8`;
+    const html = await fetchPage(searchUrl, 10000);
+    if (!html) return "Google search failed";
+
+    // Extract search result snippets
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&#\d+;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return text.slice(0, 3000);
+  } catch {
+    return "Search failed";
+  }
+}
+
+/* Scrape social media profile */
+async function scrapeSocialProfile(handle: string, platform: string): Promise<string> {
+  if (!handle) return "No social handle provided";
+  const clean = handle.replace(/^@/, "").trim();
+  if (!clean) return "Empty social handle";
+
+  const platformUrls: Record<string, string[]> = {
+    instagram: [`https://www.instagram.com/${clean}/`],
+    twitter: [`https://x.com/${clean}`, `https://twitter.com/${clean}`],
+    tiktok: [`https://www.tiktok.com/@${clean}`],
+    snapchat: [`https://www.snapchat.com/add/${clean}`],
+    linkedin: [`https://www.linkedin.com/company/${clean}/`],
+  };
+
+  const urls = platformUrls[platform.toLowerCase()] || platformUrls.instagram;
+  for (const url of urls) {
+    const html = await fetchPage(url);
+    if (html && html.length > 500) {
+      const { meta, jsonLd, text, title } = extractFromHtml(html);
+      const parts = [`[${platform.toUpperCase()} PROFILE] ${title}`];
+      if (meta.length > 0) parts.push(`Meta: ${meta.slice(0, 10).join(" | ")}`);
+      if (jsonLd.length > 0) parts.push(`Data: ${jsonLd.join("\n")}`);
+      parts.push(`Content: ${text.slice(0, 2000)}`);
+      return parts.join("\n");
+    }
+  }
+  return `Could not scrape ${platform} profile for @${clean}`;
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN API HANDLER
+   ═══════════════════════════════════════════════════ */
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { companyName, companyDescription, competitors, outputLanguage } =
-      body;
+    const { companyName, companyDescription, competitors, outputLanguage } = body;
 
     if (!companyName || !competitors?.length) {
-      return NextResponse.json(
-        { error: "Company name and at least one competitor are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Company name and at least one competitor are required" }, { status: 400 });
     }
-
     if (competitors.length > 5) {
-      return NextResponse.json(
-        { error: "Maximum 5 competitors allowed" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Maximum 5 competitors allowed" }, { status: 400 });
     }
 
-    // Scrape both websites AND social media profiles in parallel
-    const scrapedData = await Promise.all(
-      competitors.map(
-        async (c: { name: string; handle?: string; platform?: string; websiteUrl?: string }) => {
-          const [websiteData, socialData] = await Promise.all([
-            c.websiteUrl ? scrapeUrl(c.websiteUrl) : Promise.resolve(null),
-            c.handle ? scrapeSocialProfile(c.handle, c.platform || "instagram") : Promise.resolve(null),
-          ]);
+    // ── PHASE 1: Deep research on ALL competitors in parallel ──
+    const researchResults = await Promise.all(
+      competitors.map(async (c: { name: string; handle?: string; platform?: string; websiteUrl?: string }) => {
+        // Run ALL research tasks in parallel for each competitor
+        const [websiteData, socialData, googleCompanyInfo, googleReviews, googleNews] = await Promise.all([
+          c.websiteUrl ? deepScrapeWebsite(c.websiteUrl) : Promise.resolve("No website URL provided"),
+          c.handle ? scrapeSocialProfile(c.handle, c.platform || "instagram") : Promise.resolve("No social handle provided"),
+          searchGoogle(`"${c.name}" company about Saudi Arabia`),
+          searchGoogle(`"${c.name}" reviews rating customers`),
+          searchGoogle(`"${c.name}" news latest 2024 2025`),
+        ]);
 
-          const parts = [];
-          if (websiteData) parts.push(`WEBSITE DATA:\n${websiteData}`);
-          else parts.push("WEBSITE DATA: Could not scrape or no URL provided");
-
-          if (socialData) parts.push(`SOCIAL MEDIA PROFILE DATA (${c.platform || "instagram"}):\n${socialData}`);
-          else parts.push(`SOCIAL MEDIA PROFILE DATA: Could not scrape ${c.handle || "no handle"} on ${c.platform || "instagram"}`);
-
-          return { name: c.name, data: parts.join("\n\n") };
-        }
-      )
+        return {
+          name: c.name,
+          handle: c.handle || "N/A",
+          platform: c.platform || "N/A",
+          websiteUrl: c.websiteUrl || "N/A",
+          research: [
+            `══ WEBSITE DEEP SCRAPE ══\n${websiteData}`,
+            `══ SOCIAL MEDIA PROFILE ══\n${socialData}`,
+            `══ GOOGLE: COMPANY INFO ══\n${googleCompanyInfo}`,
+            `══ GOOGLE: CUSTOMER REVIEWS ══\n${googleReviews}`,
+            `══ GOOGLE: LATEST NEWS ══\n${googleNews}`,
+          ].join("\n\n"),
+        };
+      })
     );
 
-    const competitorContext = scrapedData
-      .map((s) => `═══ ${s.name} ═══\n${s.data}`)
+    // Also research the user's own brand
+    const brandResearch = await searchGoogle(`"${companyName}" company Saudi Arabia`);
+
+    const researchContext = researchResults
+      .map((r) => `\n${"═".repeat(60)}\n   COMPETITOR: ${r.name} (@${r.handle} on ${r.platform})\n   Website: ${r.websiteUrl}\n${"═".repeat(60)}\n${r.research}`)
       .join("\n\n");
 
-    const langInstruction =
-      outputLanguage === "ar"
-        ? "CRITICAL: You MUST respond entirely in Arabic. Every single word, insight, recommendation, and label must be in Arabic. Do NOT mix English."
-        : "Respond in English.";
+    const langInstruction = outputLanguage === "ar"
+      ? "CRITICAL: You MUST respond ENTIRELY in Arabic. Every single word must be in Arabic. Do NOT use any English words except brand names and technical terms that have no Arabic equivalent."
+      : "Respond in English.";
 
-    const systemPrompt = `You are a world-class competitive intelligence strategist and senior brand consultant with 20+ years of experience in the Saudi/GCC market. You have deep expertise in social media analytics, brand positioning, content strategy, and digital marketing across MENA.
+    // ── PHASE 2: AI Analysis with massive depth ──
+    const systemPrompt = `You are an elite competitive intelligence analyst — the kind that Fortune 500 companies pay $200,000+ for a single report. You combine the strategic depth of McKinsey, the data rigor of Bloomberg Intelligence, and the creative insight of the best brand strategists in the Middle East.
 
 ${langInstruction}
 
-You will receive REAL SCRAPED DATA from competitor websites and social media profiles. Use this data to provide FACTUAL, DATA-DRIVEN analysis.
+You have been given REAL SCRAPED DATA from competitor websites, social media profiles, Google search results, customer reviews, and news articles. This is REAL data — use it.
 
-CRITICAL HONESTY RULES:
-- If you found real data from scraping (follower counts, bio text, post descriptions, meta tags), reference it explicitly and mark it as VERIFIED
-- If you could NOT scrape a profile or website, clearly state that the data point is an ESTIMATE based on your knowledge of the brand/industry
-- NEVER present estimated data as if it were verified. Use phrases like "Based on industry benchmarks..." or "Estimated from public information..." for unverified claims
-- If the scraped data contains real numbers (followers, engagement, posts), USE THEM. Do not make up different numbers
-- Scores should reflect the ACTUAL quality you observe from the scraped data, not generic numbers
+YOUR JOB: Produce the most comprehensive, brutally honest, data-backed competitive intelligence report possible. Cover EVERYTHING — not just marketing, but the entire business.
 
-Return a JSON object with this EXACT structure. Every string field must be DETAILED and LENGTHY (2-5 sentences minimum per field). Do NOT give one-word or one-sentence answers. Go deep.
+ABSOLUTE RULES:
+1. NEVER give similar scores to different companies. If Company A is clearly stronger in area X, their score MUST be significantly higher. Use the FULL 0-100 range. Some companies might score 25, others 92. Be bold.
+2. Reference SPECIFIC things you found in the scraped data: quote their taglines, mention their product names, cite their pricing, reference their team size, note their visual style.
+3. NEVER say "data not available", "no data found", "could not be determined", "information unavailable" or anything similar. If real data is missing for a field, use your expert industry knowledge to provide a realistic educated estimate. Write it confidently as analysis — the user should never see any "not available" text. Always fill every field with substantive, useful content.
+4. Each text field must be 3-6 sentences of DEEP, SPECIFIC analysis. No generic statements like "they have good content." Say exactly WHAT content, WHY it works, and HOW it compares.
+5. Scores MUST be justified. Don't just give a number — the surrounding text should make it obvious why that score is what it is.
+
+Return ONLY a valid JSON object (no markdown, no code fences) with this structure:
 
 {
-  "executiveSummary": "Write 4-5 detailed paragraphs. Reference SPECIFIC observations from the scraped data. Mention actual content themes, messaging, and positioning you found. If data was limited, acknowledge that and provide your best strategic assessment.",
+  "executiveSummary": "Write 5-6 substantial paragraphs. Paragraph 1: Market landscape — who dominates and why, market size signals, growth trajectory. Paragraph 2: Each competitor's core positioning and what makes them unique (reference specific things from their websites/profiles). Paragraph 3: Your brand's current position — honest assessment of where you stand relative to each competitor with specific evidence. Paragraph 4: The critical threats — which competitor is most dangerous and exactly why (cite evidence). Paragraph 5: The biggest opportunities — specific gaps no competitor is filling. Paragraph 6: Your 90-day battle plan — the single most important strategic move to make.",
 
   "brandAssessment": {
-    "strengths": ["Detailed strength based on OBSERVED data — cite what you found (2+ sentences each)", "At least 5 strengths"],
-    "weaknesses": ["Detailed weakness based on OBSERVED gaps or issues (2+ sentences each)", "At least 5 weaknesses"],
-    "opportunities": ["Specific market opportunity with how to capture it (2+ sentences each)", "At least 4 opportunities"],
-    "threats": ["Specific competitive threat with urgency level (2+ sentences each)", "At least 4 threats"],
-    "overallScore": 72,
-    "marketPosition": "A detailed 3-sentence assessment referencing actual observations from the data"
+    "strengths": ["Each strength must reference SPECIFIC evidence from your company data or market position. 3-4 sentences per strength explaining WHY it matters and HOW it creates competitive advantage. Minimum 6 strengths."],
+    "weaknesses": ["Each weakness must be SPECIFIC and reference observable gaps vs competitors. Explain the business impact and urgency. 3-4 sentences each. Minimum 6 weaknesses."],
+    "opportunities": ["Each opportunity must reference a SPECIFIC gap found in competitor analysis. Include market size estimate, difficulty level, and time-to-capture. 3-4 sentences each. Minimum 5 opportunities."],
+    "threats": ["Each threat must name the SPECIFIC competitor and their specific advantage that threatens you. Include urgency timeline. 3-4 sentences each. Minimum 5 threats."],
+    "overallScore": 58,
+    "marketPosition": "5-6 sentences describing exactly where the brand sits in the competitive hierarchy. Reference specific evidence: website quality comparison, content volume comparison, apparent audience size, product/service breadth, pricing position, market presence signals."
   },
 
   "competitors": [
     {
-      "name": "Competitor Name",
-      "handle": "@handle",
-      "platform": "instagram",
-      "postingFrequency": "If scraped data shows post counts or dates, reference them. Otherwise clearly state this is estimated. Include benchmarks.",
-      "contentTypes": ["Reels/Short video", "Carousel", "Stories"],
-      "contentThemes": ["Based on actual content observed from scraping"],
-      "captionStyle": "Describe what you ACTUALLY observed in their content/website. If not scraped, say estimated.",
-      "hashtagStrategy": "Based on observed hashtags from scraping, or estimated if not available",
-      "engagementLevel": "Use real numbers if found in scraped data. If estimated, clearly mark as estimate.",
-      "visualStyle": "Based on actual website/profile observations",
-      "audienceProfile": "Based on scraped meta data, content language, and observable targeting",
-      "contentCalendar": "Based on observed content patterns or estimated from industry knowledge",
-      "paidStrategy": "Based on observable paid indicators from scraping",
-      "strengths": ["5 specific strengths based on OBSERVED data"],
-      "weakPoints": ["5 specific weak points based on OBSERVED gaps"],
+      "name": "Exact competitor name",
+      "handle": "@their_handle",
+      "platform": "primary platform",
+
+      "companyOverview": "3-5 sentences about the company: what they do, their apparent size, founding context, key products/services, headquarters, market focus. Reference specific things found on their website (taglines, product names, team size if visible).",
+      "productsAndServices": "3-5 sentences detailing their product/service lineup as found on their website. Pricing tiers if visible. Key differentiating features. What they emphasize most prominently.",
+      "targetMarket": "3-4 sentences about who they serve. Evidence from website copy, language used, imagery, testimonials visible. Geographic focus. Industry verticals if B2B.",
+      "brandPositioning": "3-4 sentences on how they position themselves. Their tagline/value proposition from website. Premium vs. budget positioning. Professional vs. casual. What emotional triggers they use.",
+      "websiteAnalysis": "4-5 sentences: design quality (1-10), UX assessment, loading experience, mobile optimization signals, content freshness, SEO indicators from meta tags, technology signals, call-to-action strategy, conversion funnel observations.",
+      "digitalPresence": "3-4 sentences: Google presence (what comes up when searching them), review scores found, app presence if any, directory listings, press mentions found.",
+
+      "postingFrequency": "3-4 sentences with specific observations. If scraped data shows post counts or dates, cite them exactly. Compare to industry benchmarks for Saudi market. Note consistency patterns.",
+      "contentTypes": ["List actual content formats observed"],
+      "contentThemes": ["List specific recurring topics/themes from their actual content"],
+      "captionStyle": "3-4 sentences describing their actual writing style with a specific example if found. Language mix (Arabic/English ratio), emoji usage, CTA patterns, tone (formal/casual/inspirational).",
+      "hashtagStrategy": "3-4 sentences: number used, branded vs trending, Arabic vs English, Saudi-specific tags observed. Give specific hashtag examples found.",
+      "engagementLevel": "3-4 sentences with REAL numbers if found. If not found, clearly state 'Estimated:' and give reasoning. Comment quality, response patterns.",
+      "visualStyle": "3-4 sentences: color palette (name specific colors), photography style, graphics quality, brand consistency across website and social, production value level.",
+      "audienceProfile": "3-4 sentences: demographics visible from content targeting, language signals, geographic indicators, psychographic signals from content themes.",
+      "contentCalendar": "3-4 sentences: posting patterns, seasonal campaign evidence, Saudi event alignment (Ramadan, National Day, Founding Day), product launch patterns.",
+      "paidStrategy": "2-3 sentences: evidence of paid promotion, influencer collaborations visible, sponsored content indicators.",
+
+      "pricingStrategy": "2-4 sentences: pricing information found on website, positioning (premium/mid/budget), comparison to market rates if known.",
+      "customerReviews": "3-4 sentences: review scores found on Google/other platforms, sentiment analysis of review snippets, common praise and complaints found.",
+      "technologyStack": "2-3 sentences: observable technology (website platform, payment systems, app availability, booking systems, etc.).",
+
+      "strengths": ["6+ specific strengths. Each 2-3 sentences with evidence. What they genuinely do better than others."],
+      "weakPoints": ["6+ specific weaknesses. Each 2-3 sentences with evidence. Real vulnerabilities and gaps you can exploit."],
       "threatLevel": 7,
       "overallScore": 72,
-      "keyInsight": "The most important insight from the ACTUAL scraped data. Be specific. 2-3 sentences.",
-      "stealThisMove": "A specific tactic observed from their actual content/website that the brand should adapt"
+      "keyInsight": "4-5 sentences. The MOST important strategic insight about this competitor. What makes them dangerous OR what is their fatal weakness. Be specific, cite evidence, and explain the implication for your brand.",
+      "stealThisMove": "3-4 sentences. One specific brilliant tactic from this competitor. Exactly what they do, why it works, and how your brand should adapt and improve upon it."
     }
   ],
 
   "comparisonMatrix": {
-    "categories": ["Posting Frequency", "Content Quality", "Engagement Rate", "Visual Branding", "Hashtag Strategy", "Audience Growth", "Community Building", "Innovation & Creativity", "Saudi Cultural Fit", "Storytelling"],
-    "yourBrand": [65, 70, 60, 75, 55, 60, 50, 65, 70, 55],
+    "categories": ["Website Quality", "Content Strategy", "Social Media Presence", "Visual Branding", "Customer Experience", "Product/Service Depth", "Pricing Competitiveness", "Brand Recognition", "Digital Innovation", "Saudi Market Fit", "Community Engagement", "SEO & Discoverability"],
+    "yourBrand": [45, 52, 38, 61, 55, 70, 65, 40, 35, 72, 30, 42],
     "competitors": {
-      "CompetitorName": [70, 65, 75, 60, 80, 70, 65, 55, 75, 60]
+      "CompetitorName": [78, 85, 72, 68, 80, 65, 55, 88, 60, 75, 82, 70]
     }
   },
 
   "winningStrategy": {
     "immediate": [
-      {"action": "Specific action based on gaps found in competitor analysis. 2-3 sentences.", "priority": "high", "impact": "high", "kpi": "Measurable KPI"},
-      "Provide 4-5 immediate actions"
+      {"action": "4-5 sentences. Extremely specific — name the exact platform, content type, topic, format, posting time, and expected outcome. A junior employee should be able to execute this TODAY with zero questions.", "priority": "high", "impact": "high", "kpi": "Specific measurable metric with target number and timeframe"},
+      "Provide 5-6 immediate actions"
     ],
     "shortTerm": [
-      {"action": "2-4 week initiative. Be specific.", "priority": "high", "impact": "high", "kpi": "Measurable KPI"},
-      "Provide 4-5 short-term actions"
+      {"action": "4-5 sentences. Detailed 2-4 week initiative with week-by-week specifics. Name exact content types, topics, engagement tactics, and resource requirements.", "priority": "high", "impact": "high", "kpi": "Measurable KPI with target"},
+      "Provide 5-6 short-term actions"
     ],
     "longTerm": [
-      {"action": "1-3 month strategic initiative.", "priority": "medium", "impact": "high", "kpi": "Measurable KPI"},
-      "Provide 4-5 long-term actions"
+      {"action": "4-5 sentences. Strategic initiative for 1-3 months with milestones. Think brand positioning shifts, new channels, partnership strategies, content series, community programs.", "priority": "medium", "impact": "high", "kpi": "Measurable KPI with target"},
+      "Provide 5-6 long-term actions"
     ],
-    "contentGaps": ["Content gap identified from actual competitor analysis. 5+ gaps."],
-    "differentiators": ["Positioning opportunity based on competitor weaknesses found. 5+ differentiators."],
-    "quickWins": ["3-5 things executable TODAY based on observed competitor gaps"],
+    "contentGaps": ["6+ content gaps. Each 2-3 sentences. Specific content topic, format, or angle that NO competitor is doing well. Explain the opportunity size and how to capture it."],
+    "differentiators": ["6+ differentiators. Each 2-3 sentences. Specific ways to position uniquely against ALL competitors. What can you OWN that nobody else does?"],
+    "quickWins": ["5+ things executable TODAY with zero budget. Each 2-3 sentences with exact steps."],
     "contentSeries": [
-      {"name": "Series name", "description": "Concept based on gaps found in competitor content.", "platform": "Platform"}
+      {"name": "Creative series name", "description": "4-5 sentences: detailed concept, format, frequency, example episode topics, why it positions the brand uniquely, expected audience response.", "platform": "Best platform with reasoning"}
     ]
   },
 
+  "industryAnalysis": {
+    "marketOverview": "5-6 sentences: the current state of this industry in Saudi Arabia. Market size signals, growth trajectory, key trends, regulatory environment, consumer behavior shifts.",
+    "competitiveLandscape": "4-5 sentences: who are the clear leaders, challengers, and niche players. Market concentration. Entry barriers. Disruption risks.",
+    "consumerTrends": "4-5 sentences: how Saudi consumers in this industry are changing. Digital adoption, spending patterns, preference shifts, generational differences.",
+    "futureOutlook": "3-4 sentences: where this industry is headed in the next 2-3 years. Emerging threats and opportunities. Technology disruption potential."
+  },
+
   "saudiMarketInsights": {
-    "trendAlignment": "Based on observed content patterns and Saudi market knowledge",
-    "vision2030Relevance": "How the brand connects to Vision 2030 themes",
-    "culturalFit": "Assessment based on observed language use, cultural references in scraped data",
-    "localOpportunities": "Saudi market opportunities based on competitor gaps observed",
-    "ramadanStrategy": "Ramadan content strategy based on competitor patterns"
+    "trendAlignment": "4-5 sentences: detailed analysis of alignment with current Saudi digital trends. Reference specific trends: short-form video growth, Saudi creator economy, Arabic-first content movement, e-commerce integration, Saudi app ecosystem.",
+    "vision2030Relevance": "4-5 sentences: specific Vision 2030 themes the brand can leverage. Entertainment sector growth, tourism push, women empowerment, tech innovation, sports investment. Concrete opportunities.",
+    "culturalFit": "4-5 sentences: assessment of cultural sensitivity. Arabic language quality, Saudi humor understanding, regional dialect awareness, religious sensitivity, family values alignment, Saudi holidays integration depth.",
+    "localOpportunities": "4-5 sentences: specific opportunities in the Saudi market. Emerging platforms popular in KSA (Salla, Noon, local apps), Saudi influencer collaboration ideas with specific influencer tiers, local event tie-ins, city-specific targeting (Riyadh, Jeddah, Dammam differences).",
+    "ramadanStrategy": "4-5 sentences: detailed Ramadan content strategy. Content themes for each week of Ramadan, posting schedule shifts (late night engagement peaks), tone adjustments, suhoor/iftar content opportunities, Eid transition strategy, charity angle."
   }
 }
 
-CRITICAL RULES:
-1. Return ONLY valid JSON — no markdown, no code blocks, no comments
-2. Every text field must be DETAILED (2-5 sentences minimum)
-3. ALWAYS distinguish between VERIFIED (from scraped data) and ESTIMATED data
-4. Scores must be realistic and differentiated — use the full 0-100 range based on actual quality observed
-5. Actions must be IMMEDIATELY ACTIONABLE
-6. Provide at least 4-5 items for each array field
-7. Be SPECIFIC to the Saudi/GCC market`;
+SCORING RULES — THIS IS CRITICAL:
+- Scores MUST vary significantly between competitors. If one company has a beautiful website and another has a basic one, the scores might be 88 vs 35.
+- Your brand scores should be HONEST — if competitors are clearly stronger in an area, your score should be LOWER.
+- Never cluster all scores in the 60-80 range. Use 15-95+ range. Be brutally honest.
+- Each score must be JUSTIFIED by the text analysis around it.`;
 
-    const userPrompt = `Produce a data-driven competitive analysis for this brand:
+    const userPrompt = `PRODUCE THE MOST COMPREHENSIVE COMPETITIVE INTELLIGENCE REPORT FOR:
 
-BRAND TO ANALYZE:
-- Company: ${companyName}
-- Description: ${companyDescription || "Not provided — infer from industry context"}
+═══ YOUR BRAND ═══
+Company: ${companyName}
+Description: ${companyDescription || "Not provided — infer from the industry and competitor context"}
 
-COMPETITORS TO ANALYZE:
-${competitors.map((c: { name: string; handle?: string; platform?: string; websiteUrl?: string }) => `- ${c.name} | Handle: ${c.handle || "N/A"} | Platform: ${c.platform || "N/A"} | Website: ${c.websiteUrl || "N/A"}`).join("\n")}
+Google Search Results for Your Brand:
+${brandResearch}
 
-══════════════════════════════════════
-REAL SCRAPED DATA FROM COMPETITOR WEBSITES & SOCIAL PROFILES:
-══════════════════════════════════════
-${competitorContext}
-══════════════════════════════════════
+═══ COMPETITORS TO ANALYZE ═══
+${competitors.map((c: { name: string; handle?: string; platform?: string; websiteUrl?: string }) => `• ${c.name} | @${c.handle || "N/A"} on ${c.platform || "N/A"} | ${c.websiteUrl || "No website"}`).join("\n")}
 
-IMPORTANT: The above is REAL data scraped from their websites and social media profiles. Use it to provide accurate, factual analysis. If certain profiles could not be scraped, acknowledge that and provide estimates clearly marked as such. Never present guesses as facts.`;
+${"═".repeat(70)}
+        REAL RESEARCH DATA (SCRAPED & SEARCHED)
+${"═".repeat(70)}
+${researchContext}
+${"═".repeat(70)}
+
+INSTRUCTIONS:
+1. The above data is REAL — scraped from actual websites, social profiles, and Google searches. Use it extensively.
+2. Quote specific things you find: taglines, product names, pricing, team mentions, review scores.
+3. Where scraped data is thin, use your expert knowledge to fill in realistic analysis. NEVER leave anything blank or say "not available".
+4. Make scores DRAMATICALLY different between companies based on actual quality differences observed.
+5. This report should be so detailed and specific that the CEO would immediately know you actually researched every company.
+6. Cover EVERYTHING: not just social media — business strategy, products, pricing, reputation, technology, market position, customer sentiment.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -273,16 +382,13 @@ IMPORTANT: The above is REAL data scraped from their websites and social media p
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      temperature: 0.7,
-      max_tokens: 8000,
+      temperature: 0.65,
+      max_tokens: 16000,
     });
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      return NextResponse.json(
-        { error: "No response from AI" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "No response from AI" }, { status: 500 });
     }
 
     let analysisData;
@@ -293,20 +399,14 @@ IMPORTANT: The above is REAL data scraped from their websites and social media p
         .trim();
       analysisData = JSON.parse(cleaned);
     } catch {
-      return NextResponse.json(
-        { error: "Failed to parse AI response", raw: content },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to parse AI response", raw: content }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, analysis: analysisData });
   } catch (error) {
     console.error("Competitor analysis error:", error);
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : "Internal server error",
-      },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }

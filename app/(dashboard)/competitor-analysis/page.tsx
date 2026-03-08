@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Swords, Plus, Trash2, Download, Save, Loader2,
   ChevronDown, AlertTriangle, Target, TrendingUp,
   Shield, Zap, Clock, Calendar, Rocket, Lightbulb, BarChart3,
   Building2, Eye, Star, Crosshair, Globe, Sparkles, ArrowRight,
+  Package, Users, DollarSign, Layers,
 } from "lucide-react";
 import { useAppStore, type Company } from "@/lib/store";
 import { createClient } from "@/lib/supabase";
@@ -21,6 +22,12 @@ interface CompetitorResult {
   engagementLevel: string; visualStyle: string; audienceProfile?: string; contentCalendar?: string;
   paidStrategy?: string; strengths: string[]; weakPoints: string[]; threatLevel: number;
   overallScore: number; keyInsight: string; stealThisMove?: string;
+  companyOverview?: string; productsAndServices?: string; targetMarket?: string;
+  brandPositioning?: string; websiteAnalysis?: string; digitalPresence?: string;
+  pricingStrategy?: string; customerReviews?: string; technologyStack?: string;
+}
+interface IndustryAnalysis {
+  marketOverview: string; competitiveLandscape: string; consumerTrends: string; futureOutlook: string;
 }
 interface AnalysisData {
   executiveSummary: string;
@@ -39,6 +46,7 @@ interface AnalysisData {
     trendAlignment: string; vision2030Relevance: string; culturalFit: string;
     localOpportunities?: string; ramadanStrategy?: string;
   };
+  industryAnalysis?: IndustryAnalysis;
 }
 interface SavedAnalysis { id: string; company_id: string; competitors: Competitor[]; analysis_data: AnalysisData; output_language: string; created_at: string; }
 
@@ -110,6 +118,50 @@ export default function CompetitorAnalysisPage() {
   const [showPrevious, setShowPrevious] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "compare" | "strategy">("overview");
   const [outputLanguage, setOutputLanguage] = useState<"en" | "ar">(locale as "en" | "ar");
+  const [loadingMsg, setLoadingMsg] = useState(0);
+  const loadingInterval = useRef<NodeJS.Timeout | null>(null);
+
+  const funnyMessages = locale === "ar" ? [
+    "اصبر يا حبيبي... مو كل شي بالحياة يجي بسرعة نودلز 🍜",
+    "قاعدين نتجسس على منافسينك... بشكل قانوني طبعاً 🕵️",
+    "الذكاء الاصطناعي يشتغل... روح سوي لك قهوة ☕",
+    "نحلل بياناتهم بعمق... أعمق من محادثاتك الساعة 3 الفجر 🌙",
+    "مو كل شي بالحياة يخلص بثانية... إلا رصيدك 💸",
+    "قاعدين نفك شفراتهم... أنت بس اقعد وتنفس 😮‍💨",
+    "الصبر مفتاح الفرج... والتحليل الخرافي 🔑",
+    "تحليل عميق جداً... مثل أفكارك الساعة 4 الفجر 🧠",
+    "قاعدين ندمر منافسينك رقمياً... لا تقلق 💀",
+    "الحين الحين... بس خلنا نخلص شغلنا أول 😤",
+    "هذا التحليل بيفجر مخك... بس اصبر شوي 🤯",
+    "منافسينك ما يعرفون إيش جاي عليهم 😈",
+  ] : [
+    "Chill... not everything in life loads faster than your TikTok feed 🍿",
+    "We're stalking your competitors... legally, of course 🕵️",
+    "AI is cooking... go grab a coffee, you deserve it ☕",
+    "Deep-diving into their data... deeper than your 3 AM thoughts 🌙",
+    "Rome wasn't built in a day, and neither is a killer analysis 🏛️",
+    "Patience is a virtue... and so is destroying your competition 💅",
+    "Hacking into the Matrix... just kidding, we're scraping websites 😎",
+    "Your competitors have no idea what's about to hit them 😈",
+    "Loading genius takes time... unlike your ex's excuses 💀",
+    "We're basically doing $200K worth of consulting for you rn 💰",
+    "Sit tight... the AI is having its main character moment 🎬",
+    "Brewing competitive intelligence... with extra shots of espresso ☕",
+    "If this was easy, everyone would do it. But here we are 👑",
+    "Almost there... jk we just started. But it'll be worth it 🔥",
+  ];
+
+  useEffect(() => {
+    if (loading) {
+      setLoadingMsg(0);
+      loadingInterval.current = setInterval(() => {
+        setLoadingMsg((prev) => (prev + 1) % funnyMessages.length);
+      }, 4000);
+    } else {
+      if (loadingInterval.current) clearInterval(loadingInterval.current);
+    }
+    return () => { if (loadingInterval.current) clearInterval(loadingInterval.current); };
+  }, [loading, funnyMessages.length]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -392,9 +444,79 @@ export default function CompetitorAnalysisPage() {
                         </div>
                       )}
 
-                      {/* Details Grid */}
+                      {/* Business Intelligence */}
+                      {(comp.companyOverview || comp.productsAndServices || comp.websiteAnalysis) && (
+                        <div className="mb-6">
+                          <h5 className="font-black text-lg text-[#0A1F0F] mb-4 flex items-center gap-2">
+                            <Building2 className="h-5 w-5 text-[#006C35]" />
+                            {locale === "ar" ? "معلومات الأعمال" : "Business Intelligence"}
+                          </h5>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {comp.companyOverview && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Building2 className="h-4 w-4" />{locale === "ar" ? "نظرة عامة على الشركة" : "Company Overview"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.companyOverview}</p>
+                              </div>
+                            )}
+                            {comp.productsAndServices && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Package className="h-4 w-4" />{locale === "ar" ? "المنتجات والخدمات" : "Products & Services"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.productsAndServices}</p>
+                              </div>
+                            )}
+                            {comp.targetMarket && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Users className="h-4 w-4" />{locale === "ar" ? "السوق المستهدف" : "Target Market"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.targetMarket}</p>
+                              </div>
+                            )}
+                            {comp.brandPositioning && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Crosshair className="h-4 w-4" />{locale === "ar" ? "تموضع العلامة التجارية" : "Brand Positioning"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.brandPositioning}</p>
+                              </div>
+                            )}
+                            {comp.websiteAnalysis && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Globe className="h-4 w-4" />{locale === "ar" ? "تحليل الموقع الإلكتروني" : "Website Analysis"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.websiteAnalysis}</p>
+                              </div>
+                            )}
+                            {comp.digitalPresence && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Eye className="h-4 w-4" />{locale === "ar" ? "الحضور الرقمي" : "Digital Presence"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.digitalPresence}</p>
+                              </div>
+                            )}
+                            {comp.pricingStrategy && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><DollarSign className="h-4 w-4" />{locale === "ar" ? "استراتيجية التسعير" : "Pricing Strategy"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.pricingStrategy}</p>
+                              </div>
+                            )}
+                            {comp.customerReviews && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Star className="h-4 w-4" />{locale === "ar" ? "مراجعات العملاء" : "Customer Reviews"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.customerReviews}</p>
+                              </div>
+                            )}
+                            {comp.technologyStack && (
+                              <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                                <p className="text-sm font-black text-[#006C35] mb-1 flex items-center gap-1.5"><Layers className="h-4 w-4" />{locale === "ar" ? "البنية التقنية" : "Technology Stack"}</p>
+                                <p className="text-base text-[#2D5A3D] leading-7">{comp.technologyStack}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Marketing Details Grid */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         <div className="space-y-4">
+                          <h5 className="font-black text-lg text-[#0A1F0F] flex items-center gap-2">
+                            <BarChart3 className="h-5 w-5 text-[#006C35]" />
+                            {locale === "ar" ? "تحليل المحتوى والتسويق" : "Content & Marketing Analysis"}
+                          </h5>
                           {[
                             { label: t.postingFrequency, value: comp.postingFrequency, icon: Calendar },
                             { label: t.engagement, value: comp.engagementLevel, icon: BarChart3 },
@@ -475,6 +597,31 @@ export default function CompetitorAnalysisPage() {
                   )}
                 </div>
               </SectionCard>
+
+              {/* Industry Analysis */}
+              {analysisData.industryAnalysis && (
+                <SectionCard>
+                  <SectionTitle icon={TrendingUp}>{locale === "ar" ? "تحليل الصناعة" : "Industry Analysis"}</SectionTitle>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-5 rounded-2xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-base text-[#006C35] mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5" />{locale === "ar" ? "نظرة عامة على السوق" : "Market Overview"}</h4>
+                      <p className="text-base text-[#2D5A3D] leading-7">{analysisData.industryAnalysis.marketOverview}</p>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-base text-[#006C35] mb-2 flex items-center gap-2"><Swords className="h-5 w-5" />{locale === "ar" ? "المشهد التنافسي" : "Competitive Landscape"}</h4>
+                      <p className="text-base text-[#2D5A3D] leading-7">{analysisData.industryAnalysis.competitiveLandscape}</p>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-base text-[#006C35] mb-2 flex items-center gap-2"><Users className="h-5 w-5" />{locale === "ar" ? "اتجاهات المستهلكين" : "Consumer Trends"}</h4>
+                      <p className="text-base text-[#2D5A3D] leading-7">{analysisData.industryAnalysis.consumerTrends}</p>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-base text-[#006C35] mb-2 flex items-center gap-2"><Rocket className="h-5 w-5" />{locale === "ar" ? "التوقعات المستقبلية" : "Future Outlook"}</h4>
+                      <p className="text-base text-[#2D5A3D] leading-7">{analysisData.industryAnalysis.futureOutlook}</p>
+                    </div>
+                  </div>
+                </SectionCard>
+              )}
             </div>
           )}
 
@@ -634,6 +781,33 @@ export default function CompetitorAnalysisPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Loading state — big funny messages */}
+      {loading && (
+        <div className="rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-br from-[#F0F7F2] via-white to-[#F8FBF8] flex flex-col items-center justify-center py-24 px-8 text-center">
+          <div className="relative mb-8">
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#006C35] to-[#00A352] flex items-center justify-center shadow-[0_8px_32px_rgba(0,108,53,0.3)] animate-pulse">
+              <Swords className="h-14 w-14 text-white animate-bounce" />
+            </div>
+            <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] flex items-center justify-center shadow-lg animate-spin" style={{ animationDuration: "3s" }}>
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+          </div>
+          <p className="text-3xl md:text-4xl font-black text-[#0A1F0F] max-w-2xl leading-tight mb-4 transition-all duration-500">
+            {funnyMessages[loadingMsg]}
+          </p>
+          <div className="flex items-center gap-3 mt-4">
+            <Loader2 className="h-6 w-6 animate-spin text-[#006C35]" />
+            <p className="text-lg text-[#5A8A6A] font-bold">{t.analyzing}...</p>
+          </div>
+          <div className="mt-8 w-full max-w-md">
+            <div className="h-2 bg-[#E8F0EA] rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-[#006C35] to-[#C9A84C] rounded-full animate-pulse" style={{ width: "60%", animation: "loading-bar 8s ease-in-out infinite" }} />
+            </div>
+          </div>
+          <style>{`@keyframes loading-bar { 0% { width: 5%; } 50% { width: 75%; } 100% { width: 5%; } }`}</style>
         </div>
       )}
 

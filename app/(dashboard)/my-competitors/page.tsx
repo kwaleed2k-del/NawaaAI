@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import {
   Swords, Clock, Trash2, Loader2, Sparkles, Eye, X, Download,
   ChevronUp, Target, BarChart3, Shield, TrendingUp, AlertTriangle,
-  Calendar, Rocket, Star, Building2,
+  Calendar, Rocket, Star, Building2, Package, Users, DollarSign,
+  Layers, Globe, Crosshair,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/lib/store";
@@ -25,6 +26,12 @@ interface CompetitorResult {
   engagementLevel: string; visualStyle: string; strengths: string[];
   weakPoints: string[]; threatLevel: number; overallScore: number; keyInsight: string;
   stealThisMove?: string;
+  companyOverview?: string; productsAndServices?: string; targetMarket?: string;
+  brandPositioning?: string; websiteAnalysis?: string; digitalPresence?: string;
+  pricingStrategy?: string; customerReviews?: string; technologyStack?: string;
+}
+interface IndustryAnalysis {
+  marketOverview: string; competitiveLandscape: string; consumerTrends: string; futureOutlook: string;
 }
 interface AnalysisData {
   executiveSummary: string;
@@ -33,6 +40,7 @@ interface AnalysisData {
   comparisonMatrix: { categories: string[]; yourBrand: number[]; competitors: Record<string, number[]>; };
   winningStrategy: { immediate: StrategyAction[]; shortTerm: StrategyAction[]; longTerm: StrategyAction[]; contentGaps: string[]; differentiators: string[]; quickWins?: string[]; };
   saudiMarketInsights: { trendAlignment: string; vision2030Relevance: string; culturalFit: string; localOpportunities?: string; ramadanStrategy?: string; };
+  industryAnalysis?: IndustryAnalysis;
 }
 interface SavedAnalysis {
   id: string; user_id: string; company_id: string; competitors: Competitor[];
@@ -379,6 +387,27 @@ export default function MyCompetitorsPage() {
                           <p className="text-sm text-[#0A1F0F] leading-6">{comp.stealThisMove}</p>
                         </div>
                       )}
+                      {/* Business Intelligence */}
+                      {(comp.companyOverview || comp.productsAndServices || comp.websiteAnalysis) && (
+                        <div className="grid grid-cols-1 gap-3 mb-4">
+                          {[
+                            { value: comp.companyOverview, label: isAr ? "نظرة عامة" : "Overview", Icon: Building2 },
+                            { value: comp.productsAndServices, label: isAr ? "المنتجات" : "Products", Icon: Package },
+                            { value: comp.targetMarket, label: isAr ? "السوق المستهدف" : "Target Market", Icon: Users },
+                            { value: comp.brandPositioning, label: isAr ? "التموضع" : "Positioning", Icon: Crosshair },
+                            { value: comp.websiteAnalysis, label: isAr ? "الموقع" : "Website", Icon: Globe },
+                            { value: comp.digitalPresence, label: isAr ? "الحضور الرقمي" : "Digital Presence", Icon: Eye },
+                            { value: comp.pricingStrategy, label: isAr ? "التسعير" : "Pricing", Icon: DollarSign },
+                            { value: comp.customerReviews, label: isAr ? "المراجعات" : "Reviews", Icon: Star },
+                            { value: comp.technologyStack, label: isAr ? "التقنية" : "Tech Stack", Icon: Layers },
+                          ].filter(item => item.value).map((item) => (
+                            <div key={item.label} className="p-3 rounded-lg bg-[#F8FBF8] border border-[#D4EBD9]">
+                              <p className="text-xs font-black text-[#006C35] mb-1 flex items-center gap-1"><item.Icon className="h-3 w-3" />{item.label}</p>
+                              <p className="text-sm text-[#2D5A3D] leading-6">{item.value}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <div className="grid grid-cols-2 gap-3">
                         <div className="p-3 rounded-lg bg-green-50/50 border border-green-200">
                           <p className="text-xs font-black text-[#006C35] mb-1">{isAr ? "القوة" : "Strengths"}</p>
@@ -503,6 +532,31 @@ export default function MyCompetitorsPage() {
                   )}
                 </div>
               </div>
+
+              {/* Industry Analysis */}
+              {data.industryAnalysis && (
+                <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
+                  <h3 className="flex items-center gap-3 text-xl font-black text-[#0A1F0F] mb-5"><TrendingUp className="h-6 w-6 text-[#006C35]" />{isAr ? "تحليل الصناعة" : "Industry Analysis"}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-sm text-[#006C35] mb-1">{isAr ? "نظرة عامة على السوق" : "Market Overview"}</h4>
+                      <p className="text-sm text-[#2D5A3D] leading-6">{data.industryAnalysis.marketOverview}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-sm text-[#006C35] mb-1">{isAr ? "المشهد التنافسي" : "Competitive Landscape"}</h4>
+                      <p className="text-sm text-[#2D5A3D] leading-6">{data.industryAnalysis.competitiveLandscape}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-sm text-[#006C35] mb-1">{isAr ? "اتجاهات المستهلكين" : "Consumer Trends"}</h4>
+                      <p className="text-sm text-[#2D5A3D] leading-6">{data.industryAnalysis.consumerTrends}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9]">
+                      <h4 className="font-black text-sm text-[#006C35] mb-1">{isAr ? "التوقعات المستقبلية" : "Future Outlook"}</h4>
+                      <p className="text-sm text-[#2D5A3D] leading-6">{data.industryAnalysis.futureOutlook}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
