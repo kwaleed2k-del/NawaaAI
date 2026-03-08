@@ -185,7 +185,7 @@ export default function PlannerPage() {
       prompt: userPrompt.trim() || null,
       plan_data: plan,
     });
-    if (error) toast.error(error.message);
+    if (error) { console.error("Save plan error:", error); toast.error(locale === "ar" ? "فشل حفظ الخطة" : "Failed to save plan"); }
     else toast.success("Plan saved");
     setSaving(false);
   }

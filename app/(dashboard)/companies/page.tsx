@@ -388,7 +388,8 @@ export default function CompaniesPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     if (error) {
-      toast.error(error.message);
+      console.error("Load companies error:", error);
+      toast.error(locale === "ar" ? "فشل تحميل الشركات" : "Failed to load companies");
       setCompanies([]);
     } else {
       setCompanies((data as Company[]) ?? []);
@@ -519,7 +520,7 @@ export default function CompaniesPage() {
         .update(payload)
         .eq("id", editingId)
         .eq("user_id", user.id);
-      if (error) toast.error(error.message);
+      if (error) { console.error("Update company error:", error); toast.error(locale === "ar" ? "فشل حفظ الشركة" : "Failed to save company"); }
       else {
         toast.success("Company saved");
         setFormOpen(false);
@@ -527,7 +528,7 @@ export default function CompaniesPage() {
       }
     } else {
       const { error } = await supabase.from("companies").insert(payload);
-      if (error) toast.error(error.message);
+      if (error) { console.error("Insert company error:", error); toast.error(locale === "ar" ? "فشل حفظ الشركة" : "Failed to save company"); }
       else {
         toast.success("Company saved");
         setFormOpen(false);
@@ -596,7 +597,7 @@ export default function CompaniesPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const { error } = await supabase.from("companies").delete().eq("id", id).eq("user_id", user.id);
-    if (error) toast.error(error.message);
+    if (error) { console.error("Delete company error:", error); toast.error(locale === "ar" ? "فشل حذف الشركة" : "Failed to delete company"); }
     else { toast.success(tc.deleted || "Company deleted"); loadCompanies(); }
   }
 

@@ -207,13 +207,17 @@ export default function MyPlansPage() {
       setDeletingId(null);
       return;
     }
+    // Delete linked generated images first to avoid foreign key constraint
+    await supabase.from("generated_images").delete().eq("plan_id", id);
+
     const { error } = await supabase
       .from("content_plans")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id);
     if (error) {
-      toast.error(error.message);
+      console.error("Delete plan error:", error);
+      toast.error(isAr ? "فشل حذف الخطة، حاول مرة أخرى" : "Failed to delete plan, please try again");
     } else {
       toast.success(isAr ? "\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u062E\u0637\u0629" : "Plan deleted");
       setPlans((prev) => prev.filter((p) => p.id !== id));
