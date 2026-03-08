@@ -21,7 +21,7 @@ PLATFORM-SPECIFIC CAPTIONS (CRITICAL — each platform MUST have its own unique 
 - Instagram: Engaging, emoji-rich, storytelling format. 3-5 sentences. Include a call-to-action. Use line breaks for readability. Add relevant emojis between sentences.
 - TikTok: Short hook-first caption. 1-2 punchy sentences max. Use trending phrases and viral hooks. Keep it casual and energetic.
 - X (Twitter): Concise and witty. MUST be under 280 characters. Conversation-starting. Can include a question or bold statement.
-- LinkedIn: Professional thought-leadership style. 4-6 sentences. Share an insight or lesson. Use paragraph breaks. Add value — not just promotion. Do NOT make it too long (max 200 words).
+- LinkedIn: Professional thought-leadership style. 8-12 sentences minimum. Write a full story or lesson with a hook, body, and takeaway. Use paragraph breaks and line spacing for readability. Share personal insights, industry knowledge, or behind-the-scenes stories. End with a question to drive engagement. LinkedIn rewards long-form content — make it substantial (300-500 words).
 - Snapchat: Ultra-casual, personal, urgency-driven. 1-2 short sentences. Use slang where appropriate. Create FOMO.
 
 Return ONLY valid JSON in this exact structure:
