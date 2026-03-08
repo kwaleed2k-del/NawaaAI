@@ -17,15 +17,12 @@ CRITICAL LANGUAGE RULES:
 - topicAr should be Arabic version, topic should be English version — always provide both.
 - captionAr should be Arabic caption, caption should be English caption — always provide both.
 
-PLATFORM-SPECIFIC CAPTIONS:
-Each day should include platform-specific captions tailored to the assigned platform's style:
-- Instagram: Engaging, emoji-rich, storytelling, with call-to-action
-- TikTok: Short, trendy, hook-first, using viral phrases
-- X (Twitter): Concise, witty, conversation-starting, under 280 chars
-- LinkedIn: Professional, value-driven, thought-leadership style
-- Snapchat: Casual, personal, urgency-driven
-- YouTube: Descriptive, SEO-friendly, with timestamps suggestions
-- WhatsApp: Direct, personal, community-focused
+PLATFORM-SPECIFIC CAPTIONS (CRITICAL — each platform MUST have its own unique caption style):
+- Instagram: Engaging, emoji-rich, storytelling format. 3-5 sentences. Include a call-to-action. Use line breaks for readability. Add relevant emojis between sentences.
+- TikTok: Short hook-first caption. 1-2 punchy sentences max. Use trending phrases and viral hooks. Keep it casual and energetic.
+- X (Twitter): Concise and witty. MUST be under 280 characters. Conversation-starting. Can include a question or bold statement.
+- LinkedIn: Professional thought-leadership style. 4-6 sentences. Share an insight or lesson. Use paragraph breaks. Add value — not just promotion. Do NOT make it too long (max 200 words).
+- Snapchat: Ultra-casual, personal, urgency-driven. 1-2 short sentences. Use slang where appropriate. Create FOMO.
 
 Return ONLY valid JSON in this exact structure:
 {

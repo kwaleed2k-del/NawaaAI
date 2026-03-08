@@ -34,12 +34,12 @@ type GeneratedImage = {
 
 const PLATFORM_EMOJI: Record<string, string> = {
   instagram: "\ud83d\udcf8", tiktok: "\ud83c\udfb5", x: "\u2716\ufe0f",
-  snapchat: "\ud83d\udc7b", linkedin: "\ud83d\udcbc", youtube: "\ud83c\udfac", whatsapp: "\ud83d\udcac",
+  snapchat: "\ud83d\udc7b", linkedin: "\ud83d\udcbc",
 };
 
 const PLATFORM_COLOR: Record<string, string> = {
   instagram: "bg-pink-500", tiktok: "bg-slate-800", x: "bg-slate-700",
-  snapchat: "bg-yellow-400", linkedin: "bg-blue-600", youtube: "bg-red-600", whatsapp: "bg-green-600",
+  snapchat: "bg-yellow-400", linkedin: "bg-blue-600",
 };
 
 export default function DashboardPage() {
