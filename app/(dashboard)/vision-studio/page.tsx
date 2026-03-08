@@ -174,11 +174,20 @@ export default function VisionStudioPage() {
         referenceBase64.push(dataUri);
       }
 
+      // Send only essential company fields to avoid bloated requests
+      const companySlim = {
+        name: selectedCompany.name,
+        name_ar: selectedCompany.name_ar,
+        industry: selectedCompany.industry,
+        tone: selectedCompany.tone,
+        brand_colors: selectedCompany.brand_colors,
+        logo_url: selectedCompany.logo_url,
+      };
       const res = await fetch("/api/generate-images", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          company: selectedCompany,
+          company: companySlim,
           dayContent: { platform: currentDay.platform, contentType: currentDay.contentType, topic: currentDay.topic, topicAr: currentDay.topicAr, caption: currentDay.caption, imagePromptHint: currentDay.imagePromptHint },
           style, additionalInstructions: additionalInstructions.trim() || undefined, outputLanguage,
           includeLogo: includeLogo && !!selectedCompany?.logo_url,
