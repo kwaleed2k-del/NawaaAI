@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   BarChart3, Building2, Calendar, ChevronLeft, ChevronRight,
-  FolderOpen, Hash, ImageIcon, LogOut, Menu, Search, Settings, Sparkles, TrendingUp, X,
+  FolderOpen, Hash, ImageIcon, LogOut, Menu, Search, Settings, Sparkles, Swords, TrendingUp, X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/lib/store";
@@ -23,12 +23,14 @@ const navItems = [
   { href: "/planner", key: "planner" as const, icon: Calendar },
   { href: "/vision-studio", key: "visionStudio" as const, icon: Sparkles, badge: "AI" },
   { href: "/hashtags", key: "hashtags" as const, icon: Hash },
+  { href: "/competitor-analysis", key: "competitorAnalysis" as const, icon: Swords, badge: "AI" },
   { href: "/insights", key: "insights" as const, icon: TrendingUp },
 ];
 
 const savedItems = [
   { href: "/my-plans", key: "myPlans" as const, icon: FolderOpen },
   { href: "/my-generations", key: "myGenerations" as const, icon: ImageIcon },
+  { href: "/my-competitors", key: "myCompetitors" as const, icon: Swords },
 ];
 
 function NavLinks({
