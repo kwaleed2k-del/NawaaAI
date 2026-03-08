@@ -28,8 +28,6 @@ const PLATFORMS = [
   { id: "x", label: "X (Twitter)", emoji: "\uD835\uDD4F", selectedBg: "bg-gradient-to-br from-slate-700 to-slate-900", selectedBorder: "border-slate-400", unselectedBg: "bg-slate-50", color: "text-slate-700", barColor: "from-slate-700 to-slate-900", pillBg: "bg-slate-100 text-slate-700 border-slate-200" },
   { id: "snapchat", label: "Snapchat", emoji: "\uD83D\uDC7B", selectedBg: "bg-gradient-to-br from-yellow-400 to-amber-400", selectedBorder: "border-yellow-400", unselectedBg: "bg-yellow-50", color: "text-yellow-700", barColor: "from-yellow-400 to-amber-400", pillBg: "bg-yellow-100 text-yellow-700 border-yellow-200" },
   { id: "linkedin", label: "LinkedIn", emoji: "\uD83D\uDCBC", selectedBg: "bg-gradient-to-br from-blue-500 to-blue-700", selectedBorder: "border-blue-400", unselectedBg: "bg-blue-50", color: "text-blue-600", barColor: "from-blue-500 to-blue-700", pillBg: "bg-blue-100 text-blue-700 border-blue-200" },
-  { id: "youtube", label: "YouTube", emoji: "\uD83C\uDFAC", selectedBg: "bg-gradient-to-br from-red-500 to-red-700", selectedBorder: "border-red-400", unselectedBg: "bg-red-50", color: "text-red-600", barColor: "from-red-500 to-red-700", pillBg: "bg-red-100 text-red-700 border-red-200" },
-  { id: "whatsapp", label: "WhatsApp", emoji: "\uD83D\uDCAC", selectedBg: "bg-gradient-to-br from-green-500 to-emerald-600", selectedBorder: "border-green-400", unselectedBg: "bg-green-50", color: "text-green-700", barColor: "from-green-500 to-emerald-600", pillBg: "bg-green-100 text-green-700 border-green-200" },
 ];
 
 /* ── Types ── */

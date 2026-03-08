@@ -36,8 +36,6 @@ const PLATFORM_OPTIONS = [
   { id: "x", label: "X", emoji: "𝕏", color: "from-slate-700 to-slate-900", selectedBorder: "border-slate-400", unselectedBg: "bg-slate-50", textColor: "text-slate-700" },
   { id: "snapchat", label: "Snapchat", emoji: "👻", color: "from-yellow-400 to-amber-400", selectedBorder: "border-yellow-400", unselectedBg: "bg-yellow-50", textColor: "text-yellow-700" },
   { id: "linkedin", label: "LinkedIn", emoji: "💼", color: "from-blue-500 to-blue-700", selectedBorder: "border-blue-400", unselectedBg: "bg-blue-50", textColor: "text-blue-600" },
-  { id: "youtube", label: "YouTube", emoji: "🎬", color: "from-red-500 to-red-700", selectedBorder: "border-red-400", unselectedBg: "bg-red-50", textColor: "text-red-600" },
-  { id: "whatsapp", label: "WhatsApp", emoji: "💬", color: "from-green-500 to-emerald-600", selectedBorder: "border-green-400", unselectedBg: "bg-green-50", textColor: "text-green-700" },
 ];
 
 /* ── Hashtag pill color rotation ── */

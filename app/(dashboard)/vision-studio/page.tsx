@@ -30,8 +30,6 @@ const PLATFORM_EMOJI: Record<string, string> = {
   x: "\uD835\uDD4F",
   snapchat: "\uD83D\uDC7B",
   linkedin: "\uD83D\uDCBC",
-  youtube: "\uD83C\uDFAC",
-  whatsapp: "\uD83D\uDCAC",
 };
 
 export default function VisionStudioPage() {
