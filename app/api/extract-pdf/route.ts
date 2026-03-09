@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { genAI } from "@/lib/gemini";
+import { authenticateRequest, checkRateLimit } from "@/lib/api-auth";
 
 export async function POST(request: NextRequest) {
+  const { user, error: authError } = await authenticateRequest();
+  if (authError) return authError;
+  const rl = checkRateLimit(user!.id, "/api/extract-pdf");
+  if (rl) return rl;
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;

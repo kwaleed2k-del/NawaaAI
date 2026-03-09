@@ -66,7 +66,7 @@ const PLATFORMS = [
   "LinkedIn",
 ];
 
-const FALLBACK_COLORS = ["#006C35", "#00A352", "#C9A84C", "#0B1A0F", "#D0EBDA"];
+const FALLBACK_COLORS = ["#006C35", "#00A352", "#7C3AED", "#0B1A0F", "#D0EBDA"];
 
 /* ── Platform config with rich visual data (matches planner/hashtags) ── */
 const PLATFORM_CARDS: Record<string, { emoji: string; selectedBg: string; selectedBorder: string; unselectedBg: string; color: string }> = {
@@ -79,8 +79,8 @@ const PLATFORM_CARDS: Record<string, { emoji: string; selectedBg: string; select
 
 /* ── Card accent gradient rotation ── */
 const CARD_GRADIENTS = [
-  "from-[#006C35] via-[#00A352] to-[#C9A84C]",
-  "from-[#C9A84C] via-[#E8D5A0] to-[#006C35]",
+  "from-[#006C35] via-[#00A352] to-[#7C3AED]",
+  "from-[#7C3AED] via-[#A78BFA] to-[#006C35]",
   "from-rose-500 via-pink-500 to-purple-500",
   "from-blue-500 via-indigo-500 to-purple-500",
   "from-amber-500 via-orange-500 to-red-500",
@@ -90,7 +90,7 @@ const CARD_GRADIENTS = [
 /* ── Tag emoji prefixes and colors ── */
 const TAG_STYLES = {
   industry:  { emoji: "\uD83C\uDFED", bg: "bg-[#006C35]/10", border: "border-[#006C35]/25", text: "text-[#006C35]" },
-  tone:      { emoji: "\uD83C\uDFA8", bg: "bg-[#C9A84C]/10", border: "border-[#C9A84C]/25", text: "text-[#C9A84C]" },
+  tone:      { emoji: "\uD83C\uDFA8", bg: "bg-[#7C3AED]/10", border: "border-[#7C3AED]/25", text: "text-[#7C3AED]" },
   audience:  { emoji: "\uD83C\uDFAF", bg: "bg-[#3B82F6]/10", border: "border-[#3B82F6]/25", text: "text-[#3B82F6]" },
   platform:  { emoji: "\uD83D\uDCF1", bg: "bg-[#A855F7]/10", border: "border-[#A855F7]/25", text: "text-[#A855F7]" },
   website:   { emoji: "\uD83C\uDF10", bg: "bg-[#F97316]/10", border: "border-[#F97316]/25", text: "text-[#F97316]" },
@@ -137,7 +137,7 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
 
   const mixColors: Record<string, string> = {
     educational: "#006C35",
-    promotional: "#C9A84C",
+    promotional: "#7C3AED",
     engagement: "#00A352",
     storytelling: "#3B82F6",
     entertainment: "#A855F7",
@@ -150,27 +150,27 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
       {/* Brand Personality */}
       {bp && (
         <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
-          <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-[#004D26]">
-            <Sparkles className="h-5 w-5 text-[#C9A84C]" />
+          <h4 className="mb-3 flex items-center gap-2 text-2xl font-extrabold text-[#004D26]">
+            <Sparkles className="h-5 w-5 text-[#7C3AED]" />
             {tc.brandPersonality}
           </h4>
           <div className="space-y-3">
             {personalityDimensions.map((d) => (
               <div key={d.key} className="flex items-center gap-2">
                 <span className="text-[#5A8A6A]">{d.icon}</span>
-                <span className="w-24 text-sm text-[#004D26]">{d.label}</span>
+                <span className="w-24 text-lg text-[#004D26]">{d.label}</span>
                 <div className="flex-1 h-3 rounded-full bg-[#F0F7F2] overflow-hidden">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-[#006C35] to-[#00A352] transition-all duration-700"
                     style={{ width: `${d.value}%` }}
                   />
                 </div>
-                <span className="w-8 text-right text-sm font-medium text-[#C9A84C]">{d.value}</span>
+                <span className="w-8 text-right text-lg font-medium text-[#7C3AED]">{d.value}</span>
               </div>
             ))}
           </div>
           {bp.summary && (
-            <p className="mt-3 text-sm text-[#5A8A6A] italic border-t border-[#D4EBD9] pt-2">{bp.summary}</p>
+            <p className="mt-3 text-lg text-[#5A8A6A] italic border-t border-[#D4EBD9] pt-2">{bp.summary}</p>
           )}
         </div>
       )}
@@ -178,23 +178,23 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
       {/* Content Pillars */}
       {pillars && pillars.length > 0 && (
         <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
-          <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-[#004D26]">
-            <Target className="h-5 w-5 text-[#C9A84C]" />
+          <h4 className="mb-3 flex items-center gap-2 text-2xl font-extrabold text-[#004D26]">
+            <Target className="h-5 w-5 text-[#7C3AED]" />
             {tc.contentPillars}
           </h4>
           <div className="grid gap-2">
             {pillars.map((p, i) => (
               <div key={i} className="rounded-xl bg-[#F8FBF8] border border-[#D4EBD9] p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-[#004D26]">
+                  <span className="text-lg font-medium text-[#004D26]">
                     {p.name}{p.nameAr ? ` — ${p.nameAr}` : ""}
                   </span>
-                  <span className="text-sm font-bold text-[#C9A84C]">{p.percentage}%</span>
+                  <span className="text-lg font-bold text-[#7C3AED]">{p.percentage}%</span>
                 </div>
-                <p className="text-sm text-[#5A8A6A] mb-2">{p.description}</p>
+                <p className="text-lg text-[#5A8A6A] mb-2">{p.description}</p>
                 <div className="h-3 rounded-full bg-[#F0F7F2] overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#C9A84C] to-[#E8D5A0] transition-all duration-700"
+                    className="h-full rounded-full bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] transition-all duration-700"
                     style={{ width: `${p.percentage}%` }}
                   />
                 </div>
@@ -207,26 +207,26 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
       {/* Audience Insights */}
       {audience && (
         <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
-          <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-[#004D26]">
-            <Users className="h-5 w-5 text-[#C9A84C]" />
+          <h4 className="mb-3 flex items-center gap-2 text-2xl font-extrabold text-[#004D26]">
+            <Users className="h-5 w-5 text-[#7C3AED]" />
             {tc.audienceInsights}
           </h4>
           <div className="flex flex-wrap gap-2 mb-3">
             {audience.primaryAge && (
-              <span className="rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] px-4 py-2 text-sm font-medium text-white">
+              <span className="rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] px-4 py-2 text-lg font-medium text-white">
                 {tc.age}: {audience.primaryAge}
               </span>
             )}
             {audience.interests?.map((interest, i) => (
-              <span key={i} className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-4 py-2 text-sm text-[#004D26]">
+              <span key={i} className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-4 py-2 text-lg text-[#004D26]">
                 {interest}
               </span>
             ))}
           </div>
           {audience.saudiSpecific && (
-            <div className="rounded-xl bg-[#F8FBF8] border-2 border-[#C9A84C]/30 p-4 mb-3">
-              <p className="text-sm text-[#C9A84C] font-semibold mb-1">{"\u{1F1F8}\u{1F1E6}"} {tc.saudiInsight}</p>
-              <p className="text-sm text-[#0A1F0F]">{audience.saudiSpecific}</p>
+            <div className="rounded-xl bg-[#F8FBF8] border-2 border-[#7C3AED]/30 p-4 mb-3">
+              <p className="text-lg text-[#7C3AED] font-semibold mb-1">{"\u{1F1F8}\u{1F1E6}"} {tc.saudiInsight}</p>
+              <p className="text-lg text-[#0A1F0F]">{audience.saudiSpecific}</p>
             </div>
           )}
           {audience.bestPostingTimes && audience.bestPostingTimes.length > 0 && (
@@ -235,8 +235,8 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
                 <div key={i} className="flex items-start gap-2 rounded-xl bg-[#F8FBF8] border border-[#D4EBD9] p-4">
                   <Clock className="h-5 w-5 text-[#00A352] mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-[#004D26]">{t.day} · {t.time}</p>
-                    <p className="text-sm text-[#5A8A6A]">{t.reason}</p>
+                    <p className="text-lg font-medium text-[#004D26]">{t.day} · {t.time}</p>
+                    <p className="text-lg text-[#5A8A6A]">{t.reason}</p>
                   </div>
                 </div>
               ))}
@@ -248,8 +248,8 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
       {/* Content Mix */}
       {mix && mixTotal > 0 && (
         <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
-          <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-[#004D26]">
-            <Megaphone className="h-5 w-5 text-[#C9A84C]" />
+          <h4 className="mb-3 flex items-center gap-2 text-2xl font-extrabold text-[#004D26]">
+            <Megaphone className="h-5 w-5 text-[#7C3AED]" />
             {tc.contentMix}
           </h4>
           {/* Stacked bar */}
@@ -267,8 +267,8 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
             {Object.entries(mix).map(([key, val]) => (
               <div key={key} className="flex items-center gap-1.5">
                 <div className="h-3 w-3 rounded-full" style={{ backgroundColor: mixColors[key] || "#5A8A6A" }} />
-                <span className="text-sm text-[#004D26] capitalize">{key}</span>
-                <span className="text-sm font-medium text-[#C9A84C]">{val}%</span>
+                <span className="text-lg text-[#004D26] capitalize">{key}</span>
+                <span className="text-lg font-medium text-[#7C3AED]">{val}%</span>
               </div>
             ))}
           </div>
@@ -278,24 +278,24 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
       {/* Platform Strategy */}
       {platform && (
         <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
-          <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-[#004D26]">
-            <Target className="h-5 w-5 text-[#C9A84C]" />
+          <h4 className="mb-3 flex items-center gap-2 text-2xl font-extrabold text-[#004D26]">
+            <Target className="h-5 w-5 text-[#7C3AED]" />
             {tc.platformStrategy}
           </h4>
           <div className="flex flex-wrap gap-2 mb-2">
             {platform.primary && (
-              <span className="rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] px-4 py-2 text-sm font-semibold text-white">
+              <span className="rounded-xl bg-gradient-to-r from-[#006C35] to-[#00A352] px-4 py-2 text-lg font-semibold text-white">
                 ★ {platform.primary}
               </span>
             )}
             {platform.secondary && (
-              <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-4 py-2 text-sm font-medium text-[#004D26]">
+              <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-4 py-2 text-lg font-medium text-[#004D26]">
                 {platform.secondary}
               </span>
             )}
           </div>
           {platform.rationale && (
-            <p className="text-sm text-[#5A8A6A] italic">{platform.rationale}</p>
+            <p className="text-lg text-[#5A8A6A] italic">{platform.rationale}</p>
           )}
         </div>
       )}
@@ -303,26 +303,26 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
       {/* Tone Guide */}
       {tone && (
         <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
-          <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-[#004D26]">
-            <Megaphone className="h-5 w-5 text-[#C9A84C]" />
+          <h4 className="mb-3 flex items-center gap-2 text-2xl font-extrabold text-[#004D26]">
+            <Megaphone className="h-5 w-5 text-[#7C3AED]" />
             {tc.toneGuide}
           </h4>
           <div className="flex flex-wrap gap-3 mb-3">
             <div className="flex-1 min-w-[140px]">
-              <p className="text-sm font-medium text-[#006C35] mb-1.5">{"\u2713"} {tc.doUse}</p>
+              <p className="text-lg font-medium text-[#006C35] mb-1.5">{"\u2713"} {tc.doUse}</p>
               <div className="flex flex-wrap gap-1">
                 {tone.doUse?.map((t, i) => (
-                  <span key={i} className="rounded-xl bg-[#006C35]/10 border border-[#006C35]/30 px-3 py-1.5 text-sm text-[#006C35]">
+                  <span key={i} className="rounded-xl bg-[#006C35]/10 border border-[#006C35]/30 px-3 py-1.5 text-lg text-[#006C35]">
                     {t}
                   </span>
                 ))}
               </div>
             </div>
             <div className="flex-1 min-w-[140px]">
-              <p className="text-sm font-medium text-red-600 mb-1.5">{"\u2717"} {tc.avoid}</p>
+              <p className="text-lg font-medium text-red-600 mb-1.5">{"\u2717"} {tc.avoid}</p>
               <div className="flex flex-wrap gap-1">
                 {tone.avoid?.map((t, i) => (
-                  <span key={i} className="rounded-xl bg-red-50 border border-red-200 px-3 py-1.5 text-sm text-red-600">
+                  <span key={i} className="rounded-xl bg-red-50 border border-red-200 px-3 py-1.5 text-lg text-red-600">
                     {t}
                   </span>
                 ))}
@@ -330,9 +330,9 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
             </div>
           </div>
           {tone.exampleCaption && (
-            <div className="rounded-xl bg-[#F8FBF8] border-l-4 border-[#C9A84C] p-4">
-              <p className="text-sm text-[#5A8A6A] mb-1">{tc.exampleCaption}</p>
-              <p className="text-base text-[#0A1F0F] italic">&ldquo;{tone.exampleCaption}&rdquo;</p>
+            <div className="rounded-xl bg-[#F8FBF8] border-l-4 border-[#7C3AED] p-4">
+              <p className="text-lg text-[#5A8A6A] mb-1">{tc.exampleCaption}</p>
+              <p className="text-xl text-[#0A1F0F] italic">&ldquo;{tone.exampleCaption}&rdquo;</p>
             </div>
           )}
         </div>
@@ -340,11 +340,11 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
 
       {/* Vision 2030 Alignment */}
       {vision && (
-        <div className="rounded-2xl border-2 border-[#C9A84C]/40 bg-gradient-to-br from-[#F8FBF8] to-white p-6">
-          <h4 className="mb-2 flex items-center gap-2 text-base font-bold text-[#C9A84C]">
+        <div className="rounded-2xl border-2 border-[#7C3AED]/40 bg-gradient-to-br from-[#F8FBF8] to-white p-6">
+          <h4 className="mb-2 flex items-center gap-2 text-2xl font-extrabold text-[#7C3AED]">
             {"\u{1F3DB}\uFE0F"} {tc.vision2030}
           </h4>
-          <p className="text-base text-[#0A1F0F]">{vision}</p>
+          <p className="text-lg text-[#0A1F0F]">{vision}</p>
         </div>
       )}
     </div>
@@ -367,6 +367,7 @@ export default function CompaniesPage() {
   const [brandAnalysis, setBrandAnalysis] = useState<Record<string, unknown> | null>(null);
   const [outputLanguage, setOutputLanguage] = useState<"en" | "ar">("ar");
   const [viewingCompany, setViewingCompany] = useState<Company | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -614,7 +615,7 @@ export default function CompaniesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(tc.confirmDelete || "Are you sure you want to delete this company?")) return;
+    setConfirmDeleteId(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const { error } = await supabase.from("companies").delete().eq("id", id).eq("user_id", user.id);
@@ -625,7 +626,7 @@ export default function CompaniesPage() {
   /* ── Loading skeleton ── */
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-6">
         <div className="h-40 animate-shimmer rounded-2xl bg-gradient-to-r from-[#D4EBD9]/50 via-[#F0F7F2] to-[#D4EBD9]/50 border-2 border-[#D4EBD9]" />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -637,49 +638,42 @@ export default function CompaniesPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-10">
       {/* ===== PAGE HEADER BANNER ===== */}
-      <div
-        className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10 shadow-xl"
-      >
-        {/* Decorative shapes */}
-        <div className="absolute top-4 right-8 flex gap-2">
-          {["\uD83C\uDFE2", "\u2728", "\uD83D\uDE80"].map((em, i) => (
-            <span key={i} className="text-2xl md:text-3xl">{em}</span>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-['Cairo'] text-4xl font-extrabold text-white md:text-5xl drop-shadow-lg">
-              {tc.pageTitle}
-            </h1>
-            <p className="mt-3 text-lg text-white/80 md:text-xl flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-[#E8D5A0]" />
-              Premium Brand Builder
-              <Building2 className="h-5 w-5 text-[#E8D5A0]" />
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Count badge */}
-            {companies.length > 0 && (
-              <div
-                className="flex items-center gap-2 rounded-2xl bg-white/20 px-5 py-3 border border-white/30"
+      <div className="relative overflow-hidden rounded-[2rem] bg-[#0B0E14]">
+        <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br from-violet-600/30 to-fuchsia-600/10 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-gradient-to-tr from-blue-600/20 to-cyan-500/10 blur-3xl" />
+        <div className="relative z-10 p-6 sm:p-8">
+          <div className="flex items-center gap-6">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 shadow-lg shadow-violet-500/25">
+              <Building2 className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+                <span className="bg-gradient-to-r from-white via-violet-200 to-blue-200 bg-clip-text text-transparent">
+                  {tc.pageTitle}
+                </span>
+              </h1>
+              <p className="mt-1 text-xl sm:text-2xl text-slate-400">
+                {locale === "ar" ? "\u0628\u0646\u0627\u0621 \u0627\u0644\u0647\u0648\u064a\u0629 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u0629 \u0627\u0644\u0645\u062a\u0645\u064a\u0632\u0629" : "Premium Brand Builder"}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {companies.length > 0 && (
+                <div className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3 py-2">
+                  <Building2 className="h-4 w-4 text-slate-400" />
+                  <span className="text-lg font-bold text-white">{companies.length}</span>
+                  <span className="text-sm text-slate-400">{locale === "ar" ? "\u0634\u0631\u0643\u0627\u062a" : "Companies"}</span>
+                </div>
+              )}
+              <Button
+                onClick={openAdd}
+                className="h-11 px-6 text-lg font-bold rounded-xl bg-white text-[#006C35] hover:bg-white/90 hover:shadow-md transition-all shadow-lg"
               >
-                <Building2 className="h-6 w-6 text-white" />
-                <span className="text-2xl font-extrabold text-white">{companies.length}</span>
-                <span className="text-lg text-white/80 font-medium">Companies</span>
-              </div>
-            )}
-
-            <Button
-              onClick={openAdd}
-              className="h-14 px-8 text-lg font-bold rounded-2xl bg-white text-[#006C35] hover:bg-white/90 hover:shadow-md transition-all shadow-lg"
-            >
-              <Plus className="mr-2 h-6 w-6" />
-              {tc.addCompany}
-            </Button>
+                <Plus className="mr-2 h-4 w-4" />
+                {tc.addCompany}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -702,7 +696,7 @@ export default function CompaniesPage() {
             <div
               className="absolute -top-2 -right-2"
             >
-              <Sparkles className="h-7 w-7 text-[#C9A84C]" />
+              <Sparkles className="h-7 w-7 text-[#7C3AED]" />
             </div>
             <div
               className="absolute -bottom-1 -left-3"
@@ -711,19 +705,19 @@ export default function CompaniesPage() {
             </div>
           </div>
 
-          <h2 className="text-2xl md:text-3xl font-extrabold text-[#004D26] font-['Cairo'] text-center">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#004D26] font-['Cairo'] text-center">
             {tc.noCompanies}
           </h2>
-          <p className="mt-2 text-lg text-[#5A8A6A] text-center max-w-md">
+          <p className="mt-2 text-xl sm:text-2xl text-[#5A8A6A] text-center max-w-md">
             {tc.addFirst}
           </p>
 
           <div>
             <Button
               onClick={openAdd}
-              className="mt-8 h-16 px-10 text-xl font-bold rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] text-white shadow-xl hover:shadow-md transition-all"
+              className="mt-8 h-11 px-6 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] text-white shadow-md hover:shadow-sm transition-all"
             >
-              <Plus className="mr-3 h-7 w-7" />
+              <Plus className="mr-2 h-4 w-4" />
               {tc.addCompany}
             </Button>
           </div>
@@ -756,9 +750,9 @@ export default function CompaniesPage() {
                       <div
                         className="relative"
                       >
-                        <div className="rounded-2xl p-[3px] bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#C9A84C] shadow-lg">
+                        <div className="rounded-2xl p-[3px] bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#7C3AED] shadow-lg">
                           <div
-                            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[14px] text-3xl font-extrabold text-white"
+                            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[14px] text-lg font-extrabold text-white"
                             style={{ backgroundColor: c.brand_colors?.[0] ?? "#006C35" }}
                           >
                             {c.logo_url ? (
@@ -795,9 +789,9 @@ export default function CompaniesPage() {
                           return (
                             <span
                               key={ki}
-                              className={cn("rounded-xl border px-4 py-2 text-lg font-semibold inline-flex items-center gap-1.5", style.bg, style.border, style.text)}
+                              className={cn("rounded-xl border px-3 py-1.5 text-sm font-bold inline-flex items-center gap-1.5", style.bg, style.border, style.text)}
                             >
-                              <span className="text-base">{style.emoji}</span>
+                              <span className="text-lg">{style.emoji}</span>
                               {kw.label}
                             </span>
                           );
@@ -809,7 +803,7 @@ export default function CompaniesPage() {
                     <div className="mt-5 flex items-center justify-between">
                       {c.brand_colors?.length ? (
                         <div className="flex items-center gap-3">
-                          <span className="text-lg font-semibold text-[#5A8A6A]">Colors</span>
+                          <span className="text-sm font-bold text-[#5A8A6A]">Colors</span>
                           <div className="flex gap-2">
                             {c.brand_colors.slice(0, 5).map((hex, idx) => (
                               <div
@@ -826,7 +820,7 @@ export default function CompaniesPage() {
                       {/* AI analysis badge */}
                       {c.brand_analysis && Object.keys(c.brand_analysis).length > 0 && (
                         <span
-                          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#C9A84C]/15 to-[#E8D5A0]/15 border border-[#C9A84C]/30 px-3 py-1.5 text-sm font-bold text-[#C9A84C]"
+                          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#7C3AED]/15 to-[#A78BFA]/15 border border-[#7C3AED]/30 px-3 py-1.5 text-sm font-bold text-[#7C3AED]"
                         >
                           <Sparkles className="h-4 w-4" />
                           AI {locale === "ar" ? "محلل" : "Analyzed"}
@@ -838,28 +832,46 @@ export default function CompaniesPage() {
                     <div className="mt-6 flex gap-3">
                       <div className="flex-1">
                         <Button
-                          className="h-12 w-full text-lg font-bold bg-gradient-to-r from-[#006C35] to-[#00A352] text-white hover:shadow-sm rounded-2xl transition-all shadow-md"
+                          className="h-11 w-full text-lg font-bold bg-gradient-to-r from-[#006C35] to-[#00A352] text-white hover:shadow-sm rounded-2xl transition-all shadow-md"
                           onClick={() => setViewingCompany(c)}
                         >
-                          <Eye className="mr-2 h-5 w-5" /> {tc.viewDetails || "View Details"}
+                          <Eye className="mr-2 h-4 w-4" /> {tc.viewDetails || "View Details"}
                         </Button>
                       </div>
                       <div>
                         <Button
                           variant="outline"
-                          className="h-12 px-5 text-lg font-bold border-2 border-[#D4EBD9] text-[#004D26] hover:bg-[#F0F7F2] hover:border-[#00A352]/40 rounded-2xl transition-all"
+                          className="h-11 px-4 text-lg font-bold border-2 border-[#D4EBD9] text-[#004D26] hover:bg-[#F0F7F2] hover:border-[#00A352]/40 rounded-2xl transition-all"
                           onClick={(e) => { e.stopPropagation(); openEdit(c); }}
                         >
-                          <Pencil className="h-5 w-5" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                       </div>
                       <div>
-                        <Button
-                          className="h-12 px-5 text-lg font-bold bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl shadow-md hover:shadow-sm transition-all"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </Button>
+                        {confirmDeleteId === c.id ? (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              className="h-11 px-4 text-lg font-bold bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl shadow-md hover:shadow-sm transition-all"
+                              onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
+                            >
+                              {locale === "ar" ? "نعم" : "Yes"}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="h-11 px-4 text-lg font-bold border-2 border-[#D4EBD9] text-[#004D26] hover:bg-[#F0F7F2] hover:border-[#00A352]/40 rounded-2xl transition-all"
+                              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
+                            >
+                              {locale === "ar" ? "إلغاء" : "Cancel"}
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            className="h-11 px-4 text-lg font-bold bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl shadow-md hover:shadow-sm transition-all"
+                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(c.id); }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -882,7 +894,7 @@ export default function CompaniesPage() {
                 <Plus className="h-10 w-10 text-white" />
               </div>
 
-              <p className="mt-5 text-xl font-extrabold text-[#004D26] font-['Cairo']">{tc.addCompany}</p>
+              <p className="mt-5 text-xl font-bold text-[#004D26] font-['Cairo']">{tc.addCompany}</p>
               <p className="mt-1 text-lg text-[#5A8A6A]">Build your brand profile</p>
             </div>
           </div>
@@ -893,24 +905,24 @@ export default function CompaniesPage() {
       <Dialog open={formOpen} onOpenChange={(open) => { setFormOpen(open); if (!open) loadCompanies(); }}>
         <DialogContent className="max-w-[95vw] lg:max-w-[85vw] max-h-[95vh] overflow-y-auto bg-white border-2 border-[#D4EBD9] text-[#0A1F0F] scrollbar-nawaa p-0">
           {/* Gradient header bar */}
-          <div className="sticky top-0 z-10 bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-4 sm:px-8 py-5 sm:py-7 rounded-t-lg overflow-hidden">
+          <div className="sticky top-0 z-10 bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] px-4 sm:px-8 py-5 sm:py-7 rounded-t-lg overflow-hidden">
             {/* Decorative shapes */}
             <div className="flex items-center gap-4 relative z-10">
               <div
-                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 border border-white/30"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 border border-white/30"
               >
-                <Building2 className="h-8 w-8 text-white" />
+                <Building2 className="h-5 w-5 text-white" />
               </div>
               <div>
                 <DialogHeader className="p-0 space-y-0">
-                  <DialogTitle className="font-['Cairo'] text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg">
+                  <DialogTitle className="font-['Cairo'] text-2xl sm:text-3xl font-black text-white drop-shadow-lg">
                     {editingId ? tc.editCompany : tc.addCompany}
                   </DialogTitle>
                 </DialogHeader>
-                <p className="text-white/80 text-lg mt-1 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-[#E8D5A0]" />
+                <p className="text-white/80 text-xl sm:text-2xl mt-1 flex items-center gap-2">
+                  <Sparkles className="h-3.5 w-3.5 text-[#A78BFA]" />
                   Premium Brand Builder
-                  <Sparkles className="h-4 w-4 text-[#E8D5A0]" />
+                  <Sparkles className="h-3.5 w-3.5 text-[#A78BFA]" />
                 </p>
               </div>
             </div>
@@ -925,7 +937,7 @@ export default function CompaniesPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-['Cairo'] text-2xl md:text-3xl font-extrabold text-[#004D26]">{tc.basicInfo}</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-3xl font-black text-[#004D26]">{tc.basicInfo}</h3>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
@@ -933,7 +945,7 @@ export default function CompaniesPage() {
                   <Input
                     value={form.name}
                     onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    className="h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-5 transition-all"
+                    className="h-11 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-4 transition-all"
                     placeholder={tc.namePlaceholder}
                   />
                 </div>
@@ -942,7 +954,7 @@ export default function CompaniesPage() {
                   <Input
                     value={form.name_ar}
                     onChange={(e) => setForm((f) => ({ ...f, name_ar: e.target.value }))}
-                    className="h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-5 transition-all"
+                    className="h-11 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-4 transition-all"
                     placeholder={tc.nameArPlaceholder}
                   />
                 </div>
@@ -960,12 +972,12 @@ export default function CompaniesPage() {
                       }
                     }}
                   >
-                    <SelectTrigger className="h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] focus:border-[#006C35] rounded-2xl text-lg px-5">
+                    <SelectTrigger className="h-11 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] focus:border-[#006C35] rounded-2xl text-lg px-4">
                       <SelectValue placeholder={tc.selectIndustry} />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-2 border-[#D4EBD9] rounded-xl max-h-80">
                       {INDUSTRIES.map((ind) => (
-                        <SelectItem key={ind.en} value={ind.en} className="text-[#0A1F0F] text-lg py-3 rounded-xl">
+                        <SelectItem key={ind.en} value={ind.en} className="text-[#0A1F0F] text-lg py-2 rounded-xl">
                           {locale === "ar" ? ind.ar : ind.en}
                         </SelectItem>
                       ))}
@@ -976,7 +988,7 @@ export default function CompaniesPage() {
                       value={form.industry}
                       onChange={(e) => setForm((f) => ({ ...f, industry: e.target.value }))}
                       placeholder={locale === "ar" ? "اكتب مجال شركتك..." : "Type your industry..."}
-                      className="mt-3 h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-5 transition-all"
+                      className="mt-3 h-11 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-4 transition-all"
                     />
                   )}
                 </div>
@@ -985,7 +997,7 @@ export default function CompaniesPage() {
                   <Input
                     value={form.website}
                     onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
-                    className="h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-5 transition-all"
+                    className="h-11 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-4 transition-all"
                     placeholder="https://"
                   />
                 </div>
@@ -996,7 +1008,7 @@ export default function CompaniesPage() {
                   <Textarea
                     value={form.description}
                     onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                    className="border-0 bg-transparent text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 rounded-2xl text-lg p-5 resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="border-0 bg-transparent text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 rounded-2xl text-lg p-4 resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
                     rows={Math.min(Math.max(5, Math.ceil(form.description.length / 80)), 15)}
                     placeholder={locale === "ar" ? "اكتب وصف شركتك أو ارفع ملف PDF للملف التعريفي..." : "Describe your company, paste a full company profile, or upload a PDF..."}
                   />
@@ -1006,24 +1018,24 @@ export default function CompaniesPage() {
                       <label className={cn("cursor-pointer flex items-center gap-2 bg-white border-2 border-[#D4EBD9] rounded-xl px-4 py-2 hover:border-[#006C35] hover:shadow-md transition-all", uploadingPdf && "pointer-events-none opacity-50")}>
                         <input type="file" accept="application/pdf" className="hidden" onChange={handlePdfUpload} />
                         {uploadingPdf ? (
-                          <Loader2 className="h-5 w-5 text-[#C9A84C] animate-spin" />
+                          <Loader2 className="h-5 w-5 text-[#7C3AED] animate-spin" />
                         ) : (
                           <FileText className="h-5 w-5 text-[#006C35]" />
                         )}
-                        <span className="text-sm font-bold text-[#006C35]">
+                        <span className="text-lg font-bold text-[#006C35]">
                           {uploadingPdf ? (locale === "ar" ? "جاري الاستخراج..." : "Extracting...") : (locale === "ar" ? "رفع ملف PDF" : "Upload PDF")}
                         </span>
                       </label>
                       {form.description.length > 500 && (
-                        <span className="flex items-center gap-1.5 text-sm font-medium text-[#00A352]">
+                        <span className="flex items-center gap-1.5 text-lg font-medium text-[#00A352]">
                           <FileText className="h-4 w-4" />
                           {locale === "ar" ? "ملف تعريفي شامل" : "Rich profile"}
                         </span>
                       )}
                     </div>
                     <span className={cn(
-                      "text-sm font-semibold tabular-nums",
-                      form.description.length > 5000 ? "text-[#C9A84C]" : "text-[#5A8A6A]/60"
+                      "text-lg font-semibold tabular-nums",
+                      form.description.length > 5000 ? "text-[#7C3AED]" : "text-[#5A8A6A]/60"
                     )}>
                       {form.description.length.toLocaleString()} {locale === "ar" ? "حرف" : "chars"}
                     </span>
@@ -1033,17 +1045,17 @@ export default function CompaniesPage() {
             </section>
 
             {/* Gradient divider */}
-            <div className="my-3 h-1.5 rounded-full bg-gradient-to-r from-transparent via-[#C9A84C]/40 to-transparent" />
+            <div className="my-3 h-1.5 rounded-full bg-gradient-to-r from-transparent via-[#7C3AED]/40 to-transparent" />
 
             {/* ─── Section 2: Brand Identity ─── */}
             <section
               className="rounded-2xl bg-gradient-to-br from-[#F8FBF8] to-[#F0F7F2] p-6 lg:p-8"
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] shadow-lg">
                   <Palette className="h-6 w-6 text-[#0A1F0F]" />
                 </div>
-                <h3 className="font-['Cairo'] text-2xl md:text-3xl font-extrabold text-[#004D26]">{tc.brandIdentity}</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-3xl font-black text-[#004D26]">{tc.brandIdentity}</h3>
               </div>
 
               {/* Logo upload */}
@@ -1051,14 +1063,14 @@ export default function CompaniesPage() {
                 <Label className="text-lg font-bold text-[#004D26] mb-3 block">{tc.logo}</Label>
                 <div className="flex items-center gap-5">
                   {uploadingLogo ? (
-                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-3 border-dashed border-[#C9A84C] bg-white shadow-inner">
-                      <Loader2 className="h-8 w-8 text-[#C9A84C] animate-spin" />
+                    <div className="flex h-24 w-24 items-center justify-center rounded-2xl border-3 border-dashed border-[#7C3AED] bg-white shadow-inner">
+                      <Loader2 className="h-8 w-8 text-[#7C3AED] animate-spin" />
                     </div>
                   ) : form.logo_url ? (
                     <div
                       className="relative"
                     >
-                      <div className="rounded-2xl p-[3px] bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#C9A84C]">
+                      <div className="rounded-2xl p-[3px] bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#7C3AED]">
                         <img src={form.logo_url} alt="" className="h-24 w-24 rounded-[14px] object-cover" />
                       </div>
                     </div>
@@ -1100,7 +1112,7 @@ export default function CompaniesPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-white border-2 border-[#D4EBD9] rounded-xl">
                     {TONES.map((t) => (
-                      <SelectItem key={t} value={t} className="text-[#0A1F0F] text-lg py-3 rounded-xl">{t}</SelectItem>
+                      <SelectItem key={t} value={t} className="text-[#0A1F0F] text-lg py-2 rounded-xl">{t}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -1118,7 +1130,7 @@ export default function CompaniesPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-lg">
                   <Megaphone className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-['Cairo'] text-2xl md:text-3xl font-extrabold text-[#004D26]">{tc.marketing}</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-3xl font-black text-[#004D26]">{tc.marketing}</h3>
               </div>
               <div className="space-y-6">
                 <div>
@@ -1126,7 +1138,7 @@ export default function CompaniesPage() {
                   <Textarea
                     value={form.target_audience}
                     onChange={(e) => setForm((f) => ({ ...f, target_audience: e.target.value }))}
-                    className="border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg p-5 transition-all"
+                    className="border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg p-4 transition-all"
                     rows={3}
                     placeholder={tc.targetPlaceholder}
                   />
@@ -1136,7 +1148,7 @@ export default function CompaniesPage() {
                   <Textarea
                     value={form.unique_value}
                     onChange={(e) => setForm((f) => ({ ...f, unique_value: e.target.value }))}
-                    className="border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg p-5 transition-all"
+                    className="border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg p-4 transition-all"
                     rows={3}
                     placeholder={tc.uniquePlaceholder}
                   />
@@ -1146,7 +1158,7 @@ export default function CompaniesPage() {
                   <Input
                     value={form.competitors}
                     onChange={(e) => setForm((f) => ({ ...f, competitors: e.target.value }))}
-                    className="h-14 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-5 transition-all"
+                    className="h-11 border-2 border-[#D4EBD9] bg-[#F8FBF8] text-[#0A1F0F] placeholder:text-[#5A8A6A]/50 focus:border-[#006C35] focus:bg-white rounded-2xl text-lg px-4 transition-all"
                   />
                 </div>
 
@@ -1175,7 +1187,7 @@ export default function CompaniesPage() {
                             <div
                               className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/30"
                             >
-                              <span className="text-sm text-white font-bold">{"\u2713"}</span>
+                              <span className="text-lg text-white font-bold">{"\u2713"}</span>
                             </div>
                           )}
                         </button>
@@ -1187,7 +1199,7 @@ export default function CompaniesPage() {
             </section>
 
             {/* Gradient divider */}
-            <div className="my-3 h-1.5 rounded-full bg-gradient-to-r from-transparent via-[#C9A84C]/40 to-transparent" />
+            <div className="my-3 h-1.5 rounded-full bg-gradient-to-r from-transparent via-[#7C3AED]/40 to-transparent" />
 
             {/* ─── Section 4: AI Analysis ─── */}
             <section
@@ -1195,11 +1207,11 @@ export default function CompaniesPage() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <div
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] shadow-lg"
                 >
                   <Sparkles className="h-6 w-6 text-[#0A1F0F]" />
                 </div>
-                <h3 className="font-['Cairo'] text-2xl md:text-3xl font-extrabold text-[#004D26]">{tc.analyzeAI}</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-3xl font-black text-[#004D26]">{tc.analyzeAI}</h3>
               </div>
               <div className="mb-5 flex items-center gap-4">
                 <Label className="text-lg font-bold text-[#004D26]">{tc.generateIn}</Label>
@@ -1244,7 +1256,7 @@ export default function CompaniesPage() {
                         className={cn(
                           "h-3 w-10 rounded-full transition-all",
                           i < getAnalysisCount()
-                            ? "bg-gradient-to-r from-[#C9A84C] to-[#E8D5A0]"
+                            ? "bg-gradient-to-r from-[#7C3AED] to-[#A78BFA]"
                             : "bg-[#D4EBD9]"
                         )}
                       />
@@ -1271,7 +1283,7 @@ export default function CompaniesPage() {
                     "relative h-16 text-xl px-10 rounded-2xl font-extrabold transition-all shadow-xl overflow-hidden",
                     getAnalysisCount() >= 3
                       ? "bg-[#D4EBD9] text-[#5A8A6A] cursor-not-allowed opacity-60"
-                      : "bg-gradient-to-r from-[#C9A84C] via-[#E8D5A0] to-[#C9A84C] text-[#0A1F0F] hover:shadow-md"
+                      : "bg-gradient-to-r from-[#7C3AED] via-[#A78BFA] to-[#7C3AED] text-[#0A1F0F] hover:shadow-md"
                   )}
                 >
                   {/* Shimmer effect */}
@@ -1327,7 +1339,7 @@ export default function CompaniesPage() {
             return (
               <>
                 {/* Header with gradient + company logo */}
-                <div className="relative bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-4 sm:px-8 py-6 sm:py-10 overflow-hidden">
+                <div className="relative bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] px-4 sm:px-8 py-6 sm:py-10 overflow-hidden">
 
                   {/* Close button */}
                   <button
@@ -1366,17 +1378,17 @@ export default function CompaniesPage() {
                       )}
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         {vc.industry && (
-                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-sm font-semibold text-white">
+                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-lg font-semibold text-white">
                             {TAG_STYLES.industry.emoji} {locale === "ar" ? (INDUSTRIES.find((ind) => ind.en === vc.industry)?.ar ?? vc.industry) : vc.industry}
                           </span>
                         )}
                         {vc.tone && (
-                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-sm font-semibold text-white">
+                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-lg font-semibold text-white">
                             {TAG_STYLES.tone.emoji} {vc.tone}
                           </span>
                         )}
                         {vc.website && (
-                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-sm font-semibold text-white flex items-center gap-1.5">
+                          <span className="rounded-xl bg-white/20 border border-white/30 px-4 py-1.5 text-lg font-semibold text-white flex items-center gap-1.5">
                             <Globe className="h-4 w-4" /> {vc.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                           </span>
                         )}
@@ -1399,10 +1411,10 @@ export default function CompaniesPage() {
                             <FileText className="h-5 w-5 text-[#00A352]" />
                             {tc.description}
                           </h4>
-                          <span className="text-sm font-medium text-[#5A8A6A]/60">{vc.description.length.toLocaleString()} {locale === "ar" ? "حرف" : "chars"}</span>
+                          <span className="text-lg font-medium text-[#5A8A6A]/60">{vc.description.length.toLocaleString()} {locale === "ar" ? "حرف" : "chars"}</span>
                         </div>
                         <div className={cn(
-                          "text-base text-[#0A1F0F] leading-relaxed whitespace-pre-wrap",
+                          "text-lg text-[#0A1F0F] leading-relaxed whitespace-pre-wrap",
                           vc.description.length > 600 ? "max-h-[300px] overflow-y-auto scrollbar-nawaa pr-2" : ""
                         )}>
                           {vc.description}
@@ -1425,7 +1437,7 @@ export default function CompaniesPage() {
                     {vc.unique_value && (
                       <div className="rounded-2xl border-2 border-[#D4EBD9] bg-white p-6">
                         <h4 className="flex items-center gap-2 text-lg font-bold text-[#004D26] mb-3">
-                          <Sparkles className="h-5 w-5 text-[#C9A84C]" />
+                          <Sparkles className="h-5 w-5 text-[#7C3AED]" />
                           {tc.uniqueValue}
                         </h4>
                         <p className="text-lg text-[#5A8A6A] leading-relaxed">{vc.unique_value}</p>
@@ -1477,7 +1489,7 @@ export default function CompaniesPage() {
                                 className="h-14 w-14 rounded-2xl border-2 border-white shadow-lg ring-2 ring-[#D4EBD9] cursor-pointer"
                                 style={{ backgroundColor: hex }}
                               />
-                              <span className="text-xs font-mono font-semibold text-[#5A8A6A]">{hex}</span>
+                              <span className="text-sm font-mono font-semibold text-[#5A8A6A]">{hex}</span>
                             </div>
                           ))}
                         </div>
@@ -1486,19 +1498,19 @@ export default function CompaniesPage() {
                   </div>
 
                   {/* Gradient divider */}
-                  <div className="h-1.5 rounded-full bg-gradient-to-r from-transparent via-[#C9A84C]/40 to-transparent" />
+                  <div className="h-1.5 rounded-full bg-gradient-to-r from-transparent via-[#7C3AED]/40 to-transparent" />
 
                   {/* AI Analysis Section */}
                   <div
                   >
                     <div className="flex items-center gap-3 mb-6">
                       <div
-                        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg"
+                        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] shadow-lg"
                       >
                         <Sparkles className="h-6 w-6 text-[#0A1F0F]" />
                       </div>
                       <div>
-                        <h3 className="font-['Cairo'] text-2xl md:text-3xl font-extrabold text-[#004D26]">
+                        <h3 className="font-['Cairo'] text-2xl sm:text-3xl font-black text-[#004D26]">
                           {tc.aiAnalysis || "AI Brand Analysis"}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
@@ -1509,14 +1521,14 @@ export default function CompaniesPage() {
                                 className={cn(
                                   "h-2.5 w-8 rounded-full transition-all",
                                   i < analysisCount
-                                    ? "bg-gradient-to-r from-[#C9A84C] to-[#E8D5A0]"
+                                    ? "bg-gradient-to-r from-[#7C3AED] to-[#A78BFA]"
                                     : "bg-[#D4EBD9]"
                                 )}
                               />
                             ))}
                           </div>
                           <span className={cn(
-                            "text-sm font-semibold",
+                            "text-lg font-semibold",
                             analysisCount >= 3 ? "text-red-500" : "text-[#5A8A6A]"
                           )}>
                             {analysisCount}/3 {tc.analysisRemaining || "analyses used"}
@@ -1533,11 +1545,11 @@ export default function CompaniesPage() {
                         >
                           <Sparkles className="h-12 w-12 text-[#D4EBD9] mx-auto mb-4" />
                         </div>
-                        <p className="text-xl font-bold text-[#5A8A6A]">
+                        <p className="text-2xl font-bold text-[#5A8A6A]">
                           {tc.noAnalysis || "No AI analysis yet. Edit the company to run one."}
                         </p>
                         <Button
-                          className="mt-5 h-12 px-8 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#E8D5A0] text-[#0A1F0F] shadow-lg hover:shadow-md transition-all"
+                          className="mt-5 h-12 px-8 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] text-[#0A1F0F] shadow-lg hover:shadow-md transition-all"
                           onClick={() => { setViewingCompany(null); openEdit(vc); }}
                         >
                           <Sparkles className="mr-2 h-5 w-5" />

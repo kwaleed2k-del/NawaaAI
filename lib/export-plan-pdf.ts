@@ -113,8 +113,8 @@ function renderDayPage(d: PlanDay, lang: "en" | "ar", company: Company, plan: Co
 
       ${d.contentTips ? `
       <!-- Tips -->
-      <div style="background: #F0F7F2; border: 2px solid #C9A84C; border-radius: 16px; padding: 16px 20px;">
-        <p style="margin: 0; font-size: 13px; color: #C9A84C; font-weight: 600; margin-bottom: 4px;">${labels.tips}</p>
+      <div style="background: #F0F7F2; border: 2px solid #7C3AED; border-radius: 16px; padding: 16px 20px;">
+        <p style="margin: 0; font-size: 13px; color: #7C3AED; font-weight: 600; margin-bottom: 4px;">${labels.tips}</p>
         <p style="margin: 0; font-size: 14px; color: #0A1F0F;">${d.contentTips}</p>
       </div>
       ` : ""}

@@ -48,8 +48,8 @@ export default function RootLayout({
               iconTheme: { primary: "#fca5a5", secondary: "#fff" },
             },
             loading: {
-              className: "!bg-[#004D26] !text-white !text-base !font-semibold !rounded-2xl !shadow-[0_8px_32px_rgba(0,77,38,0.35)] !px-6 !py-4 !min-w-[320px] !max-w-[480px] !border-2 !border-[#C9A84C]/40",
-              iconTheme: { primary: "#C9A84C", secondary: "#fff" },
+              className: "!bg-[#004D26] !text-white !text-base !font-semibold !rounded-2xl !shadow-[0_8px_32px_rgba(0,77,38,0.35)] !px-6 !py-4 !min-w-[320px] !max-w-[480px] !border-2 !border-[#7C3AED]/40",
+              iconTheme: { primary: "#7C3AED", secondary: "#fff" },
             },
           }}
         />

@@ -60,7 +60,7 @@
   --secondary-foreground: #0A1F0F;
   --muted: #F0F7F2;
   --muted-foreground: #5A8A6A;
-  --accent: #C9A84C;
+  --accent: #7C3AED;
   --accent-foreground: #0A1F0F;
   --destructive: oklch(0.58 0.22 27);
   --border: #D4EBD9;
@@ -85,6 +85,11 @@
 /* ═══════════════════════════════════════
    KEYFRAME ANIMATIONS
    ═══════════════════════════════════════ */
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
 
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -203,11 +208,11 @@
   box-shadow: 0 8px 32px rgba(0,108,53,0.06);
 }
 
-.glass-gold {
+.glass-accent {
   background: rgba(255,255,255,0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(201,168,76,0.2);
+  border: 1px solid rgba(124,58,237,0.2);
 }
 
 /* ═══════════════════════════════════════
@@ -215,11 +220,12 @@
    ═══════════════════════════════════════ */
 
 /* Glow effects */
-.glow-gold { box-shadow: 0 0 20px rgba(201,168,76,0.15), 0 0 60px rgba(201,168,76,0.05); }
+.glow-accent { box-shadow: 0 0 20px rgba(124,58,237,0.15), 0 0 60px rgba(124,58,237,0.05); }
 .glow-green { box-shadow: 0 0 20px rgba(0,108,53,0.15), 0 0 60px rgba(0,108,53,0.05); }
-.glow-gold-sm { box-shadow: 0 0 10px rgba(201,168,76,0.12); }
+.glow-accent-sm { box-shadow: 0 0 10px rgba(124,58,237,0.12); }
 .glow-green-sm { box-shadow: 0 0 10px rgba(0,108,53,0.12); }
 
+.animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out 3; }
 .animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
 .animate-glow-pulse-green { animation: glow-pulse-green 3s ease-in-out infinite; }
 .animate-border-glow { animation: border-glow 3s ease-in-out infinite; }
@@ -239,8 +245,8 @@
 }
 
 /* Gradient text */
-.text-gradient-gold {
-  background: linear-gradient(135deg, #C9A84C, #9A7B30);
+.text-gradient-accent {
+  background: linear-gradient(135deg, #7C3AED, #3B82F6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -253,8 +259,8 @@
   background-clip: text;
 }
 
-.text-gradient-gold-green {
-  background: linear-gradient(135deg, #C9A84C, #00A352);
+.text-gradient-accent-green {
+  background: linear-gradient(135deg, #7C3AED, #00A352);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -298,8 +304,8 @@
   --saudi-green: #006C35;
   --saudi-green-bright: #00A352;
   --saudi-green-deep: #004D26;
-  --gold: #C9A84C;
-  --gold-bright: #E8C96A;
+  --accent-purple: #7C3AED;
+  --accent-blue: #3B82F6;
   --text-primary: #0A1F0F;
   --text-secondary: #2D5A3D;
   --text-muted: #5A8A6A;

@@ -1,98 +1,191 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-/* framer-motion removed – using plain HTML + CSS transitions */
-import { ImageIcon, Trash2, Download, Maximize2, X, Sparkles, Loader2, Calendar } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  ImageIcon,
+  Trash2,
+  Download,
+  Maximize2,
+  X,
+  Sparkles,
+  Loader2,
+  Calendar,
+  Building2,
+  FileText,
+  Filter,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useAppStore } from "@/lib/store";
-import { messages } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
+/* ---------- Types ---------- */
 type GenerationRow = {
   id: string;
   image_urls: string[] | null;
   day_label: string | null;
   prompt_used: string | null;
   company_id: string | null;
+  plan_id: string | null;
   created_at: string;
+};
+
+type CompanyRow = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+};
+
+type PlanRow = {
+  id: string;
+  title: string;
 };
 
 /* ---------- Accent gradient palette cycling per card ---------- */
 const cardAccents = [
-  "from-[#006C35] via-[#00A352] to-[#2DD17A]",   // green
-  "from-[#C9A84C] via-[#E0C068] to-[#F5DC8A]",   // gold
-  "from-[#1E6DB8] via-[#3B9AE8] to-[#70C0F5]",   // blue
-  "from-[#7B3FA0] via-[#A855F7] to-[#D09CF7]",   // purple
+  "from-[#006C35] via-[#00A352] to-[#2DD17A]",
+  "from-[#7C3AED] via-[#A78BFA] to-[#C4B5FD]",
+  "from-[#1E6DB8] via-[#3B9AE8] to-[#70C0F5]",
+  "from-[#7B3FA0] via-[#A855F7] to-[#D09CF7]",
 ];
 
 const cardBorderHover = [
   "hover:border-[#00A352]",
-  "hover:border-[#C9A84C]",
+  "hover:border-[#7C3AED]",
   "hover:border-[#3B9AE8]",
   "hover:border-[#A855F7]",
 ];
 
-const cardShadowHover = [
-  "hover:shadow-lg",
-  "hover:shadow-lg",
-  "hover:shadow-lg",
-  "hover:shadow-lg",
-];
-
-/* ---------- Framer Motion Variants ---------- */
-
-
+/* ---------- Component ---------- */
 export default function MyGenerationsPage() {
   const supabase = createClient();
   const { locale, user } = useAppStore();
 
   const [generations, setGenerations] = useState<GenerationRow[]>([]);
+  const [companies, setCompanies] = useState<CompanyRow[]>([]);
+  const [plans, setPlans] = useState<PlanRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
 
-  const title = locale === "ar" ? "معرض الصور" : "My Generations";
-  const subtitle = locale === "ar" ? "جميع الصور المولّدة بالذكاء الاصطناعي" : "All your AI-generated images";
-  const noGenerations = locale === "ar" ? "لا توجد صور بعد" : "No generations yet";
-  const noGenerationsSub = locale === "ar" ? "ابدأ بإنشاء صور من استوديو الرؤية" : "Start creating images from Vision Studio";
-  const downloadLabel = locale === "ar" ? "تنزيل" : "Download";
-  const deleteLabel = locale === "ar" ? "حذف" : "Delete";
-  const fullScreenLabel = locale === "ar" ? "عرض كامل" : "Full screen";
+  /* ---------- i18n labels ---------- */
+  const isAr = locale === "ar";
+  const t = {
+    galleryLabel: isAr ? "معرض الصور" : "Gallery",
+    title: isAr ? "معرض الصور" : "My Generations",
+    subtitle: isAr
+      ? "جميع الصور المولّدة بالذكاء الاصطناعي — مجمّعة حسب الشركة"
+      : "All your AI-generated images — grouped by company",
+    noGenerations: isAr ? "لا توجد صور بعد" : "No generations yet",
+    noGenerationsSub: isAr
+      ? "ابدأ بإنشاء صور من استوديو الرؤية"
+      : "Start creating images from Vision Studio",
+    download: isAr ? "تنزيل" : "Download",
+    delete: isAr ? "حذف" : "Delete",
+    fullScreen: isAr ? "عرض كامل" : "Full screen",
+    all: isAr ? "الكل" : "All",
+    yes: isAr ? "نعم" : "Yes",
+    cancel: isAr ? "إلغاء" : "Cancel",
+    openStudio: isAr ? "افتح استوديو الرؤية" : "Open Vision Studio",
+    images: isAr ? "صور" : "images",
+    plan: isAr ? "الخطة" : "Plan",
+    noCompany: isAr ? "بدون شركة" : "No Company",
+    generationsFor: isAr ? "الصور لـ" : "Generations for",
+    totalImages: isAr ? "إجمالي الصور" : "Total Images",
+    failedLoad: isAr ? "فشل تحميل الصور" : "Failed to load generations",
+    failedDelete: isAr ? "فشل الحذف" : "Failed to delete",
+    deleted: isAr ? "تم الحذف" : "Deleted successfully",
+    filterBy: isAr ? "تصفية حسب الشركة" : "Filter by Company",
+  };
 
-  const fetchGenerations = useCallback(async () => {
+  /* ---------- Fetch data ---------- */
+  const fetchData = useCallback(async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from("generated_images")
-      .select("id, image_urls, day_label, prompt_used, company_id, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    const [genRes, compRes, planRes] = await Promise.all([
+      supabase
+        .from("generated_images")
+        .select("id, image_urls, day_label, prompt_used, company_id, plan_id, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("companies")
+        .select("id, name, logo_url")
+        .eq("user_id", user.id),
+      supabase
+        .from("content_plans")
+        .select("id, title")
+        .eq("user_id", user.id),
+    ]);
 
-    if (error) {
-      toast.error(locale === "ar" ? "فشل تحميل الصور" : "Failed to load generations");
-      console.error(error);
+    if (genRes.error) {
+      toast.error(t.failedLoad);
+      console.error(genRes.error);
     } else {
-      setGenerations((data as GenerationRow[]) ?? []);
+      setGenerations((genRes.data as GenerationRow[]) ?? []);
     }
+
+    if (!compRes.error) setCompanies((compRes.data as CompanyRow[]) ?? []);
+    if (!planRes.error) setPlans((planRes.data as PlanRow[]) ?? []);
+
     setLoading(false);
-  }, [locale, user]);
+  }, [user]);
 
   useEffect(() => {
-    fetchGenerations();
-  }, [fetchGenerations]);
+    fetchData();
+  }, [fetchData]);
 
+  /* ---------- Lookup maps ---------- */
+  const companyMap = useMemo(() => {
+    const m = new Map<string, CompanyRow>();
+    companies.forEach((c) => m.set(c.id, c));
+    return m;
+  }, [companies]);
+
+  const planMap = useMemo(() => {
+    const m = new Map<string, PlanRow>();
+    plans.forEach((p) => m.set(p.id, p));
+    return m;
+  }, [plans]);
+
+  /* ---------- Company counts for filter badges ---------- */
+  const companyCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    generations.forEach((g) => {
+      const key = g.company_id ?? "__none__";
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+    return counts;
+  }, [generations]);
+
+  /* ---------- Filtered generations ---------- */
+  const filteredGenerations = useMemo(() => {
+    if (activeFilter === "all") return generations;
+    if (activeFilter === "__none__")
+      return generations.filter((g) => !g.company_id);
+    return generations.filter((g) => g.company_id === activeFilter);
+  }, [generations, activeFilter]);
+
+  /* ---------- Total image count ---------- */
+  const totalImages = generations.reduce(
+    (sum, g) => sum + (g.image_urls?.length ?? 0),
+    0
+  );
+
+  /* ---------- Actions ---------- */
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure?")) return;
+    setConfirmDeleteId(null);
     setDeletingId(id);
     const { error } = await supabase.from("generated_images").delete().eq("id", id);
     if (error) {
-      toast.error(locale === "ar" ? "فشل الحذف" : "Failed to delete");
+      toast.error(t.failedDelete);
     } else {
       setGenerations((prev) => prev.filter((g) => g.id !== id));
-      toast.success(locale === "ar" ? "تم الحذف" : "Deleted successfully");
+      toast.success(t.deleted);
     }
     setDeletingId(null);
   }
@@ -111,7 +204,7 @@ export default function MyGenerationsPage() {
   function formatCreatedAt(dateStr: string): string {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+      return d.toLocaleDateString(isAr ? "ar-SA" : "en-US", {
         weekday: "long",
         year: "numeric",
         month: "long",
@@ -124,22 +217,38 @@ export default function MyGenerationsPage() {
     }
   }
 
-  /* ---------- Loading skeleton with animated gradient sweep ---------- */
+  /* ---------- Loading skeleton ---------- */
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FBF8] p-6">
+      <div dir={isAr ? "rtl" : "ltr"} className="min-h-screen bg-[#F8FBF8] p-6">
         <div className="mx-auto max-w-7xl space-y-8">
           {/* Header skeleton */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8">
-            <div className="space-y-3">
-              <div className="relative h-10 w-72 overflow-hidden rounded-xl bg-white/20">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#003D1F] via-[#006C35] to-[#00A352] p-8 sm:p-10 lg:p-14">
+            <div className="space-y-4">
+              <div className="relative h-12 w-12 overflow-hidden rounded-2xl bg-white/20">
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
               </div>
-              <div className="relative h-6 w-96 overflow-hidden rounded-xl bg-white/15">
+              <div className="relative h-12 w-80 overflow-hidden rounded-xl bg-white/20">
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              </div>
+              <div className="relative h-8 w-[28rem] overflow-hidden rounded-xl bg-white/15">
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite_0.3s] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
               </div>
             </div>
           </div>
+
+          {/* Filter skeleton */}
+          <div className="flex gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="relative h-12 w-36 overflow-hidden rounded-2xl bg-white border-2 border-[#D4EBD9]"
+              >
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
+              </div>
+            ))}
+          </div>
+
           {/* Card skeletons */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -147,23 +256,26 @@ export default function MyGenerationsPage() {
                 key={i}
                 className="relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-white"
               >
-                {/* Accent bar skeleton */}
                 <div className="relative h-1.5 overflow-hidden bg-gradient-to-r from-[#D4EBD9] via-[#A8D5B8] to-[#D4EBD9]">
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
                 </div>
                 <div className="p-5 space-y-4">
-                  {/* Date badge skeleton */}
-                  <div className="flex items-center justify-between">
-                    <div className="relative h-8 w-48 overflow-hidden rounded-full bg-[#D4EBD9]/40">
+                  {/* Badges skeleton */}
+                  <div className="flex gap-2">
+                    <div className="relative h-8 w-28 overflow-hidden rounded-full bg-[#D4EBD9]/40">
                       <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
                     </div>
-                    <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-[#D4EBD9]/40">
-                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-red-200/30 to-transparent" />
+                    <div className="relative h-8 w-24 overflow-hidden rounded-full bg-[#D4EBD9]/40">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
                     </div>
                   </div>
-                  {/* Title skeleton */}
-                  <div className="relative h-7 w-40 overflow-hidden rounded-lg bg-[#D4EBD9]/30">
+                  {/* Date skeleton */}
+                  <div className="relative h-6 w-48 overflow-hidden rounded-lg bg-[#D4EBD9]/30">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite_0.2s] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
+                  </div>
+                  {/* Title skeleton */}
+                  <div className="relative h-8 w-40 overflow-hidden rounded-lg bg-[#D4EBD9]/30">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite_0.3s] bg-gradient-to-r from-transparent via-[#00A352]/10 to-transparent" />
                   </div>
                   {/* Image grid skeleton */}
                   <div className="grid grid-cols-2 gap-3">
@@ -174,9 +286,7 @@ export default function MyGenerationsPage() {
                       >
                         <div
                           className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#00A352]/8 to-transparent"
-                          style={{
-                            animation: `shimmer 2s infinite ${j * 0.15}s`,
-                          }}
+                          style={{ animation: `shimmer 2s infinite ${j * 0.15}s` }}
                         />
                       </div>
                     ))}
@@ -186,7 +296,6 @@ export default function MyGenerationsPage() {
             ))}
           </div>
         </div>
-        {/* Shimmer keyframe injected via style tag */}
         <style>{`
           @keyframes shimmer {
             0% { transform: translateX(-100%); }
@@ -197,201 +306,417 @@ export default function MyGenerationsPage() {
     );
   }
 
-  /* ---------- Total image count across all generations ---------- */
-  const totalImages = generations.reduce(
-    (sum, g) => sum + (g.image_urls?.length ?? 0),
-    0
-  );
-
   return (
-    <div className="min-h-screen bg-[#F8FBF8]">
+    <div dir={isAr ? "rtl" : "ltr"} className="min-h-screen bg-[#F8FBF8]">
       <div className="mx-auto max-w-7xl space-y-10">
-        {/* ========== Gradient Banner Header ========== */}
-        <div
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10"
-        >
-          <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="font-['Cairo'] text-4xl md:text-5xl font-extrabold text-white drop-shadow-sm">
-                {title}
-              </h1>
-              <div className="mt-3 flex items-center gap-2 text-lg text-white/80">
-                <ImageIcon className="h-5 w-5" />
-                <span>{subtitle}</span>
+        {/* ===== PAGE HEADER BANNER ===== */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#003D1F] via-[#006C35] to-[#00A352] p-8 sm:p-10 lg:p-14">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#00A352]/30 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-emerald-400/20 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+          <div className="absolute top-10 right-20 w-2 h-2 rounded-full bg-white/30 animate-pulse" />
+          <div
+            className="absolute bottom-8 left-32 w-2.5 h-2.5 rounded-full bg-white/25 animate-pulse"
+            style={{ animationDelay: "1s" }}
+          />
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                <ImageIcon className="h-6 w-6 text-emerald-200" />
               </div>
+              <span className="text-lg font-bold text-emerald-200/80 tracking-wide">
+                {t.galleryLabel}
+              </span>
             </div>
-            {/* Count badge */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+              {t.title}
+            </h1>
+            <p className="mt-4 text-xl sm:text-2xl font-medium text-emerald-100/70">
+              {t.subtitle}
+            </p>
+
+            {/* Stats row */}
             {generations.length > 0 && (
-              <div
-                className="flex items-center gap-3 self-start rounded-2xl border border-white/20 bg-white/15 px-5 py-3"
-              >
-                <span className="text-lg font-semibold text-white">
-                  {totalImages}
-                </span>
-                <span className="text-lg text-white/70">
-                  {locale === "ar" ? "صورة" : "images"}
-                </span>
+              <div className="mt-6 flex flex-wrap gap-6">
+                <div className="flex items-center gap-2 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 px-5 py-3">
+                  <ImageIcon className="h-5 w-5 text-emerald-300" />
+                  <span className="text-lg font-bold text-white">
+                    {totalImages}
+                  </span>
+                  <span className="text-base font-medium text-emerald-200/70">
+                    {t.images}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 px-5 py-3">
+                  <Building2 className="h-5 w-5 text-emerald-300" />
+                  <span className="text-lg font-bold text-white">
+                    {companies.length}
+                  </span>
+                  <span className="text-base font-medium text-emerald-200/70">
+                    {isAr ? "شركات" : "companies"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 px-5 py-3">
+                  <Sparkles className="h-5 w-5 text-emerald-300" />
+                  <span className="text-lg font-bold text-white">
+                    {generations.length}
+                  </span>
+                  <span className="text-base font-medium text-emerald-200/70">
+                    {isAr ? "مجموعات" : "generations"}
+                  </span>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* ========== Empty State ========== */}
+        {/* ===== EMPTY STATE ===== */}
         {generations.length === 0 ? (
-          <div
-            className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] bg-white py-28"
-          >
-            {/* Animated floating icon in gradient circle */}
-            <div
-              className="relative"
-            >
-              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#006C35]/15 via-[#00A352]/10 to-[#C9A84C]/15">
+          <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] bg-white py-28">
+            <div className="relative">
+              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#006C35]/15 via-[#00A352]/10 to-[#7C3AED]/15">
                 <ImageIcon className="h-16 w-16 text-[#00A352]" />
               </div>
-              {/* Pulsing sparkles */}
-              <div
-                className="absolute -right-2 -top-2"
-              >
-                <Sparkles className="h-7 w-7 text-[#C9A84C]" />
+              <div className="absolute -right-2 -top-2">
+                <Sparkles className="h-7 w-7 text-[#7C3AED]" />
               </div>
-              <div
-                className="absolute -bottom-1 -left-3"
-              >
+              <div className="absolute -bottom-1 -left-3">
                 <Sparkles className="h-5 w-5 text-[#00A352]" />
               </div>
             </div>
 
-            <p className="mt-8 text-2xl font-bold text-[#004D26]">{noGenerations}</p>
-            <p className="mt-2 text-lg text-[#5A8A6A]/70">{noGenerationsSub}</p>
+            <p className="mt-8 text-2xl sm:text-3xl font-black text-[#004D26]">
+              {t.noGenerations}
+            </p>
+            <p className="mt-2 text-lg text-[#5A8A6A]/70">{t.noGenerationsSub}</p>
             <a
               href="/vision-studio"
-              className="mt-8 inline-flex h-14 items-center rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-10 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#00A352]/25"
+              className="mt-8 inline-flex h-14 items-center rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] px-10 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#00A352]/25"
             >
               <Sparkles className="mr-2 h-6 w-6" />
-              {locale === "ar" ? "افتح استوديو الرؤية" : "Open Vision Studio"}
+              {t.openStudio}
             </a>
           </div>
         ) : (
-          /* ========== Generation Cards Grid ========== */
-          <div
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {generations.map((gen, idx) => {
-              const accentIdx = idx % 4;
-              return (
-                <div key={gen.id}>
-                  <Card
+          <>
+            {/* ===== FILTER BAR ===== */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-[#00A352]" />
+                <span className="text-lg font-bold text-[#004D26]">{t.filterBy}</span>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {/* All button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter("all")}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all duration-300",
+                    activeFilter === "all"
+                      ? "border-[#00A352] bg-gradient-to-r from-[#006C35] to-[#00A352] text-white shadow-lg shadow-[#00A352]/20"
+                      : "border-[#D4EBD9] bg-white text-[#004D26] hover:border-[#00A352]/40 hover:bg-[#F0F7F2]"
+                  )}
+                >
+                  {t.all}
+                  <span
                     className={cn(
-                      "group relative overflow-hidden border-2 border-[#D4EBD9] bg-white rounded-2xl transition-all duration-500",
-                      "hover:-translate-y-1.5",
-                      cardBorderHover[accentIdx],
-                      cardShadowHover[accentIdx]
+                      "inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-bold",
+                      activeFilter === "all"
+                        ? "bg-white/20 text-white"
+                        : "bg-[#D4EBD9] text-[#004D26]"
                     )}
                   >
-                    {/* Gradient accent bar at top */}
-                    <div
-                      className={cn(
-                        "h-1.5 w-full bg-gradient-to-r",
-                        cardAccents[accentIdx]
-                      )}
-                    />
+                    {generations.length}
+                  </span>
+                </button>
 
-                    <CardHeader className="p-5 pb-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1 space-y-2">
+                {/* Per-company buttons */}
+                {companies.map((company) => {
+                  const count = companyCounts.get(company.id) ?? 0;
+                  if (count === 0) return null;
+                  const isActive = activeFilter === company.id;
+                  return (
+                    <button
+                      key={company.id}
+                      type="button"
+                      onClick={() => setActiveFilter(company.id)}
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all duration-300",
+                        isActive
+                          ? "border-[#00A352] bg-gradient-to-r from-[#006C35] to-[#00A352] text-white shadow-lg shadow-[#00A352]/20"
+                          : "border-[#D4EBD9] bg-white text-[#004D26] hover:border-[#00A352]/40 hover:bg-[#F0F7F2]"
+                      )}
+                    >
+                      {company.logo_url ? (
+                        <img
+                          src={company.logo_url}
+                          alt=""
+                          className="h-5 w-5 rounded-full object-cover"
+                        />
+                      ) : (
+                        <Building2 className={cn("h-4 w-4", isActive ? "text-white" : "text-[#00A352]")} />
+                      )}
+                      {company.name}
+                      <span
+                        className={cn(
+                          "inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-bold",
+                          isActive
+                            ? "bg-white/20 text-white"
+                            : "bg-[#D4EBD9] text-[#004D26]"
+                        )}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+
+                {/* Uncategorized button */}
+                {(companyCounts.get("__none__") ?? 0) > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveFilter("__none__")}
+                    className={cn(
+                      "inline-flex items-center gap-2 rounded-2xl border-2 px-5 py-3 text-sm font-bold transition-all duration-300",
+                      activeFilter === "__none__"
+                        ? "border-[#00A352] bg-gradient-to-r from-[#006C35] to-[#00A352] text-white shadow-lg shadow-[#00A352]/20"
+                        : "border-[#D4EBD9] bg-white text-[#004D26] hover:border-[#00A352]/40 hover:bg-[#F0F7F2]"
+                    )}
+                  >
+                    {t.noCompany}
+                    <span
+                      className={cn(
+                        "inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-bold",
+                        activeFilter === "__none__"
+                          ? "bg-white/20 text-white"
+                          : "bg-[#D4EBD9] text-[#004D26]"
+                      )}
+                    >
+                      {companyCounts.get("__none__") ?? 0}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* ===== SECTION HEADER (showing current filter) ===== */}
+            {activeFilter !== "all" && (
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl font-black text-[#004D26]">
+                  {t.generationsFor}{" "}
+                  <span className="text-[#00A352]">
+                    {activeFilter === "__none__"
+                      ? t.noCompany
+                      : companyMap.get(activeFilter)?.name ?? ""}
+                  </span>
+                </h2>
+                <span className="text-lg font-bold text-[#5A8A6A]/60">
+                  ({filteredGenerations.length})
+                </span>
+              </div>
+            )}
+
+            {/* ===== GENERATION CARDS GRID ===== */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredGenerations.map((gen, idx) => {
+                const accentIdx = idx % 4;
+                const company = gen.company_id
+                  ? companyMap.get(gen.company_id)
+                  : null;
+                const plan = gen.plan_id ? planMap.get(gen.plan_id) : null;
+
+                return (
+                  <div key={gen.id}>
+                    <Card
+                      className={cn(
+                        "group relative overflow-hidden border-2 border-[#D4EBD9] bg-white rounded-2xl transition-all duration-500",
+                        "hover:-translate-y-1.5 hover:shadow-lg",
+                        cardBorderHover[accentIdx]
+                      )}
+                    >
+                      {/* Gradient accent bar at top */}
+                      <div
+                        className={cn(
+                          "h-1.5 w-full bg-gradient-to-r",
+                          cardAccents[accentIdx]
+                        )}
+                      />
+
+                      <CardHeader className="p-5 pb-3">
+                        <div className="space-y-3">
+                          {/* Top row: badges + delete */}
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex flex-wrap gap-2 min-w-0 flex-1">
+                              {/* Company badge */}
+                              {company ? (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1.5 text-sm font-bold text-[#004D26]">
+                                  {company.logo_url ? (
+                                    <img
+                                      src={company.logo_url}
+                                      alt=""
+                                      className="h-4 w-4 rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <Building2 className="h-3.5 w-3.5 text-[#00A352]" />
+                                  )}
+                                  {company.name}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 px-3 py-1.5 text-sm font-bold text-gray-500">
+                                  <Building2 className="h-3.5 w-3.5" />
+                                  {t.noCompany}
+                                </span>
+                              )}
+
+                              {/* Plan badge */}
+                              {plan && (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 border border-violet-200 px-3 py-1.5 text-sm font-bold text-violet-700">
+                                  <FileText className="h-3.5 w-3.5" />
+                                  {plan.title.length > 25
+                                    ? plan.title.slice(0, 25) + "..."
+                                    : plan.title}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Delete button */}
+                            <div className="shrink-0">
+                              {confirmDeleteId === gen.id ? (
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    disabled={deletingId === gen.id}
+                                    onClick={() => handleDelete(gen.id)}
+                                    className="h-9 px-3 text-sm font-bold bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl shadow-md hover:shadow-sm transition-all"
+                                  >
+                                    {deletingId === gen.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      t.yes
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setConfirmDeleteId(null)}
+                                    className="h-9 px-3 text-sm font-bold border-2 border-[#D4EBD9] text-[#004D26] hover:bg-[#F0F7F2] hover:border-[#00A352]/40 rounded-xl transition-all"
+                                  >
+                                    {t.cancel}
+                                  </Button>
+                                </div>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  disabled={deletingId === gen.id}
+                                  onClick={() => setConfirmDeleteId(gen.id)}
+                                  className="h-9 w-9 shrink-0 rounded-xl bg-red-50 text-red-500 transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30"
+                                  title={t.delete}
+                                >
+                                  {deletingId === gen.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+
                           {/* Date badge */}
                           <div className="inline-flex items-center gap-2 rounded-full border border-[#D4EBD9] bg-[#F0F7F2] px-3 py-1.5">
                             <Calendar className="h-4 w-4 text-[#00A352]" />
-                            <span className="text-sm font-medium text-[#5A8A6A]">
+                            <span className="text-base font-medium text-[#5A8A6A]">
                               {formatCreatedAt(gen.created_at)}
                             </span>
                           </div>
+
+                          {/* Day label */}
                           {gen.day_label && (
-                            <CardTitle className="truncate font-['Cairo'] text-xl font-bold text-[#004D26]">
+                            <p className="text-2xl font-extrabold text-[#004D26] truncate">
                               {gen.day_label}
-                            </CardTitle>
+                            </p>
                           )}
                         </div>
-                        {/* Delete button with hover animation */}
-                        <div
-                        >
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            disabled={deletingId === gen.id}
-                            onClick={() => handleDelete(gen.id)}
-                            className="h-9 w-9 shrink-0 rounded-xl bg-red-50 text-red-500 transition-all duration-300 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30"
-                            title={deleteLabel}
-                          >
-                            {deletingId === gen.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
+                      </CardHeader>
 
-                    <CardContent className="p-5 pt-0">
-                      {/* 2x2 image grid */}
-                      <div className="grid grid-cols-2 gap-3">
-                        {(gen.image_urls ?? []).map((url, imgIdx) => (
-                          <div
-                            key={imgIdx}
-                            className="group/img relative aspect-square overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-[#F8FBF8] transition-all duration-300 hover:border-[#00A352]/50"
-                          >
-                            <img
-                              src={url}
-                              alt={`${gen.day_label || "Generation"} - ${imgIdx + 1}`}
-                              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-110"
-                              loading="lazy"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = "none";
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  const fallback = document.createElement("div");
-                                  fallback.className =
-                                    "absolute inset-0 flex items-center justify-center bg-[#F0F7F2]";
-                                  fallback.innerHTML =
-                                    '<p class="text-[#5A8A6A] text-sm text-center px-2">Failed to load</p>';
-                                  parent.appendChild(fallback);
-                                }
-                              }}
-                            />
-                            {/* Gradient hover overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-t from-[#004D26]/70 via-[#006C35]/40 to-transparent opacity-0 transition-all duration-300 group-hover/img:opacity-100">
-                              <button
-                                type="button"
-                                onClick={() => setLightboxUrl(url)}
-                                className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-white/30 bg-white/90 text-[#004D26] shadow-lg transition-colors hover:bg-white"
-                                title={fullScreenLabel}
-                              >
-                                <Maximize2 className="h-5 w-5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDownload(url)}
-                                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] text-white shadow-lg transition-shadow hover:shadow-[#00A352]/40"
-                                title={downloadLabel}
-                              >
-                                <Download className="h-5 w-5" />
-                              </button>
+                      <CardContent className="p-5 pt-0">
+                        {/* 2x2 image grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {(gen.image_urls ?? []).map((url, imgIdx) => (
+                            <div
+                              key={imgIdx}
+                              className="group/img relative aspect-square overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-[#F8FBF8] transition-all duration-300 hover:border-[#00A352]/50"
+                            >
+                              <img
+                                src={url}
+                                alt={`${gen.day_label || "Generation"} - ${imgIdx + 1}`}
+                                className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-110"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = "none";
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    const fallback = document.createElement("div");
+                                    fallback.className =
+                                      "absolute inset-0 flex items-center justify-center bg-[#F0F7F2]";
+                                    fallback.innerHTML =
+                                      '<p class="text-[#5A8A6A] text-sm text-center px-2">Failed to load</p>';
+                                    parent.appendChild(fallback);
+                                  }
+                                }}
+                              />
+                              {/* Gradient hover overlay */}
+                              <div className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-t from-[#004D26]/70 via-[#006C35]/40 to-transparent opacity-0 transition-all duration-300 group-hover/img:opacity-100">
+                                <button
+                                  type="button"
+                                  onClick={() => setLightboxUrl(url)}
+                                  className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-white/30 bg-white/90 text-[#004D26] shadow-lg transition-colors hover:bg-white"
+                                  title={t.fullScreen}
+                                >
+                                  <Maximize2 className="h-5 w-5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDownload(url)}
+                                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#006C35] to-[#00A352] text-white shadow-lg transition-shadow hover:shadow-[#00A352]/40"
+                                  title={t.download}
+                                >
+                                  <Download className="h-5 w-5" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
-          </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Empty filtered state */}
+            {filteredGenerations.length === 0 && generations.length > 0 && (
+              <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] bg-white py-20">
+                <ImageIcon className="h-16 w-16 text-[#D4EBD9]" />
+                <p className="mt-4 text-2xl font-bold text-[#004D26]">
+                  {isAr ? "لا توجد صور لهذه الشركة" : "No generations for this company"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter("all")}
+                  className="mt-4 text-lg font-bold text-[#00A352] hover:underline"
+                >
+                  {isAr ? "عرض الكل" : "Show all"}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* ========== Lightbox Overlay ========== */}
+      {/* ===== LIGHTBOX OVERLAY ===== */}
       {lightboxUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#004D26]/90 via-black/85 to-[#0A1F0F]/90 p-4"
@@ -414,7 +739,7 @@ export default function MyGenerationsPage() {
               className="absolute -right-4 -top-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-transparent bg-white text-[#004D26] shadow-xl transition-colors hover:bg-[#F0F7F2]"
               style={{
                 backgroundClip: "padding-box",
-                borderImage: "linear-gradient(135deg, #006C35, #C9A84C) 1",
+                borderImage: "linear-gradient(135deg, #006C35, #7C3AED) 1",
                 borderImageSlice: 1,
               }}
             >
@@ -428,10 +753,10 @@ export default function MyGenerationsPage() {
                 e.stopPropagation();
                 handleDownload(lightboxUrl);
               }}
-              className="absolute bottom-6 right-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-7 py-4 text-lg font-bold text-white shadow-xl transition-shadow hover:shadow-2xl hover:shadow-[#00A352]/30"
+              className="absolute bottom-6 right-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] px-7 py-4 text-lg font-bold text-white shadow-xl transition-shadow hover:shadow-2xl hover:shadow-[#00A352]/30"
             >
               <Download className="h-6 w-6" />
-              {downloadLabel}
+              {t.download}
             </button>
           </div>
         </div>

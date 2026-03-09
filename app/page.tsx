@@ -95,7 +95,7 @@ function DashboardPreview({ isRtl }: { isRtl: boolean }) {
         </p>
         <div className="flex gap-1">
           <div className="h-2.5 w-2.5 rounded-full bg-[#00A352]" />
-          <div className="h-2.5 w-2.5 rounded-full bg-[#C9A84C]" />
+          <div className="h-2.5 w-2.5 rounded-full bg-[#7C3AED]" />
           <div className="h-2.5 w-2.5 rounded-full bg-[#006C35]" />
         </div>
       </div>
@@ -342,7 +342,7 @@ export default function LandingPage() {
             }}
           >
             <span className="block text-[#004D26]">{L.heroLine1}</span>
-            <span className="block bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] bg-clip-text text-transparent">{L.heroLine2}</span>
+            <span className="block bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] bg-clip-text text-transparent">{L.heroLine2}</span>
           </motion.h1>
 
           {/* Content row: subtitle + CTA on left, preview on right */}
@@ -466,7 +466,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="pill-badge bg-[#C9A84C] text-white inline-flex"
+              className="pill-badge bg-[#7C3AED] text-white inline-flex"
             >
               {L.featuresLabel}
             </motion.span>
@@ -622,7 +622,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="pill-badge bg-[#C9A84C] text-white inline-flex"
+              className="pill-badge bg-[#7C3AED] text-white inline-flex"
             >
               {L.pricingLabel}
             </motion.span>
@@ -754,7 +754,7 @@ export default function LandingPage() {
             <div
               className="absolute -bottom-16 -left-16 h-[160px] w-[160px] rounded-full opacity-10"
               style={{
-                background: "radial-gradient(circle, #C9A84C, transparent)",
+                background: "radial-gradient(circle, #7C3AED, transparent)",
               }}
             />
 

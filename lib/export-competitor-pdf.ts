@@ -90,7 +90,7 @@ interface AnalysisData {
 type Locale = "en" | "ar";
 
 function scoreColor(score: number): string {
-  return score >= 70 ? "#006C35" : score >= 40 ? "#C9A84C" : "#ef4444";
+  return score >= 70 ? "#006C35" : score >= 40 ? "#F59E0B" : "#ef4444";
 }
 
 function threatColor(level: number): { bg: string; text: string; label: string; labelAr: string } {
@@ -248,8 +248,8 @@ function renderCompetitorPage(comp: CompetitorResult, locale: Locale, pageNum: n
       </div>
 
       ${comp.stealThisMove ? `
-      <div style="margin-top:8px;background:rgba(201,168,76,0.08);border:2px solid rgba(201,168,76,0.2);border-radius:10px;padding:10px 14px;">
-        <span style="font-size:10px;font-weight:800;color:#C9A84C;text-transform:uppercase;letter-spacing:1px;">${isAr ? "اسرق هذه الحركة" : "STEAL THIS MOVE"}</span>
+      <div style="margin-top:8px;background:rgba(124,58,237,0.08);border:2px solid rgba(124,58,237,0.2);border-radius:10px;padding:10px 14px;">
+        <span style="font-size:10px;font-weight:800;color:#7C3AED;text-transform:uppercase;letter-spacing:1px;">${isAr ? "اسرق هذه الحركة" : "STEAL THIS MOVE"}</span>
         <p style="font-size:12px;color:#0A1F0F;margin:4px 0 0;line-height:1.6;">${comp.stealThisMove}</p>
       </div>` : ""}
     </div>
@@ -341,13 +341,13 @@ function renderStrategyPage(data: AnalysisData, locale: Locale, pageNum: number)
 
     <div style="padding:24px 48px;">
       ${actionBlock(data.winningStrategy.immediate, isAr ? "إجراءات فورية (هذا الأسبوع)" : "Immediate Actions (This Week)", "#DC2626")}
-      ${actionBlock(data.winningStrategy.shortTerm, isAr ? "قصيرة المدى (2-4 أسابيع)" : "Short-Term (2-4 Weeks)", "#C9A84C")}
+      ${actionBlock(data.winningStrategy.shortTerm, isAr ? "قصيرة المدى (2-4 أسابيع)" : "Short-Term (2-4 Weeks)", "#7C3AED")}
       ${actionBlock(data.winningStrategy.longTerm, isAr ? "طويلة المدى (1-3 أشهر)" : "Long-Term (1-3 Months)", "#006C35")}
 
       <div style="display:flex;gap:24px;margin-top:8px;">
         <!-- Content Gaps -->
         <div style="flex:1;">
-          <h3 style="font-size:14px;font-weight:800;color:#C9A84C;margin:0 0 8px;">${isAr ? "فجوات المحتوى" : "Content Gaps"}</h3>
+          <h3 style="font-size:14px;font-weight:800;color:#7C3AED;margin:0 0 8px;">${isAr ? "فجوات المحتوى" : "Content Gaps"}</h3>
           ${data.winningStrategy.contentGaps.slice(0, 5).map(g => `<p style="font-size:11px;color:#2D5A3D;margin:3px 0;line-height:1.5;">• ${g}</p>`).join("")}
         </div>
         <!-- Differentiators -->
@@ -359,7 +359,7 @@ function renderStrategyPage(data: AnalysisData, locale: Locale, pageNum: number)
 
       ${data.winningStrategy.quickWins && data.winningStrategy.quickWins.length > 0 ? `
       <div style="margin-top:16px;background:rgba(0,108,53,0.05);border:2px solid #D4EBD9;border-radius:12px;padding:14px 18px;">
-        <h3 style="font-size:14px;font-weight:800;color:#C9A84C;margin:0 0 8px;">${isAr ? "مكاسب سريعة" : "Quick Wins"}</h3>
+        <h3 style="font-size:14px;font-weight:800;color:#7C3AED;margin:0 0 8px;">${isAr ? "مكاسب سريعة" : "Quick Wins"}</h3>
         ${data.winningStrategy.quickWins.slice(0, 4).map((w, i) => `<p style="font-size:12px;color:#0A1F0F;margin:4px 0;line-height:1.6;"><strong>${i + 1}.</strong> ${w}</p>`).join("")}
       </div>` : ""}
     </div>
@@ -403,8 +403,8 @@ function renderSaudiPage(data: AnalysisData, locale: Locale, pageNum: number): s
       </div>
 
       ${data.saudiMarketInsights.ramadanStrategy ? `
-      <div style="margin-top:20px;background:linear-gradient(135deg,rgba(0,108,53,0.05),rgba(201,168,76,0.08));border:2px solid rgba(201,168,76,0.2);border-radius:16px;padding:20px;">
-        <h3 style="font-size:15px;font-weight:800;color:#C9A84C;margin:0 0 8px;">${isAr ? "استراتيجية رمضان" : "Ramadan Strategy"}</h3>
+      <div style="margin-top:20px;background:linear-gradient(135deg,rgba(0,108,53,0.05),rgba(124,58,237,0.08));border:2px solid rgba(124,58,237,0.2);border-radius:16px;padding:20px;">
+        <h3 style="font-size:15px;font-weight:800;color:#7C3AED;margin:0 0 8px;">${isAr ? "استراتيجية رمضان" : "Ramadan Strategy"}</h3>
         <p style="font-size:13px;color:#2D5A3D;margin:0;line-height:1.8;">${data.saudiMarketInsights.ramadanStrategy}</p>
       </div>` : ""}
     </div>

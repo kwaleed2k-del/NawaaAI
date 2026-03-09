@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
 import { genAI } from "@/lib/gemini";
 import sharp from "sharp";
+import { authenticateRequest, checkRateLimit } from "@/lib/api-auth";
 
 const PROMPT_BUILDER_SYSTEM = `You are an elite commercial photography director and art director who creates prompts for AI image generation. Your goal is to produce images that look like REAL professional photography — NOT AI-generated.
 
@@ -60,10 +61,10 @@ You specialize in creating marketing content for Saudi Arabian brands that looks
 ═══ BRAND COLOR INTEGRATION (CRITICAL — MUST FOLLOW) ═══
 - The client's brand colors are NON-NEGOTIABLE. At least 2 brand colors MUST be clearly visible in EVERY image.
 - Incorporate brand colors through REAL objects: colored packaging, clothing, walls, props, food items, furniture, accessories, signage, stationery
-- For each brand color, suggest specific objects: e.g., #006C35 → clothing, wall paint, packaging, foliage; #C9A84C → jewelry, cushions, coffee cups, frames
+- For each brand color, suggest specific objects: e.g., #006C35 → clothing, wall paint, packaging, foliage; #7C3AED → jewelry, cushions, coffee cups, frames
 - Do NOT apply color filters or unrealistic color grading
-- Colors appear naturally: "wearing a deep green (#006C35) linen shirt", "gold (#C9A84C) accent cushion on the sofa"
-- If colors are warm (reds, oranges, golds), use warm-toned props and textiles
+- Colors appear naturally: "wearing a deep green (#006C35) linen shirt", "violet (#7C3AED) accent cushion on the sofa"
+- If colors are warm (reds, oranges, purples), use warm-toned props and textiles
 - If colors are cool (blues, greens), use corresponding natural elements
 
 ═══ CLIENT REQUIREMENTS ═══
@@ -192,6 +193,11 @@ async function generateImageWithGemini(
 }
 
 export async function POST(request: NextRequest) {
+  const { user, error: authError } = await authenticateRequest();
+  if (authError) return authError;
+  const rl = checkRateLimit(user!.id, "/api/generate-images");
+  if (rl) return rl;
+
   try {
     const body = await request.json();
     const {

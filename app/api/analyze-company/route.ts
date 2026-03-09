@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
+import { authenticateRequest, checkRateLimit, validateExternalUrl } from "@/lib/api-auth";
 
 async function scrapeWebsite(url: string): Promise<string | null> {
   try {
@@ -95,6 +96,11 @@ ALWAYS generate suggestedTargetAudience and suggestedUniqueValue based on the co
 If outputLanguage is "ar", write summary, descriptions, exampleCaption, and saudiSpecific in Arabic (Saudi/Jeddah-appropriate tone where natural).`;
 
 export async function POST(request: NextRequest) {
+  const { user, error: authError } = await authenticateRequest();
+  if (authError) return authError;
+  const rl = checkRateLimit(user!.id, "/api/analyze-company");
+  if (rl) return rl;
+
   try {
     const body = await request.json();
     const { company, outputLanguage = "en" } = body;
@@ -140,6 +146,13 @@ export async function POST(request: NextRequest) {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const jsonStr = jsonMatch ? jsonMatch[0] : text;
     const parsed = JSON.parse(jsonStr);
+
+    if (!parsed.brandPersonality || !parsed.contentPillars || !parsed.audienceInsights) {
+      return NextResponse.json(
+        { error: "AI response missing required fields. Please try again." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true, analysis: parsed });
   } catch (e) {

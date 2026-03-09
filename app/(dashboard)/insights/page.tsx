@@ -23,9 +23,9 @@ export default function InsightsPage() {
     {
       icon: PieChart,
       label: ti.reach,
-      gradient: "from-[#C9A84C] to-[#E8C84C]",
-      iconBg: "from-[#C9A84C]/20 to-[#E8C84C]/20",
-      barColor: "from-[#C9A84C] to-[#E8C84C]",
+      gradient: "from-[#7C3AED] to-[#60A5FA]",
+      iconBg: "from-[#7C3AED]/20 to-[#60A5FA]/20",
+      barColor: "from-[#7C3AED] to-[#60A5FA]",
       shadowColor: "hover:shadow-md",
       barWidth: "55%",
     },
@@ -58,8 +58,8 @@ export default function InsightsPage() {
         locale === "ar"
           ? "راقب نمو جمهورك واكتشف فرص التوسع"
           : "Monitor your audience growth and discover expansion opportunities",
-      gradient: "from-[#C9A84C] to-[#E8C84C]",
-      accentBar: "from-[#C9A84C] to-[#E8C84C]",
+      gradient: "from-[#7C3AED] to-[#60A5FA]",
+      accentBar: "from-[#7C3AED] to-[#60A5FA]",
     },
     {
       icon: Activity,
@@ -85,101 +85,80 @@ export default function InsightsPage() {
 
   return (
     <div
-      className="space-y-10"
+      dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-10"
     >
-      {/* ── Page Header: Gradient Banner ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-12">
-        {/* Floating decorative elements */}
-        <div className="pointer-events-none absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white/10" />
-        <div
-          className="pointer-events-none absolute bottom-4 left-8 h-20 w-20 rounded-full bg-white/10"
-        />
-        <div
-          className="pointer-events-none absolute top-1/2 right-1/4 h-14 w-14 rounded-full bg-white/5"
-        />
+      {/* ===== PAGE HEADER BANNER ===== */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#003D1F] via-[#006C35] to-[#00A352] p-8 sm:p-10 lg:p-14">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#00A352]/30 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-emerald-400/20 to-transparent rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute top-10 right-20 w-2 h-2 rounded-full bg-white/30 animate-pulse" />
+        <div className="absolute bottom-8 left-32 w-2.5 h-2.5 rounded-full bg-white/25 animate-pulse" style={{ animationDelay: "1s" }} />
 
         <div className="relative z-10">
-          <h1 className="font-cairo text-4xl font-bold text-white md:text-5xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+              <BarChart3 className="h-6 w-6 text-emerald-200" />
+            </div>
+            <span className="text-xl font-bold text-emerald-200/80 tracking-wide">{locale === "ar" ? "التحليلات" : "Insights"}</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
             {ti.pageTitle}
           </h1>
-          <p className="mt-3 flex items-center gap-2 text-lg text-white/90 md:text-xl">
-            <Sparkles className="h-5 w-5 text-[#C9A84C]" />
-            {ti.pageSub}
-            <Sparkles className="h-5 w-5 text-[#C9A84C]" />
-          </p>
+          <p className="mt-4 text-xl sm:text-2xl font-medium text-emerald-100/70">{ti.pageSub}</p>
         </div>
       </div>
 
       {/* ── Coming Soon Hero Section ── */}
       <div className="relative">
-        {/* Animated gradient border wrapper */}
-        <div className="relative rounded-2xl p-[3px]">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#006C35] via-[#C9A84C] to-[#00A352]" />
-          <div className="relative rounded-2xl bg-[#F8FBF8] px-6 py-20 md:px-12 md:py-28">
+        {/* Gradient border wrapper */}
+        <div className="relative rounded-3xl p-[3px]">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#006C35] via-[#7C3AED] to-[#00A352]" />
+          <div className="relative rounded-3xl bg-gradient-to-b from-[#F8FBF8] to-white px-8 py-24 md:px-14 md:py-32">
             <div className="flex flex-col items-center justify-center text-center">
               {/* Animated icon */}
               <div
-                className="relative flex h-36 w-36 items-center justify-center rounded-full bg-gradient-to-br from-[#006C35] to-[#00A352]"
+                className="relative flex h-40 w-40 items-center justify-center rounded-full bg-gradient-to-br from-[#003D1F] via-[#006C35] to-[#00A352] shadow-lg shadow-emerald-500/25"
               >
-                <TrendingUp className="text-white" style={{ width: 72, height: 72 }} />
+                <TrendingUp className="text-white" style={{ width: 80, height: 80 }} />
                 {/* Outer ring pulse */}
                 <div
                   className="absolute inset-0 rounded-full border-4 border-[#006C35]/30"
                 />
               </div>
 
-              {/* Floating emojis */}
-              <div className="pointer-events-none absolute inset-0">
-                <span
-                  className="absolute left-[15%] top-[20%] text-4xl"
-                >
-                  📊
-                </span>
-                <span
-                  className="absolute right-[15%] top-[18%] text-4xl"
-                >
-                  📈
-                </span>
-                <span
-                  className="absolute left-1/2 bottom-[12%] -translate-x-1/2 text-4xl"
-                >
-                  🎯
-                </span>
-              </div>
-
               {/* Coming Soon text */}
-              <h2 className="mt-10 text-5xl font-extrabold bg-gradient-to-r from-[#006C35] to-[#C9A84C] bg-clip-text text-transparent">
+              <h2 className="mt-12 text-6xl sm:text-7xl font-black bg-gradient-to-r from-[#003D1F] via-[#006C35] to-[#7C3AED] bg-clip-text text-transparent">
                 {ti.comingSoon}
               </h2>
-              <p className="mt-4 max-w-lg text-xl leading-relaxed text-[#5A8A6A]">
+              <p className="mt-6 max-w-xl text-3xl leading-relaxed text-[#5A8A6A] font-medium">
                 {ti.comingSoonDesc}
               </p>
 
               {/* ── Preview Metric Cards ── */}
               <div
-                className="mt-14 grid w-full max-w-2xl grid-cols-1 gap-6 sm:grid-cols-3"
+                className="mt-16 grid w-full max-w-3xl grid-cols-1 gap-8 sm:grid-cols-3"
               >
                 {metricCards.map((item, i) => (
                   <div
                     key={item.label}
-                    className={`group cursor-default rounded-2xl border-2 border-[#D4EBD9] bg-white p-6 text-center shadow-md transition-shadow duration-300 ${item.shadowColor}`}
+                    className={`group cursor-default rounded-3xl border-2 border-[#D4EBD9] bg-gradient-to-b from-white to-[#F0F7F2] p-8 text-center shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-[#006C35]/40`}
                   >
                     <div
-                      className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.iconBg}`}
+                      className={`mx-auto flex h-18 w-18 items-center justify-center rounded-2xl bg-gradient-to-br ${item.iconBg} h-[72px] w-[72px]`}
                     >
                       <item.icon
-                        className="h-8 w-8 transition-transform duration-300 group-hover:rotate-12"
+                        className="h-9 w-9 transition-transform duration-300 group-hover:rotate-12"
                         style={{
                           color: item.gradient.includes("006C35")
                             ? "#006C35"
-                            : item.gradient.includes("C9A84C")
-                            ? "#C9A84C"
+                            : item.gradient.includes("7C3AED")
+                            ? "#7C3AED"
                             : "#8B5CF6",
                         }}
                       />
                     </div>
-                    <p className="mt-4 text-xl font-bold text-[#004D26]">{item.label}</p>
-                    <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-[#F0F7F2]">
+                    <p className="mt-5 text-2xl sm:text-3xl font-black text-[#004D26]">{item.label}</p>
+                    <div className="mt-4 h-3.5 w-full overflow-hidden rounded-full bg-[#E8F5EC]">
                       <div
                         className={`h-full rounded-full bg-gradient-to-r ${item.barColor}`}
                       />
@@ -194,27 +173,27 @@ export default function InsightsPage() {
 
       {/* ── What to Expect Section ── */}
       <div>
-        <h3 className="mb-8 text-center text-3xl font-bold text-[#004D26] md:text-4xl">
+        <h3 className="mb-10 text-center text-4xl font-black text-[#003D1F] md:text-5xl">
           {locale === "ar" ? "ماذا تتوقع" : "What to Expect"}
         </h3>
         <div
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
         >
           {featureCards.map((card, i) => (
             <div
               key={card.title}
-              className="group relative cursor-default overflow-hidden rounded-2xl border-2 border-[#D4EBD9] bg-white p-6 shadow-md transition-shadow duration-300 hover:shadow-xl"
+              className="group relative cursor-default overflow-hidden rounded-3xl border-2 border-[#D4EBD9] bg-gradient-to-b from-white to-[#F0F7F2] p-8 shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-[#006C35]/40"
             >
               {/* Gradient accent bar at top */}
-              <div className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${card.accentBar}`} />
+              <div className={`absolute inset-x-0 top-0 h-2 bg-gradient-to-r ${card.accentBar}`} />
 
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${card.gradient}`}
+                className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg`}
               >
-                <card.icon className="h-7 w-7 text-white" />
+                <card.icon className="h-8 w-8 text-white" />
               </div>
-              <h4 className="mt-5 text-xl font-bold text-[#004D26]">{card.title}</h4>
-              <p className="mt-2 text-lg leading-relaxed text-[#5A8A6A]">{card.description}</p>
+              <h4 className="mt-6 text-2xl sm:text-3xl font-black text-[#003D1F]">{card.title}</h4>
+              <p className="mt-3 text-xl leading-relaxed text-[#5A8A6A]">{card.description}</p>
             </div>
           ))}
         </div>

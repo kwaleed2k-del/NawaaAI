@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
+import { authenticateRequest, checkRateLimit, validateExternalUrl } from "@/lib/api-auth";
 
 /* ═══════════════════════════════════════════════════
    DEEP RESEARCH ENGINE — Real web scraping + search
@@ -182,6 +183,11 @@ async function scrapeSocialProfile(handle: string, platform: string): Promise<st
    ═══════════════════════════════════════════════════ */
 
 export async function POST(request: NextRequest) {
+  const { user, error: authError } = await authenticateRequest();
+  if (authError) return authError;
+  const rl = checkRateLimit(user!.id, "/api/competitor-analysis");
+  if (rl) return rl;
+
   try {
     const body = await request.json();
     const { companyName, companyDescription, competitors, outputLanguage } = body;
@@ -191,6 +197,16 @@ export async function POST(request: NextRequest) {
     }
     if (competitors.length > 5) {
       return NextResponse.json({ error: "Maximum 5 competitors allowed" }, { status: 400 });
+    }
+
+    // Validate competitor URLs
+    for (const c of competitors) {
+      if (c.websiteUrl) {
+        const urlCheck = validateExternalUrl(c.websiteUrl);
+        if (!urlCheck.valid) {
+          return NextResponse.json({ error: `Invalid URL for "${c.name}": ${urlCheck.error}` }, { status: 400 });
+        }
+      }
     }
 
     // ── PHASE 1: Deep research on ALL competitors in parallel ──
@@ -400,6 +416,13 @@ INSTRUCTIONS:
       analysisData = JSON.parse(cleaned);
     } catch {
       return NextResponse.json({ error: "Failed to parse AI response", raw: content }, { status: 500 });
+    }
+
+    if (!analysisData.executiveSummary || !Array.isArray(analysisData.competitors)) {
+      return NextResponse.json(
+        { error: "AI response missing required fields. Please try again." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true, analysis: analysisData });

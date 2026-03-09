@@ -24,7 +24,7 @@ export type Company = {
 type User = {
   id: string;
   email?: string;
-  user_metadata?: { full_name?: string; avatar_url?: string };
+  user_metadata?: { full_name?: string; avatar_url?: string; agency_name?: string; agency_type?: string; has_seen_welcome?: boolean };
 } | null;
 
 type Store = {

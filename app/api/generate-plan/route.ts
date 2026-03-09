@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
+import { authenticateRequest, checkRateLimit } from "@/lib/api-auth";
 
 const SYSTEM_PROMPT = `You are the Chief Content Strategist at Saudi Arabia's most prestigious marketing agency. You have mastered content creation for the Gulf market, deep expertise in Saudi culture, Arabic language nuances, Islamic values, Vision 2030, and regional trends. You create content plans that go viral and drive real business results.
 
@@ -60,6 +61,11 @@ Make captions long, detailed, and ready to copy-paste — at least 2-3 sentences
 Include best posting times specific to Saudi Arabia timezone (AST/GMT+3).`;
 
 export async function POST(request: NextRequest) {
+  const { user, error: authError } = await authenticateRequest();
+  if (authError) return authError;
+  const rl = checkRateLimit(user!.id, "/api/generate-plan");
+  if (rl) return rl;
+
   try {
     const body = await request.json();
     const {
@@ -121,6 +127,13 @@ export async function POST(request: NextRequest) {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const jsonStr = jsonMatch ? jsonMatch[0] : text;
     const parsed = JSON.parse(jsonStr);
+
+    if (!Array.isArray(parsed.days) || parsed.days.length === 0) {
+      return NextResponse.json(
+        { error: "AI response missing plan days. Please try again." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true, plan: parsed });
   } catch (e) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import sharp from "sharp";
+import { checkRateLimit } from "@/lib/api-auth";
 
 function rgbToHex(r: number, g: number, b: number): string {
   return "#" + [r, g, b].map((x) => Math.round(x).toString(16).padStart(2, "0")).join("");
@@ -59,7 +60,7 @@ async function extractColors(buffer: Buffer): Promise<{ hex: string; name: strin
     }
 
     // Fill remaining with fallbacks
-    const fallbacks = ["#006C35", "#00A352", "#C9A84C", "#0A1F0F", "#D4EBD9"];
+    const fallbacks = ["#006C35", "#00A352", "#7C3AED", "#0A1F0F", "#D4EBD9"];
     while (colors.length < 5) {
       colors.push({ hex: fallbacks[colors.length], name: names[colors.length] || "Extra" });
     }
@@ -70,7 +71,7 @@ async function extractColors(buffer: Buffer): Promise<{ hex: string; name: strin
     return [
       { hex: "#006C35", name: "Primary" },
       { hex: "#00A352", name: "Secondary" },
-      { hex: "#C9A84C", name: "Accent" },
+      { hex: "#7C3AED", name: "Accent" },
       { hex: "#0A1F0F", name: "Dark" },
       { hex: "#D4EBD9", name: "Light" },
     ];
@@ -90,6 +91,8 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
+    const rl = checkRateLimit(user.id, "/api/upload-logo");
+    if (rl) return rl;
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);

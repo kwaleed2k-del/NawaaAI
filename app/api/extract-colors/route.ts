@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Vibrant } from "node-vibrant/node";
+import { authenticateRequest, checkRateLimit, validateExternalUrl } from "@/lib/api-auth";
 
 const FALLBACK_COLORS = [
   { hex: "#006C35", name: "Primary", role: "dominant" as const },
   { hex: "#0B1A0F", name: "Secondary", role: "dark" as const },
-  { hex: "#C9A84C", name: "Accent", role: "vibrant" as const },
+  { hex: "#7C3AED", name: "Accent", role: "vibrant" as const },
   { hex: "#172E1F", name: "Dark", role: "dark" as const },
   { hex: "#D0EBDA", name: "Light", role: "muted" as const },
 ];
@@ -19,6 +20,11 @@ function hexFromRgb(r: number, g: number, b: number): string {
 }
 
 export async function POST(request: NextRequest) {
+  const { user, error: authError } = await authenticateRequest();
+  if (authError) return authError;
+  const rl = checkRateLimit(user!.id, "/api/extract-colors");
+  if (rl) return rl;
+
   try {
     const contentType = request.headers.get("content-type") || "";
     let buffer: Buffer;
@@ -40,6 +46,8 @@ export async function POST(request: NextRequest) {
         const base64 = body.base64.replace(/^data:image\/\w+;base64,/, "");
         buffer = Buffer.from(base64, "base64");
       } else if (body.url) {
+        const urlCheck = validateExternalUrl(body.url);
+        if (!urlCheck.valid) return NextResponse.json({ success: false, error: urlCheck.error }, { status: 400 });
         const res = await fetch(body.url);
         if (!res.ok) throw new Error("Failed to fetch image URL");
         const arr = await res.arrayBuffer();

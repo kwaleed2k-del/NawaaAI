@@ -108,8 +108,8 @@ const PLATFORM_BAR_COLORS: Record<string, string> = {
 /* ── Card accent bar rotation ── */
 
 const CARD_ACCENT_COLORS = [
-  "from-[#006C35] via-[#00A352] to-[#C9A84C]",
-  "from-[#C9A84C] via-[#E8D5A0] to-[#C9A84C]",
+  "from-[#006C35] via-[#00A352] to-[#7C3AED]",
+  "from-[#7C3AED] via-[#A78BFA] to-[#7C3AED]",
   "from-blue-500 via-indigo-500 to-purple-500",
   "from-purple-500 via-fuchsia-500 to-pink-500",
 ];
@@ -230,7 +230,7 @@ export default function MyPlansPage() {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-8">
         {/* Skeleton banner */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#D4EBD9] via-[#E8F5EC] to-[#D4EBD9] p-8">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-[shimmer_2s_ease-in-out_infinite]" />
@@ -276,22 +276,26 @@ export default function MyPlansPage() {
 
   if (plans.length === 0) {
     return (
-      <div className="space-y-8">
-        {/* Gradient banner header */}
-        <div
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10"
-        >
-          <div className="relative">
-            <h1 className="font-['Cairo'] text-4xl md:text-5xl font-extrabold text-white drop-shadow-sm">
-              {isAr ? "\u062E\u0637\u0637\u064A \u0627\u0644\u0645\u062D\u0641\u0648\u0638\u0629" : "My Saved Plans"}
-            </h1>
-            <div className="mt-3 flex items-center gap-2 text-white/80 text-lg">
-              <FolderOpen className="h-5 w-5" />
-              <span>
-                {isAr
-                  ? "\u0639\u0631\u0636 \u0648\u0625\u062F\u0627\u0631\u0629 \u062C\u0645\u064A\u0639 \u062E\u0637\u0637 \u0627\u0644\u0645\u062D\u062A\u0648\u0649 \u0627\u0644\u0645\u062D\u0641\u0648\u0638\u0629"
-                  : "View and manage all your saved content plans"}
-              </span>
+      <div dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-8">
+        {/* ===== PAGE HEADER BANNER ===== */}
+        <div className="relative overflow-hidden rounded-[2rem] bg-[#0B0E14]">
+          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br from-violet-600/30 to-fuchsia-600/10 blur-3xl" />
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-gradient-to-tr from-blue-600/20 to-cyan-500/10 blur-3xl" />
+          <div className="relative z-10 p-6 sm:p-8">
+            <div className="flex items-center gap-6">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 shadow-lg shadow-violet-500/25">
+                <FolderOpen className="h-5 w-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+                  <span className="bg-gradient-to-r from-white via-violet-200 to-blue-200 bg-clip-text text-transparent">
+                    {isAr ? "خطط المحتوى المحفوظة" : "Saved Content Plans"}
+                  </span>
+                </h1>
+                <p className="mt-1 text-xl sm:text-2xl text-slate-400">
+                  {isAr ? "إدارة ومراجعة جميع خططك" : "Manage and review all your plans"}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -303,14 +307,14 @@ export default function MyPlansPage() {
           {/* Floating animated icon */}
           <div className="relative">
             <div
-              className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#C9A84C] shadow-lg"
+              className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-[#006C35] via-[#00A352] to-[#7C3AED] shadow-lg"
             >
               <FolderOpen className="h-14 w-14 text-white" />
             </div>
 
             {/* Pulsing sparkles */}
             <div
-              className="absolute -top-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0] shadow-lg"
+              className="absolute -top-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A78BFA] shadow-lg"
             >
               <Sparkles className="h-5 w-5 text-white" />
             </div>
@@ -334,9 +338,9 @@ export default function MyPlansPage() {
           </p>
           <a
             href="/planner"
-            className="mt-8 inline-flex h-14 items-center justify-center gap-3 px-10 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] text-white hover:shadow-md transition-all duration-300 shadow-lg hover:scale-[1.02]"
+            className="mt-8 inline-flex h-14 items-center justify-center gap-3 px-10 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] text-white hover:shadow-md transition-all duration-300 shadow-lg hover:scale-[1.02]"
           >
-            <Calendar className="h-6 w-6" />
+            <Calendar className="h-5 w-5" />
             {isAr
               ? "\u0627\u0630\u0647\u0628 \u0625\u0644\u0649 \u0627\u0644\u0645\u062E\u0637\u0637"
               : "Go to Planner"}
@@ -351,43 +355,26 @@ export default function MyPlansPage() {
   const expandedPlan = plans.find((p) => p.id === expandedPlanId);
 
   return (
-    <div className="space-y-8">
-      {/* ── Gradient Banner Header ── */}
-      <div
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-8 md:p-10"
-      >
-        {/* Decorative dot pattern */}
-
-        <div className="relative flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="font-['Cairo'] text-4xl md:text-5xl font-extrabold text-white drop-shadow-sm">
-              {isAr ? "\u062E\u0637\u0637\u064A \u0627\u0644\u0645\u062D\u0641\u0648\u0638\u0629" : "My Saved Plans"}
-            </h1>
-            <div className="mt-3 flex items-center gap-2 text-white/80 text-lg">
-              <Sparkles className="h-5 w-5" />
-              <span>
-                {isAr
-                  ? "\u0639\u0631\u0636 \u0648\u0625\u062F\u0627\u0631\u0629 \u062C\u0645\u064A\u0639 \u062E\u0637\u0637 \u0627\u0644\u0645\u062D\u062A\u0648\u0649 \u0627\u0644\u0645\u062D\u0641\u0648\u0638\u0629"
-                  : "View and manage all your saved content plans"}
-              </span>
+    <div dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-8">
+      {/* ===== PAGE HEADER BANNER ===== */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-[#0B0E14]">
+        <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br from-violet-600/30 to-fuchsia-600/10 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-gradient-to-tr from-blue-600/20 to-cyan-500/10 blur-3xl" />
+        <div className="relative z-10 p-6 sm:p-8">
+          <div className="flex items-center gap-6">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 shadow-lg shadow-violet-500/25">
+              <FolderOpen className="h-5 w-5 text-white" />
             </div>
-          </div>
-
-          {/* Count badge */}
-          <div
-            className="flex items-center gap-2 rounded-2xl bg-white/20 border border-white/30 px-5 py-3"
-          >
-            <FolderOpen className="h-6 w-6 text-white" />
-            <span className="text-2xl font-extrabold text-white">{plans.length}</span>
-            <span className="text-lg text-white/80 font-medium">
-              {isAr
-                ? plans.length === 1
-                  ? "\u062E\u0637\u0629"
-                  : "\u062E\u0637\u0637"
-                : plans.length === 1
-                  ? "plan"
-                  : "plans"}
-            </span>
+            <div className="flex-1">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+                <span className="bg-gradient-to-r from-white via-violet-200 to-blue-200 bg-clip-text text-transparent">
+                  {isAr ? "خطط المحتوى المحفوظة" : "Saved Content Plans"}
+                </span>
+              </h1>
+              <p className="mt-1 text-xl sm:text-2xl text-slate-400">
+                {isAr ? "إدارة ومراجعة جميع خططك" : "Manage and review all your plans"}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -448,7 +435,7 @@ export default function MyPlansPage() {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <span className="text-lg font-extrabold text-white drop-shadow-sm">
+                        <span className="text-xl font-extrabold text-white drop-shadow-sm">
                           {company.name?.charAt(0) || "?"}
                         </span>
                       )}
@@ -462,7 +449,7 @@ export default function MyPlansPage() {
                 )}
 
                 {/* Title */}
-                <h3 className="font-['Cairo'] text-xl font-bold text-[#004D26] leading-snug line-clamp-2">
+                <h3 className="font-['Cairo'] text-2xl font-extrabold text-[#004D26] leading-snug line-clamp-2">
                   {plan.title ??
                     (isAr
                       ? plan.plan_data?.weekThemeAr ?? plan.plan_data?.weekTheme
@@ -485,7 +472,7 @@ export default function MyPlansPage() {
 
                 {/* Day count with icon badge */}
                 <div className="mt-2 flex items-center gap-2.5 text-lg text-[#0A1F0F]">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0]">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#A78BFA]">
                     <FolderOpen className="h-4 w-4 text-white" />
                   </div>
                   <span className="font-medium">
@@ -502,7 +489,7 @@ export default function MyPlansPage() {
                       <span
                         key={p}
                         className={cn(
-                          "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold shadow-sm",
+                          "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-bold shadow-sm",
                           PLATFORM_BADGE_STYLES[p.toLowerCase()] ??
                             "bg-gradient-to-r from-[#006C35] to-[#00A352] text-white border-[#D4EBD9]"
                         )}
@@ -517,7 +504,7 @@ export default function MyPlansPage() {
                 )}
 
                 {/* Created date pill */}
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1 text-sm text-[#5A8A6A]">
+                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1 text-base text-[#5A8A6A]">
                   <Clock className="h-3.5 w-3.5" />
                   <span>
                     {isAr ? "\u062A\u0645 \u0627\u0644\u062D\u0641\u0638: " : "Saved: "}
@@ -600,7 +587,7 @@ export default function MyPlansPage() {
         <div className="overflow-hidden">
             <div className="rounded-2xl border-2 border-[#006C35]/20 bg-[#F8FBF8] overflow-hidden">
               {/* ── Gradient header bar ── */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] px-6 py-6 lg:px-8 lg:py-8">
+              <div className="relative overflow-hidden bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] px-6 py-6 lg:px-8 lg:py-8">
                 <div className="relative flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-3">
@@ -608,7 +595,7 @@ export default function MyPlansPage() {
                         <Calendar className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="font-['Cairo'] text-2xl md:text-3xl font-extrabold text-white drop-shadow-sm">
+                        <h2 className="font-['Cairo'] text-2xl sm:text-3xl font-extrabold text-white drop-shadow-sm">
                           {isAr
                             ? expandedPlan.plan_data?.weekThemeAr ??
                               expandedPlan.plan_data?.weekTheme
@@ -625,7 +612,7 @@ export default function MyPlansPage() {
                     {/* Weekly strategy */}
                     {expandedPlan.plan_data?.weeklyStrategy && (
                       <div className="mt-5 max-w-2xl rounded-xl bg-white/15 border border-white/25 p-4">
-                        <p className="text-sm font-bold uppercase tracking-wider text-white/90 mb-1.5">
+                        <p className="text-lg font-bold uppercase tracking-wider text-white/90 mb-1.5">
                           {isAr ? "\u0627\u0633\u062A\u0631\u0627\u062A\u064A\u062C\u064A\u0629 \u0627\u0644\u0623\u0633\u0628\u0648\u0639" : "Weekly Strategy"}
                         </p>
                         <p className="text-lg text-white/90 leading-relaxed">
@@ -678,7 +665,7 @@ export default function MyPlansPage() {
                                 ? day.dayAr || day.dayEn
                                 : day.dayEn || day.dayAr}
                             </span>
-                            <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1 text-sm font-medium text-[#5A8A6A]">
+                            <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1 text-base font-medium text-[#5A8A6A]">
                               {day.date}
                             </span>
                           </div>
@@ -687,7 +674,7 @@ export default function MyPlansPage() {
                           <div className="flex items-center gap-2 mb-4">
                             <span
                               className={cn(
-                                "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold shadow-sm",
+                                "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-bold shadow-sm",
                                 PLATFORM_BADGE_STYLES[platformKey] ??
                                   "bg-gradient-to-r from-[#006C35] to-[#00A352] text-white border-[#D4EBD9]"
                               )}
@@ -695,20 +682,20 @@ export default function MyPlansPage() {
                               <span className="text-base">{emoji}</span>
                               <span className="capitalize">{day.platform}</span>
                             </span>
-                            <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1.5 text-sm font-medium text-[#2D5A3D]">
+                            <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1.5 text-base font-medium text-[#2D5A3D]">
                               {day.contentType}
                             </span>
                           </div>
 
                           {/* Topic */}
-                          <p className="text-lg font-bold text-[#0A1F0F] leading-snug">
+                          <p className="text-xl font-bold text-[#0A1F0F] leading-snug">
                             {isAr
                               ? day.topicAr || day.topic
                               : day.topic || day.topicAr}
                           </p>
 
                           {/* Caption */}
-                          <p className="mt-2.5 text-base text-[#2D5A3D] leading-relaxed line-clamp-4">
+                          <p className="mt-2.5 text-lg text-[#2D5A3D] leading-relaxed line-clamp-4">
                             {isAr
                               ? day.captionAr || day.caption
                               : day.caption || day.captionAr}
@@ -721,7 +708,7 @@ export default function MyPlansPage() {
                                 <span
                                   key={tag}
                                   className={cn(
-                                    "rounded-xl px-3 py-1 text-sm font-semibold",
+                                    "rounded-xl px-3 py-1 text-base font-semibold",
                                     HASHTAG_PILL_COLORS[
                                       tagIdx % HASHTAG_PILL_COLORS.length
                                     ]
@@ -731,7 +718,7 @@ export default function MyPlansPage() {
                                 </span>
                               ))}
                               {day.hashtags.length > 5 && (
-                                <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1 text-sm font-medium text-[#5A8A6A]">
+                                <span className="rounded-xl bg-[#F0F7F2] border border-[#D4EBD9] px-3 py-1 text-base font-medium text-[#5A8A6A]">
                                   +{day.hashtags.length - 5}
                                 </span>
                               )}
@@ -739,16 +726,16 @@ export default function MyPlansPage() {
                           )}
 
                           {/* Posting time — gold-tinted box */}
-                          <div className="mt-4 flex items-center gap-2 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 px-3 py-2">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#C9A84C] to-[#E8D5A0]">
+                          <div className="mt-4 flex items-center gap-2 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/25 px-3 py-2">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#A78BFA]">
                               <Clock className="h-3.5 w-3.5 text-white" />
                             </div>
-                            <span className="text-lg font-bold text-[#C9A84C]">
+                            <span className="text-xl font-bold text-[#7C3AED]">
                               {day.postingTime}
                             </span>
                           </div>
                           {day.postingTimeReason && (
-                            <p className="mt-1.5 text-sm text-[#5A8A6A] italic leading-snug px-1">
+                            <p className="mt-1.5 text-lg text-[#5A8A6A] italic leading-snug px-1">
                               {day.postingTimeReason}
                             </p>
                           )}
@@ -757,15 +744,15 @@ export default function MyPlansPage() {
                           {day.contentTips && (
                             <div className="mt-4 relative rounded-xl overflow-hidden">
                               {/* Gradient border effect */}
-                              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#C9A84C] p-[2px]">
+                              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#7C3AED] p-[2px]">
                                 <div className="h-full w-full rounded-[10px] bg-white" />
                               </div>
                               <div className="relative p-3.5">
-                                <p className="text-sm font-bold text-[#006C35] mb-1 flex items-center gap-1.5">
-                                  <Sparkles className="h-4 w-4 text-[#C9A84C]" />
+                                <p className="text-lg font-bold text-[#006C35] mb-1 flex items-center gap-1.5">
+                                  <Sparkles className="h-4 w-4 text-[#7C3AED]" />
                                   {isAr ? "\u0646\u0635\u0627\u0626\u062D" : "Tips"}
                                 </p>
-                                <p className="text-base text-[#2D5A3D] leading-relaxed">
+                                <p className="text-lg text-[#2D5A3D] leading-relaxed">
                                   {day.contentTips}
                                 </p>
                               </div>

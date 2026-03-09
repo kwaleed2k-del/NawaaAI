@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  BarChart3, Building2, Calendar, ChevronLeft, ChevronRight,
+  BarChart3, BookOpen, Building2, Calendar, ChevronLeft, ChevronRight,
   FolderOpen, Hash, ImageIcon, LogOut, Menu, Search, Settings, Sparkles, Swords, TrendingUp, X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
@@ -13,6 +13,8 @@ import { signOut } from "@/lib/auth-actions";
 import { cn, extractInitials } from "@/lib/utils";
 import { messages } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import WelcomeWizard from "@/components/WelcomeWizard";
+import KimzChat from "@/components/KimzChat";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -31,6 +33,7 @@ const savedItems = [
   { href: "/my-plans", key: "myPlans" as const, icon: FolderOpen },
   { href: "/my-generations", key: "myGenerations" as const, icon: ImageIcon },
   { href: "/my-competitors", key: "myCompetitors" as const, icon: Swords },
+  { href: "/playbook", key: "playbook" as const, icon: BookOpen },
 ];
 
 function NavLinks({
@@ -166,6 +169,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const { user, setUser, locale, setLocale } = useAppStore();
 
   useEffect(() => {
@@ -181,13 +185,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user: u } }) => {
-      if (u) setUser({ id: u.id, email: u.email ?? undefined });
+      if (u) setUser({ id: u.id, email: u.email ?? undefined, user_metadata: u.user_metadata as { full_name?: string; avatar_url?: string; agency_name?: string; agency_type?: string; has_seen_welcome?: boolean } });
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? undefined } : null);
+      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? undefined, user_metadata: session.user.user_metadata as { full_name?: string; avatar_url?: string; agency_name?: string; agency_type?: string; has_seen_welcome?: boolean } } : null);
     });
     return () => subscription.unsubscribe();
   }, [setUser]);
+
+  useEffect(() => {
+    if (user && typeof window !== "undefined") {
+      const seenLocal = localStorage.getItem("nawaa-welcome-seen") === "true";
+      const seenMeta = user.user_metadata?.has_seen_welcome === true;
+      if (!seenLocal && !seenMeta) {
+        setShowWelcome(true);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -200,6 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-[#F8FBF8] text-[#0A1F0F] text-base">
+      {showWelcome && <WelcomeWizard onComplete={() => setShowWelcome(false)} />}
 
       {/* ═══ Desktop Sidebar (lg+) ═══ */}
       <aside
@@ -386,6 +401,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </main>
         </div>
       </div>
+
+      {/* Kimz AI Chatbot */}
+      <KimzChat />
     </div>
   );
 }
