@@ -70,6 +70,32 @@ create policy "Users own their images" on generated_images for all using (auth.u
 drop policy if exists "Users own profile" on profiles;
 create policy "Users own profile" on profiles for all using (auth.uid() = id);
 
+-- Competitor analyses table
+create table if not exists competitor_analyses (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  company_id uuid references companies(id) on delete cascade,
+  competitors jsonb not null,
+  analysis_data jsonb not null,
+  output_language text default 'en',
+  created_at timestamp with time zone default now()
+);
+
+alter table competitor_analyses enable row level security;
+
+drop policy if exists "Users own their competitor analyses" on competitor_analyses;
+create policy "Users own their competitor analyses" on competitor_analyses for all using (auth.uid() = user_id);
+
+-- Indexes for frequent queries
+create index if not exists idx_companies_user_id on companies(user_id);
+create index if not exists idx_content_plans_user_id on content_plans(user_id);
+create index if not exists idx_content_plans_company_id on content_plans(company_id);
+create index if not exists idx_generated_images_user_id on generated_images(user_id);
+create index if not exists idx_generated_images_company_id on generated_images(company_id);
+create index if not exists idx_generated_images_plan_id on generated_images(plan_id);
+create index if not exists idx_competitor_analyses_user_id on competitor_analyses(user_id);
+create index if not exists idx_competitor_analyses_company_id on competitor_analyses(company_id);
+
 -- Storage: create bucket "logos" in Dashboard → Storage, then add policy:
 -- Allow authenticated users to upload to folder matching their user_id
 -- (e.g. path: {user_id}/filename.png)
