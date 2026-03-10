@@ -11,7 +11,8 @@ import {
 import { useAppStore, type Company } from "@/lib/store";
 import { createClient } from "@/lib/supabase";
 import { messages } from "@/lib/i18n";
-import { exportCompetitorPdf } from "@/lib/export-competitor-pdf";
+// Dynamic import to avoid loading 150KB+ jsPDF+html2canvas eagerly
+const loadExportCompetitorPdf = () => import("@/lib/export-competitor-pdf").then(m => m.exportCompetitorPdf);
 
 interface Competitor { name: string; handle: string; platform: string; websiteUrl: string; }
 interface StrategyAction { action: string; priority: string; impact: string; kpi?: string; }
@@ -215,7 +216,7 @@ export default function CompetitorAnalysisPage() {
 
   const loadAnalysis = (s: SavedAnalysis) => { setCompetitors(s.competitors); setAnalysisData(s.analysis_data); setShowPrevious(false); setActiveTab("overview"); };
   const deleteAnalysis = async (id: string) => { if (!user) return; const supabase = createClient(); await supabase.from("competitor_analyses").delete().eq("id", id).eq("user_id", user.id); loadSavedAnalyses(); };
-  const handleExportPdf = async () => { if (analysisData && selectedCompany) await exportCompetitorPdf(analysisData, selectedCompany.name, competitors, outputLanguage); };
+  const handleExportPdf = async () => { if (analysisData && selectedCompany) { const fn = await loadExportCompetitorPdf(); await fn(analysisData, selectedCompany.name, competitors, outputLanguage); } };
 
   return (
     <div className="space-y-8 w-full" dir={isRtl ? "rtl" : "ltr"}>

@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { format, nextSaturday, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
-import { exportPlanToPDF } from "@/lib/export-plan-pdf";
+// Dynamic import to avoid loading 150KB+ jsPDF+html2canvas eagerly
+const loadExportPlanToPDF = () => import("@/lib/export-plan-pdf").then(m => m.exportPlanToPDF);
 import toast from "react-hot-toast";
 
 /* ── Platform SVG Icons ── */
@@ -293,7 +294,7 @@ export default function PlannerPage() {
 
   function handleExportPDF() {
     if (!plan || !selectedCompany) return;
-    exportPlanToPDF(plan, selectedCompany, outputLanguage).then(
+    loadExportPlanToPDF().then(fn => fn(plan, selectedCompany, outputLanguage)).then(
       () => toast.success("PDF downloaded"),
       (e) => toast.error(e instanceof Error ? e.message : "Export failed")
     );

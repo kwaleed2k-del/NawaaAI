@@ -365,11 +365,13 @@ export default function KimzChat() {
         ) : (
           <>
             <MessageCircle className="h-8 w-8 text-white group-hover:scale-110 transition-transform" />
-            {/* Notification dot */}
-            <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-              <span className="relative inline-flex h-5 w-5 rounded-full bg-emerald-500 border-2 border-white" />
-            </span>
+            {/* Notification dot — only show when chat hasn't been opened */}
+            {chatMessages.length === 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                <span className="relative inline-flex h-5 w-5 rounded-full bg-emerald-500 border-2 border-white" />
+              </span>
+            )}
           </>
         )}
       </button>

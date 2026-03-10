@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
-import { exportCompetitorPdf } from "@/lib/export-competitor-pdf";
+const loadExportCompetitorPdf = () => import("@/lib/export-competitor-pdf").then(m => m.exportCompetitorPdf);
 
 /* ── Types ── */
 
@@ -123,7 +123,7 @@ export default function MyCompetitorsPage() {
   function handleExportPdf(analysis: SavedAnalysis) {
     const company = companies.find((c) => c.id === analysis.company_id);
     const companyName = company ? (isAr && company.name_ar ? company.name_ar : company.name) : "Analysis";
-    exportCompetitorPdf(analysis.analysis_data, companyName, analysis.competitors, (analysis.output_language || locale) as "en" | "ar");
+    loadExportCompetitorPdf().then(fn => fn(analysis.analysis_data, companyName, analysis.competitors, (analysis.output_language || locale) as "en" | "ar"));
   }
 
   /* ── Loading ── */

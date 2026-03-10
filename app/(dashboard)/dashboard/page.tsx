@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import {
   Building2,
   Calendar,
@@ -111,8 +111,8 @@ export default function DashboardPage() {
     (async () => {
       try {
         const [companiesRes, plansRes, imagesRes, plansCountRes, allImagesRes] = await Promise.all([
-          supabase.from("companies").select("*").eq("user_id", uid).order("created_at", { ascending: false }),
-          supabase.from("content_plans").select("*").eq("user_id", uid).order("created_at", { ascending: false }).limit(1),
+          supabase.from("companies").select("id, name, name_ar, industry, logo_url, brand_colors, platforms, created_at").eq("user_id", uid).order("created_at", { ascending: false }),
+          supabase.from("content_plans").select("id, title, week_start, plan_data").eq("user_id", uid).order("created_at", { ascending: false }).limit(1),
           supabase.from("generated_images").select("id, image_urls, company_id, created_at").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
           supabase.from("content_plans").select("id", { count: "exact", head: true }).eq("user_id", uid),
           supabase.from("generated_images").select("id", { count: "exact", head: true }).eq("user_id", uid),
@@ -135,10 +135,10 @@ export default function DashboardPage() {
   const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "there";
   const days = latestPlan?.plan_data?.days?.slice(0, 7) || [];
 
-  /* ── Quote Rotation ── */
+  /* ── Quote Rotation — 10s instead of 3s to reduce re-renders ── */
   const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * MARKETING_QUOTES_EN.length));
   useEffect(() => {
-    const interval = setInterval(() => setQuoteIndex((p) => (p + 1) % MARKETING_QUOTES_EN.length), 3000);
+    const interval = setInterval(() => setQuoteIndex((p) => (p + 1) % MARKETING_QUOTES_EN.length), 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -157,31 +157,29 @@ export default function DashboardPage() {
       <div dir={locale === "ar" ? "rtl" : "ltr"} className="flex items-center justify-center min-h-[75vh]">
         <div className="flex flex-col items-center gap-10 w-full max-w-md px-6">
           <div className="relative">
-            <motion.div animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.3, 0.15] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="absolute -inset-5 rounded-3xl bg-gradient-to-br from-[#006C35] to-[#00A352]" />
-            <motion.div animate={{ scale: [1, 1.08, 1], opacity: [0.08, 0.18, 0.08] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} className="absolute -inset-10 rounded-[2rem] bg-gradient-to-br from-[#006C35] to-[#00A352]" />
-            <motion.div animate={{ y: [0, -12, 0], rotate: [0, 5, -5, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }} className="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-[0_12px_40px_rgba(0,108,53,0.4)]">
+            <div className="absolute -inset-5 rounded-3xl bg-gradient-to-br from-[#006C35] to-[#00A352] animate-pulse opacity-20" />
+            <div className="absolute -inset-10 rounded-[2rem] bg-gradient-to-br from-[#006C35] to-[#00A352] animate-pulse opacity-10" />
+            <div className="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-[#006C35] to-[#00A352] shadow-[0_12px_40px_rgba(0,108,53,0.4)] animate-float">
               <Sparkles className="h-14 w-14 text-white" />
-            </motion.div>
+            </div>
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#004D26]">{locale === "ar" ? "\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0628\u064a\u0627\u0646\u0627\u062a\u0643" : "Loading your data"}</h2>
             <p className="text-base text-[#5A8A6A]">{locale === "ar" ? "\u0644\u062d\u0638\u0629 \u0648\u0627\u062d\u062f\u0629 \u0641\u0642\u0637..." : "Just a moment..."}</p>
           </div>
           <div className="h-20 w-full flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div key={lineIndex} initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20, scale: 0.95 }} transition={{ duration: 0.4 }} className="flex items-center gap-4 rounded-2xl border border-[#D4EBD9] bg-white px-6 py-4 shadow-sm w-full">
-                <span className="text-4xl shrink-0">{current.emoji}</span>
-                <p className="text-base font-semibold text-[#004D26] leading-snug">{current.text}</p>
-              </motion.div>
-            </AnimatePresence>
+            <div className="flex items-center gap-4 rounded-2xl border border-[#D4EBD9] bg-white px-6 py-4 shadow-sm w-full transition-opacity duration-300">
+              <span className="text-4xl shrink-0">{current.emoji}</span>
+              <p className="text-base font-semibold text-[#004D26] leading-snug">{current.text}</p>
+            </div>
           </div>
           <div className="w-full space-y-3">
             <div className="h-2 rounded-full bg-[#D4EBD9] overflow-hidden">
-              <motion.div className="h-full rounded-full bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#006C35]" animate={{ x: ["-100%", "100%"] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }} style={{ width: "60%" }} />
+              <div className="h-full rounded-full bg-gradient-to-r from-[#006C35] via-[#00A352] to-[#006C35] animate-shimmer" style={{ width: "60%" }} />
             </div>
             <div className="grid grid-cols-4 gap-2 opacity-40">
               {[0, 1, 2, 3].map((i) => (
-                <motion.div key={i} animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }} className="h-16 rounded-xl bg-[#D4EBD9]" />
+                <div key={i} className="h-16 rounded-xl bg-[#D4EBD9] animate-pulse" />
               ))}
             </div>
           </div>
@@ -251,28 +249,20 @@ export default function DashboardPage() {
           <div className="lg:max-w-lg xl:max-w-xl">
             <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 p-8 lg:p-10 relative overflow-hidden">
               <Quote className={`h-12 w-12 text-emerald-300/30 mb-4 ${isRtl ? "scale-x-[-1]" : ""}`} />
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={quoteIndex}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <p className="text-2xl lg:text-3xl font-bold text-white/95 leading-relaxed italic mb-6">
-                    &ldquo;{(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].text}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 flex items-center justify-center text-lg font-black text-white shadow-lg">
-                      {(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].author.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold text-white">{(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].author}</p>
-                      <p className="text-base text-emerald-200/70">{(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].role}</p>
-                    </div>
+              <div key={quoteIndex} className="transition-opacity duration-500">
+                <p className="text-2xl lg:text-3xl font-bold text-white/95 leading-relaxed italic mb-6">
+                  &ldquo;{(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].text}&rdquo;
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 flex items-center justify-center text-lg font-black text-white shadow-lg">
+                    {(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].author.charAt(0)}
                   </div>
-                </motion.div>
-              </AnimatePresence>
+                  <div>
+                    <p className="text-lg font-bold text-white">{(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].author}</p>
+                    <p className="text-base text-emerald-200/70">{(locale === "ar" ? MARKETING_QUOTES_AR : MARKETING_QUOTES_EN)[quoteIndex].role}</p>
+                  </div>
+                </div>
+              </div>
               {/* Quote dots indicator */}
               <div className="flex gap-2 mt-6 justify-center">
                 {MARKETING_QUOTES_EN.slice(0, 8).map((_, i) => (
@@ -289,24 +279,20 @@ export default function DashboardPage() {
 
       {/* ═══════════════════ STATS GRID ═══════════════════ */}
       <div className="grid gap-6 grid-cols-2 lg:grid-cols-4">
-        {statItems.map((s, i) => (
-          <motion.div
+        {statItems.map((s) => (
+          <div
             key={s.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
             className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${s.gradient} p-7 shadow-xl ${s.glow} hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] cursor-default`}
           >
-            {/* Card glow blob */}
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
             <div className="relative z-10">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm mb-5">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 mb-5">
                 <s.icon className="h-8 w-8 text-white" />
               </div>
               <p className="text-5xl lg:text-6xl font-black text-white tracking-tight">{s.value.toLocaleString()}</p>
               <p className="text-lg font-bold text-white/70 mt-2">{s.label}</p>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -319,8 +305,8 @@ export default function DashboardPage() {
           <h2 className="text-3xl font-black text-[#004D26]">{t.quickActions}</h2>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {quickActions.map((a, i) => (
-            <motion.div key={a.href} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.1 }}>
+          {quickActions.map((a) => (
+            <div key={a.href}>
               <Link href={a.href} className={`group relative block overflow-hidden rounded-2xl border-2 border-transparent bg-white p-8 shadow-lg ${a.glow} hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
                 {/* Top gradient accent bar */}
                 <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r ${a.gradient}`} />
@@ -333,7 +319,7 @@ export default function DashboardPage() {
                   {locale === "ar" ? "\u0627\u0628\u062f\u0623 \u0627\u0644\u0622\u0646" : "Get started"} <ArrowRight className={`h-5 w-5 text-emerald-500 group-hover:translate-x-1 transition-transform ${isRtl ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
                 </div>
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -360,11 +346,8 @@ export default function DashboardPage() {
                 const key = d.platform?.toLowerCase().trim() ?? "";
                 const grad = PLATFORM_GRADIENT[key] || "from-gray-400 to-gray-500";
                 return (
-                  <motion.div
+                  <div
                     key={i}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.05 }}
                     className="group relative overflow-hidden rounded-2xl border-2 border-[#D4EBD9] p-5 text-center hover:border-transparent hover:shadow-lg transition-all duration-300"
                   >
                     {/* Hover gradient overlay */}
@@ -374,7 +357,7 @@ export default function DashboardPage() {
                     <p className="my-3 text-4xl">{PLATFORM_EMOJI[key] || "\ud83d\udce2"}</p>
                     <p className="text-base text-[#2D5A3D] leading-snug line-clamp-2">{locale === "ar" ? d.topicAr : d.topic || d.topicAr}</p>
                     <span className={`mt-3 inline-block rounded-xl bg-gradient-to-r ${grad} px-3 py-1 text-sm font-bold text-white capitalize`}>{d.platform}</span>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -407,20 +390,20 @@ export default function DashboardPage() {
         </div>
         <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-nawaa">
           {companies.map((c, i) => (
-            <motion.div key={c.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}>
+            <div key={c.id}>
               <Link href="/companies" className="group block min-w-[280px] shrink-0 rounded-2xl border-2 border-[#D4EBD9] bg-white p-7 text-center hover:border-emerald-400 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <div
                   className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-2xl text-4xl font-black text-white overflow-hidden shadow-lg"
                   style={{ backgroundColor: c.brand_colors?.[0] || "#006C35" }}
                 >
-                  {c.logo_url ? <img src={c.logo_url} alt="" className="h-full w-full object-cover" /> : c.name?.charAt(0) || "?"}
+                  {c.logo_url ? <Image src={c.logo_url} alt={c.name || "Company logo"} width={96} height={96} className="h-full w-full object-cover" /> : c.name?.charAt(0) || "?"}
                 </div>
                 <p className="text-xl font-extrabold text-[#004D26] truncate">{c.name}</p>
                 {c.industry && (
                   <span className="mt-3 inline-block rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 px-4 py-1.5 text-base font-semibold text-emerald-700">{c.industry}</span>
                 )}
               </Link>
-            </motion.div>
+            </div>
           ))}
           <Link href="/companies" className="min-w-[280px] shrink-0 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D4EBD9] p-7 hover:border-emerald-400 hover:bg-emerald-50/50 transition-all duration-300 group">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
@@ -449,20 +432,17 @@ export default function DashboardPage() {
         {recentImages.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {recentImages.filter(img => img.image_urls?.[0]).slice(0, 5).map((img, i) => (
-              <motion.div
+              <div
                 key={img.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.08 }}
                 className="group relative aspect-square overflow-hidden rounded-2xl border-2 border-[#D4EBD9] shadow-md hover:shadow-xl hover:border-violet-300 transition-all duration-300"
               >
-                <img src={img.image_urls![0]} alt="" className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                <Image src={img.image_urls![0]} alt={locale === "ar" ? "صورة مولدة" : "Generated image"} fill className="object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" />
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span className="rounded-xl bg-white/90 backdrop-blur-sm px-5 py-2.5 text-lg font-bold text-[#004D26] flex items-center gap-2 shadow-lg">
                     <Eye className="h-5 w-5" /> {locale === "ar" ? "\u0639\u0631\u0636" : "View"}
                   </span>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
