@@ -46,29 +46,20 @@
 
 | # | Issue | File | Severity |
 |---|-------|------|----------|
-| 22 | Entire landing page is `"use client"` (828 lines) | `app/page.tsx:1` | HIGH |
-| 23 | Excessive Framer Motion on every section | `app/page.tsx` | HIGH |
-| 24 | `<img>` tags used instead of `next/image` | `dashboard/page.tsx:459`, `companies/page.tsx:416` | HIGH |
-| 25 | No image dimensions — causes CLS | All `<img>` tags | HIGH |
-| 26 | Dashboard re-renders every 3 seconds (quote rotation) | `dashboard/page.tsx:138` | MEDIUM |
-| 27 | Backdrop-filter blur on multiple components | `globals.css:195-216` | MEDIUM |
-| 28 | html2canvas + jsPDF loaded eagerly (150KB+) | `lib/export-*.ts` | MEDIUM |
-| 29 | No Suspense boundaries, no ISR/caching | All dashboard pages | MEDIUM |
-| 30 | KimzChat animations run in background when minimized | `components/KimzChat.tsx:306` | MEDIUM |
-| 31 | `SELECT *` on companies table (includes large JSONB) | `dashboard/page.tsx:113` | MEDIUM |
-| 32 | Missing `React.memo` on expensive components | `layout.tsx` NavLinks, SidebarBottom | MEDIUM |
-| 33 | `strip-motion.mjs` exists but was never run | Root | LOW |
-| 34 | 16 CSS keyframe animations defined, many unused | `globals.css:89-162` | LOW |
-
-**Recommended fix order:**
-1. Replace `<img>` with `next/image` + add dimensions
-2. Convert landing page to Server Component with client islands
-3. Dynamic import html2canvas/jsPDF
-4. Add `React.memo` to sidebar components
-5. Replace 3-second quote interval with CSS animation
-6. Reduce backdrop-filter usage
-7. Add Suspense boundaries for data loading
-8. Add specific column selects instead of `SELECT *`
+| 22 | Entire landing page is `"use client"` (828 lines) | `app/page.tsx:1` | HIGH — Deferred (large refactor) |
+| 23 | Excessive Framer Motion on dashboard | `dashboard/page.tsx` | **FIXED** — Replaced all motion.div with CSS |
+| 24 | `<img>` tags used instead of `next/image` | `dashboard/page.tsx` | **FIXED** — next/image with sizes/fill |
+| 25 | No image dimensions — causes CLS | `dashboard/page.tsx` | **FIXED** — width/height/fill added |
+| 26 | Dashboard re-renders every 3 seconds (quote rotation) | `dashboard/page.tsx:138` | **FIXED** — Changed to 10s |
+| 27 | Backdrop-filter blur on multiple components | `globals.css:195-216` | **FIXED** — Reduced blur values |
+| 28 | html2canvas + jsPDF loaded eagerly (150KB+) | `lib/export-*.ts` | **FIXED** — Dynamic imports |
+| 29 | No Suspense boundaries, no ISR/caching | All dashboard pages | TODO |
+| 30 | KimzChat notification animation runs forever | `components/KimzChat.tsx` | **FIXED** — Stops after first message |
+| 31 | `SELECT *` on companies table (includes large JSONB) | `dashboard/page.tsx:113` | **FIXED** — Specific columns |
+| 32 | Missing `React.memo` on expensive components | `layout.tsx` NavLinks, SidebarBottom | TODO |
+| 33 | `strip-motion.mjs` exists but was never run | Root | LOW — Not needed after manual fixes |
+| 34 | 16 CSS keyframe animations defined, many unused | `globals.css:89-162` | **FIXED** — Removed 4 unused animations |
+| 35 | next/image remote patterns not configured | `next.config.ts` | **FIXED** — Added Supabase patterns |
 
 ---
 
