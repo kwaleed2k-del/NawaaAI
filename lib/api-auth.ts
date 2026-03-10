@@ -11,22 +11,46 @@ export async function authenticateRequest() {
   return { user, error: null };
 }
 
+/* ══ Input Validation Helpers ══ */
+const MAX_STRING_LENGTH = 500;
+const MAX_LONG_TEXT_LENGTH = 8000;
+const MAX_MESSAGE_LENGTH = 4096;
+
+export function validateStringInput(value: unknown, fieldName: string, maxLen = MAX_STRING_LENGTH): string | null {
+  if (typeof value !== "string" || value.trim().length === 0) return `${fieldName} is required`;
+  if (value.length > maxLen) return `${fieldName} must be under ${maxLen} characters`;
+  return null;
+}
+
+export function validateMessageContent(messages: unknown): string | null {
+  if (!Array.isArray(messages) || messages.length === 0) return "Messages are required";
+  for (const msg of messages) {
+    if (!msg || typeof msg.content !== "string") return "Invalid message format";
+    if (msg.content.length > MAX_MESSAGE_LENGTH) return `Message too long (max ${MAX_MESSAGE_LENGTH} chars)`;
+    if (!["user", "assistant"].includes(msg.role)) return "Invalid message role";
+  }
+  return null;
+}
+
+export { MAX_STRING_LENGTH, MAX_LONG_TEXT_LENGTH, MAX_MESSAGE_LENGTH };
+
 /* ══ Rate Limiting (in-memory, per-user per-endpoint) ══ */
+const MAX_RATE_LIMIT_ENTRIES = 10_000;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMITS: Record<string, { max: number; windowMs: number }> = {
-  "/api/analyze-company": { max: 5, windowMs: 60_000 },
-  "/api/competitor-analysis": { max: 3, windowMs: 60_000 },
-  "/api/generate-plan": { max: 10, windowMs: 60_000 },
-  "/api/generate-images": { max: 10, windowMs: 60_000 },
-  "/api/hashtags/generate": { max: 20, windowMs: 60_000 },
-  "/api/extract-pdf": { max: 10, windowMs: 60_000 },
-  "/api/extract-colors": { max: 20, windowMs: 60_000 },
-  "/api/upload-logo": { max: 10, windowMs: 60_000 },
-  "/api/chat": { max: 30, windowMs: 60_000 },
+  "/api/analyze-company": { max: 3, windowMs: 60_000 },
+  "/api/competitor-analysis": { max: 2, windowMs: 60_000 },
+  "/api/generate-plan": { max: 5, windowMs: 60_000 },
+  "/api/generate-images": { max: 5, windowMs: 60_000 },
+  "/api/hashtags/generate": { max: 15, windowMs: 60_000 },
+  "/api/extract-pdf": { max: 5, windowMs: 60_000 },
+  "/api/extract-colors": { max: 15, windowMs: 60_000 },
+  "/api/upload-logo": { max: 5, windowMs: 60_000 },
+  "/api/chat": { max: 20, windowMs: 60_000 },
 };
 
-// Clean stale entries every 5 minutes
+// Clean stale entries every 5 minutes, enforce max size
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of rateLimitMap) {
@@ -41,6 +65,11 @@ export function checkRateLimit(userId: string, endpoint: string): NextResponse |
   const entry = rateLimitMap.get(key);
 
   if (!entry || now > entry.resetAt) {
+    // Prevent unbounded memory growth
+    if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES) {
+      const oldest = rateLimitMap.keys().next().value;
+      if (oldest) rateLimitMap.delete(oldest);
+    }
     rateLimitMap.set(key, { count: 1, resetAt: now + config.windowMs });
     return null;
   }

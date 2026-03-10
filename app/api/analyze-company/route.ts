@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
-import { authenticateRequest, checkRateLimit, validateExternalUrl } from "@/lib/api-auth";
+import { authenticateRequest, checkRateLimit, validateExternalUrl, validateStringInput } from "@/lib/api-auth";
 
 async function scrapeWebsite(url: string): Promise<string | null> {
   try {
@@ -110,6 +110,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    const nameErr = validateStringInput(company.name, "Company name", 500);
+    if (nameErr) return NextResponse.json({ error: nameErr }, { status: 400 });
 
     // Trim description — generous limit to accept large company profiles
     const companyTrimmed = { ...company };
@@ -145,7 +147,13 @@ export async function POST(request: NextRequest) {
     const text = completion.choices[0]?.message?.content?.trim() || "{}";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const jsonStr = jsonMatch ? jsonMatch[0] : text;
-    const parsed = JSON.parse(jsonStr);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      return NextResponse.json({ error: "AI returned invalid JSON. Please try again." }, { status: 500 });
+    }
 
     if (!parsed.brandPersonality || !parsed.contentPillars || !parsed.audienceInsights) {
       return NextResponse.json(

@@ -30,6 +30,9 @@ export async function POST(request: NextRequest) {
     if (!topic?.trim()) {
       return NextResponse.json({ error: "Topic required" }, { status: 400 });
     }
+    if (typeof topic !== "string" || topic.length > 500) {
+      return NextResponse.json({ error: "Topic must be under 500 characters" }, { status: 400 });
+    }
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [

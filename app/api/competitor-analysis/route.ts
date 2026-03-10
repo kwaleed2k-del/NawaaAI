@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
-import { authenticateRequest, checkRateLimit, validateExternalUrl } from "@/lib/api-auth";
+import { authenticateRequest, checkRateLimit, validateExternalUrl, validateStringInput, MAX_STRING_LENGTH } from "@/lib/api-auth";
 
 /* ═══════════════════════════════════════════════════
    DEEP RESEARCH ENGINE — Real web scraping + search
@@ -192,15 +192,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { companyName, companyDescription, competitors, outputLanguage } = body;
 
-    if (!companyName || !competitors?.length) {
-      return NextResponse.json({ error: "Company name and at least one competitor are required" }, { status: 400 });
+    // Validate inputs
+    const nameErr = validateStringInput(companyName, "Company name", MAX_STRING_LENGTH);
+    if (nameErr) return NextResponse.json({ error: nameErr }, { status: 400 });
+    if (!competitors?.length) {
+      return NextResponse.json({ error: "At least one competitor is required" }, { status: 400 });
     }
     if (competitors.length > 5) {
       return NextResponse.json({ error: "Maximum 5 competitors allowed" }, { status: 400 });
     }
+    if (companyDescription && typeof companyDescription === "string" && companyDescription.length > 2000) {
+      return NextResponse.json({ error: "Company description must be under 2000 characters" }, { status: 400 });
+    }
 
-    // Validate competitor URLs
+    // Validate each competitor's fields and URLs
     for (const c of competitors) {
+      const cErr = validateStringInput(c.name, "Competitor name", MAX_STRING_LENGTH);
+      if (cErr) return NextResponse.json({ error: cErr }, { status: 400 });
+      if (c.handle && typeof c.handle === "string" && c.handle.length > 200) {
+        return NextResponse.json({ error: `Handle too long for "${c.name}"` }, { status: 400 });
+      }
       if (c.websiteUrl) {
         const urlCheck = validateExternalUrl(c.websiteUrl);
         if (!urlCheck.valid) {
@@ -210,10 +221,10 @@ export async function POST(request: NextRequest) {
     }
 
     // ── PHASE 1: Deep research on ALL competitors in parallel ──
-    const researchResults = await Promise.all(
+    // Use Promise.allSettled so one failed competitor doesn't kill the entire request
+    const settledResults = await Promise.allSettled(
       competitors.map(async (c: { name: string; handle?: string; platform?: string; websiteUrl?: string }) => {
-        // Run ALL research tasks in parallel for each competitor
-        const [websiteData, socialData, googleCompanyInfo, googleReviews, googleNews] = await Promise.all([
+        const [websiteData, socialData, googleCompanyInfo, googleReviews, googleNews] = await Promise.allSettled([
           c.websiteUrl ? deepScrapeWebsite(c.websiteUrl) : Promise.resolve("No website URL provided"),
           c.handle ? scrapeSocialProfile(c.handle, c.platform || "instagram") : Promise.resolve("No social handle provided"),
           searchGoogle(`"${c.name}" company about Saudi Arabia`),
@@ -221,21 +232,27 @@ export async function POST(request: NextRequest) {
           searchGoogle(`"${c.name}" news latest 2024 2025`),
         ]);
 
+        const val = (r: PromiseSettledResult<string | null>) => r.status === "fulfilled" ? (r.value || "No data") : "Research failed";
+
         return {
           name: c.name,
           handle: c.handle || "N/A",
           platform: c.platform || "N/A",
           websiteUrl: c.websiteUrl || "N/A",
           research: [
-            `══ WEBSITE DEEP SCRAPE ══\n${websiteData}`,
-            `══ SOCIAL MEDIA PROFILE ══\n${socialData}`,
-            `══ GOOGLE: COMPANY INFO ══\n${googleCompanyInfo}`,
-            `══ GOOGLE: CUSTOMER REVIEWS ══\n${googleReviews}`,
-            `══ GOOGLE: LATEST NEWS ══\n${googleNews}`,
+            `══ WEBSITE DEEP SCRAPE ══\n${val(websiteData)}`,
+            `══ SOCIAL MEDIA PROFILE ══\n${val(socialData)}`,
+            `══ GOOGLE: COMPANY INFO ══\n${val(googleCompanyInfo)}`,
+            `══ GOOGLE: CUSTOMER REVIEWS ══\n${val(googleReviews)}`,
+            `══ GOOGLE: LATEST NEWS ══\n${val(googleNews)}`,
           ].join("\n\n"),
         };
       })
     );
+
+    const researchResults = settledResults
+      .filter((r): r is PromiseFulfilledResult<{ name: string; handle: string; platform: string; websiteUrl: string; research: string }> => r.status === "fulfilled")
+      .map(r => r.value);
 
     // Also research the user's own brand
     const brandResearch = await searchGoogle(`"${companyName}" company Saudi Arabia`);
@@ -418,11 +435,20 @@ INSTRUCTIONS:
       return NextResponse.json({ error: "Failed to parse AI response", raw: content }, { status: 500 });
     }
 
-    if (!analysisData.executiveSummary || !Array.isArray(analysisData.competitors)) {
+    if (!analysisData.executiveSummary || !Array.isArray(analysisData.competitors) || analysisData.competitors.length === 0) {
       return NextResponse.json(
         { error: "AI response missing required fields. Please try again." },
         { status: 500 }
       );
+    }
+    // Validate each competitor has required fields
+    for (const comp of analysisData.competitors) {
+      if (!comp.name || typeof comp.overallScore !== "number") {
+        return NextResponse.json(
+          { error: "AI response has incomplete competitor data. Please try again." },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({ success: true, analysis: analysisData });

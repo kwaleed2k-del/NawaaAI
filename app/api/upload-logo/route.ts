@@ -78,12 +78,18 @@ async function extractColors(buffer: Buffer): Promise<{ hex: string; name: strin
   }
 }
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB — enough for company profiles
+const ALLOWED_FORMATS = ["png", "jpeg", "jpg", "webp"] as const;
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     if (!file || !file.size) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` }, { status: 400 });
     }
 
     const supabase = await createServerSupabaseClient();
@@ -97,8 +103,19 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Determine file extension
-    const ext = file.type.includes("png") ? "png" : "jpg";
+    // Validate actual image content using sharp (magic-byte check)
+    let metadata;
+    try {
+      metadata = await sharp(buffer).metadata();
+      if (!metadata.format || !ALLOWED_FORMATS.includes(metadata.format as typeof ALLOWED_FORMATS[number])) {
+        return NextResponse.json({ error: `Invalid image format. Allowed: ${ALLOWED_FORMATS.join(", ")}` }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ error: "Invalid image file — could not read image data" }, { status: 400 });
+    }
+
+    // Determine file extension from actual content
+    const ext = metadata.format === "png" ? "png" : "jpg";
     const fileName = `${user.id}/${Date.now()}.${ext}`;
 
     // Upload to Supabase storage

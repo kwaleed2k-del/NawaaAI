@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { authenticateRequest, checkRateLimit } from "@/lib/api-auth";
+import { authenticateRequest, checkRateLimit, validateMessageContent } from "@/lib/api-auth";
 
 function getOpenAI() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -63,11 +63,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { messages } = body as { messages: ChatMessage[] };
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: "Messages are required" },
-        { status: 400 }
-      );
+    // Validate message array, roles, and content lengths
+    const validationError = validateMessageContent(messages);
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
     // Only keep last 10 messages for token control

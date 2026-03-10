@@ -100,9 +100,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (e) {
     console.error("extract-colors", e);
-    return NextResponse.json({
-      success: true,
-      colors: FALLBACK_COLORS,
-    });
+    return NextResponse.json(
+      { success: false, error: e instanceof Error ? e.message : "Color extraction failed" },
+      { status: 500 }
+    );
   }
 }

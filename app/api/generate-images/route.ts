@@ -218,6 +218,15 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    if (typeof company.name !== "string" || company.name.length > 500) {
+      return NextResponse.json({ error: "Company name must be under 500 characters" }, { status: 400 });
+    }
+    if (additionalInstructions && typeof additionalInstructions === "string" && additionalInstructions.length > 2000) {
+      return NextResponse.json({ error: "Additional instructions must be under 2000 characters" }, { status: 400 });
+    }
+    if (imageText && typeof imageText === "string" && imageText.length > 200) {
+      return NextResponse.json({ error: "Image text must be under 200 characters" }, { status: 400 });
+    }
 
     // Build brand color instruction string
     const brandColors = (company.brand_colors || []).slice(0, 5);
