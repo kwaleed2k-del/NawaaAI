@@ -214,7 +214,7 @@ export default function CompetitorAnalysisPage() {
   };
 
   const loadAnalysis = (s: SavedAnalysis) => { setCompetitors(s.competitors); setAnalysisData(s.analysis_data); setShowPrevious(false); setActiveTab("overview"); };
-  const deleteAnalysis = async (id: string) => { const supabase = createClient(); await supabase.from("competitor_analyses").delete().eq("id", id); loadSavedAnalyses(); };
+  const deleteAnalysis = async (id: string) => { if (!user) return; const supabase = createClient(); await supabase.from("competitor_analyses").delete().eq("id", id).eq("user_id", user.id); loadSavedAnalyses(); };
   const handleExportPdf = async () => { if (analysisData && selectedCompany) await exportCompetitorPdf(analysisData, selectedCompany.name, competitors, outputLanguage); };
 
   return (

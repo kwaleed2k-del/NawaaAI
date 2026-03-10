@@ -618,6 +618,19 @@ export default function CompaniesPage() {
     setConfirmDeleteId(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+    // Delete related records in correct order (respect foreign keys)
+    // 1. Get plan IDs so we can delete images linked via plan_id
+    const { data: plans } = await supabase.from("content_plans").select("id").eq("company_id", id);
+    const planIds = plans?.map((p) => p.id) ?? [];
+    // 2. Delete generated_images (references both company_id and plan_id)
+    await supabase.from("generated_images").delete().eq("company_id", id);
+    if (planIds.length > 0) {
+      await supabase.from("generated_images").delete().in("plan_id", planIds);
+    }
+    // 3. Now safe to delete content_plans and competitor_analyses
+    await supabase.from("content_plans").delete().eq("company_id", id);
+    await supabase.from("competitor_analyses").delete().eq("company_id", id).eq("user_id", user.id);
+    // 4. Finally delete the company
     const { error } = await supabase.from("companies").delete().eq("id", id).eq("user_id", user.id);
     if (error) { console.error("Delete company error:", error); toast.error(locale === "ar" ? "فشل حذف الشركة" : "Failed to delete company"); }
     else { toast.success(tc.deleted || "Company deleted"); loadCompanies(); }
