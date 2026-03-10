@@ -63,35 +63,26 @@
 
 ---
 
-## Phase 4 — UI/UX Polish (TODO)
+## Phase 4 — UI/UX Polish
 
-| # | Issue | File | Severity |
-|---|-------|------|----------|
-| 35 | No `loading.tsx`, `error.tsx`, `not-found.tsx` | `app/` root | HIGH |
-| 36 | No error boundaries in layouts | `(auth)/layout.tsx`, `(dashboard)/layout.tsx` | HIGH |
-| 37 | Missing accessibility: no aria-labels on icon buttons | `(dashboard)/layout.tsx:244,359` | HIGH |
-| 38 | No dark mode support | `app/layout.tsx` | MEDIUM |
-| 39 | No breadcrumb navigation on dashboard pages | All `(dashboard)/*` pages | MEDIUM |
-| 40 | Mobile sidebar has no focus trap | `(dashboard)/layout.tsx:264-310` | MEDIUM |
-| 41 | Quote carousel dots too small for touch (8px) | `login/page.tsx:143` | MEDIUM |
-| 42 | No search clear button or "no results" message | `(dashboard)/layout.tsx:347` | MEDIUM |
-| 43 | Missing loading skeletons for data fetching | `hashtags/page.tsx`, others | MEDIUM |
-| 44 | No delete confirmation dialog | `my-generations/page.tsx` | MEDIUM |
-| 45 | Password validation only shows after typing | `signup/page.tsx:305` | LOW |
-| 46 | Insights page is placeholder — no real data | `insights/page.tsx` | LOW |
-| 47 | Locale switch has no visual feedback | `(dashboard)/layout.tsx:361` | LOW |
-| 48 | Company logos not responsive, can overflow | `companies/page.tsx:416` | LOW |
-| 49 | Empty alt text on generated images | `dashboard/page.tsx:459` | LOW |
-| 50 | Hero text clamp could be too large on tablets | `app/page.tsx:338` | LOW |
-
-**Recommended fix order:**
-1. Add `loading.tsx`, `error.tsx`, `not-found.tsx`
-2. Add error boundaries to layouts
-3. Add aria-labels to all icon buttons
-4. Add delete confirmation dialogs
-5. Add Suspense boundaries for dashboard data
-6. Fix mobile touch targets (min 44x44px)
-7. Add breadcrumbs to dashboard pages
+| # | Issue | File | Status |
+|---|-------|------|--------|
+| 35 | No `loading.tsx`, `error.tsx`, `not-found.tsx` | `app/` root | **FIXED** — Created all three + dashboard variants |
+| 36 | No error boundaries in layouts | `(auth)/layout.tsx`, `(dashboard)/layout.tsx` | **FIXED** — `(auth)/error.tsx` + `(dashboard)/error.tsx` |
+| 37 | Missing accessibility: no aria-labels on icon buttons | `(dashboard)/layout.tsx`, auth pages, companies | **FIXED** — Added aria-labels throughout |
+| 38 | No dark mode support | `app/layout.tsx` | SKIPPED (per user request) |
+| 39 | No breadcrumb navigation on dashboard pages | All `(dashboard)/*` pages | **FIXED** — Auto breadcrumbs from pathname |
+| 40 | Mobile sidebar has no focus trap | `(dashboard)/layout.tsx` | **FIXED** — Focus trap + Escape key + aria-modal |
+| 41 | Quote carousel dots too small for touch (8px) | `login/page.tsx`, `signup/page.tsx` | **FIXED** — 44x44px touch target with aria-labels |
+| 42 | No search clear button or "no results" message | `(dashboard)/layout.tsx` | **FIXED** — Clear button with X icon |
+| 43 | Missing loading skeletons for data fetching | `hashtags/page.tsx`, others | **FIXED** — Dashboard `loading.tsx` skeleton |
+| 44 | No delete confirmation dialog | `my-generations/page.tsx` | **ALREADY FIXED** — `confirmDeleteId` pattern existed |
+| 45 | Password validation only shows after typing | `signup/page.tsx:305` | **FIXED** — Always visible for guidance |
+| 46 | Insights page is placeholder — no real data | `insights/page.tsx` | DEFERRED — Well-designed "coming soon" page |
+| 47 | Locale switch has no visual feedback | `(dashboard)/layout.tsx` | **FIXED** — Flash animation on toggle |
+| 48 | Company logos not responsive, can overflow | `companies/page.tsx` | **FIXED** — max-w-full + proper alt text |
+| 49 | Empty alt text on generated images | `my-generations/page.tsx` | **FIXED** — Meaningful alt text added |
+| 50 | Hero text clamp could be too large on tablets | `app/page.tsx:338` | **FIXED** — Reduced from 10vw to 7vw |
 
 ---
 
@@ -123,10 +114,10 @@
 |-------|-------------|-------|-----------|
 | Phase 1 — Critical | 5 | 3 | 2 (manual: revoke keys, gitignore) |
 | Phase 2 — Security | 16 | 16 | 0 |
-| Phase 3 — Performance | 13 | 0 | 13 |
-| Phase 4 — UI/UX | 16 | 0 | 16 |
+| Phase 3 — Performance | 13 | 10 | 3 (TODO items) |
+| Phase 4 — UI/UX | 16 | 13 | 3 (dark mode skipped, insights deferred, #44 was already fixed) |
 | Phase 5 — Code Quality | 15 | 0 | 15 |
-| **TOTAL** | **65** | **19** | **46** |
+| **TOTAL** | **65** | **42** | **23** |
 
 ---
 
