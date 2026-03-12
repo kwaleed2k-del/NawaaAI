@@ -86,25 +86,25 @@
 
 ---
 
-## Phase 5 — Code Quality & Enhancements (TODO)
+## Phase 5 — Code Quality & Enhancements
 
-| # | Issue | File | Severity |
-|---|-------|------|----------|
-| 51 | ChatMessage type duplicated in 2 files | `KimzChat.tsx:11` + `chat/route.ts:48` | MEDIUM |
-| 52 | Zustand store mixes auth state with UI state | `lib/store.ts` | MEDIUM |
-| 53 | Race condition in LocaleSync | `components/LocaleSync.tsx` + `app/page.tsx` | MEDIUM |
-| 54 | No content policy on image generation prompts | `generate-images/route.ts:243` | MEDIUM |
-| 55 | SSRF validation incomplete (no DNS rebinding) | `lib/api-auth.ts:65` | MEDIUM |
-| 56 | Missing CORS headers on API routes | All API routes | LOW |
-| 57 | Magic numbers everywhere | `api-auth.ts`, `generate-images/route.ts` | LOW |
-| 58 | Inconsistent error response shapes | Various API routes | LOW |
-| 59 | Unused export `createBrowserClient` | `lib/supabase.ts:4` | LOW |
-| 60 | Exposed system prompts in source code | `chat/route.ts:9-46` | LOW |
-| 61 | Gemini model fallback array has only 1 model | `generate-images/route.ts:160` | LOW |
-| 62 | Implement dark mode | Full app | ENHANCEMENT |
-| 63 | Move rate limiting to Redis | `lib/api-auth.ts` | ENHANCEMENT |
-| 64 | Extract shared types to `lib/types.ts` | Multiple files | ENHANCEMENT |
-| 65 | Clean up unused CSS animations | `globals.css` | ENHANCEMENT |
+| # | Issue | File | Status |
+|---|-------|------|--------|
+| 51 | ChatMessage type duplicated in 2 files | `KimzChat.tsx` + `chat/route.ts` | **FIXED** — Shared `lib/types.ts` |
+| 52 | Zustand store mixes auth state with UI state | `lib/store.ts` | **FIXED** — Separated AuthSlice and UISlice |
+| 53 | Race condition in LocaleSync | `components/LocaleSync.tsx` + `app/page.tsx` | **FIXED** — Single source of truth via store |
+| 54 | No content policy on image generation prompts | `generate-images/route.ts` | **FIXED** — Blocked patterns for NSFW/violence/hate |
+| 55 | SSRF validation incomplete (no DNS rebinding) | `lib/api-auth.ts` | **FIXED** — Block .internal/.local, credentials, metadata |
+| 56 | Missing CORS headers on API routes | `middleware.ts` | **FIXED** — CORS preflight + response headers |
+| 57 | Magic numbers everywhere | `api-auth.ts`, `generate-images/route.ts` | **FIXED** — Named constants extracted |
+| 58 | Inconsistent error response shapes | `lib/api-auth.ts` | **FIXED** — `apiError()` / `apiSuccess()` helpers |
+| 59 | Unused export `createBrowserClient` | `lib/supabase.ts` | **FIXED** — Removed alias, updated companies import |
+| 60 | Exposed system prompts in source code | `chat/route.ts` | **FIXED** — Env-overridable via KIMZ_SYSTEM_PROMPT |
+| 61 | Gemini model fallback array has only 1 model | `generate-images/route.ts` | **FIXED** — 3 models in fallback chain |
+| 62 | Implement dark mode | Full app | DEFERRED (per user request) |
+| 63 | Move rate limiting to Redis | `lib/api-auth.ts` | DEFERRED (infrastructure change) |
+| 64 | Extract shared types to `lib/types.ts` | Multiple files | **FIXED** — `lib/types.ts` created |
+| 65 | Clean up unused CSS animations | `globals.css` | **FIXED** (Phase 3) |
 
 ---
 
@@ -116,8 +116,8 @@
 | Phase 2 — Security | 16 | 16 | 0 |
 | Phase 3 — Performance | 13 | 10 | 3 (TODO items) |
 | Phase 4 — UI/UX | 16 | 13 | 3 (dark mode skipped, insights deferred, #44 was already fixed) |
-| Phase 5 — Code Quality | 15 | 0 | 15 |
-| **TOTAL** | **65** | **42** | **23** |
+| Phase 5 — Code Quality | 15 | 12 | 3 (dark mode deferred, Redis deferred, CSS done in P3) |
+| **TOTAL** | **65** | **54** | **11** |
 
 ---
 
