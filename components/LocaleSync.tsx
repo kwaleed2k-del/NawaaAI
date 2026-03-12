@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useAppStore } from "@/lib/store";
 
 const STORAGE_KEY = "nawaa-locale";
 
@@ -17,11 +18,19 @@ export function setStoredLocale(locale: "en" | "ar") {
   document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
 }
 
+/**
+ * Single source of truth for locale hydration.
+ * Reads from localStorage once on mount and syncs to Zustand store.
+ * Individual pages should NOT set document.lang/dir themselves — the store handles it.
+ */
 export default function LocaleSync() {
+  const setLocale = useAppStore((s) => s.setLocale);
+
   useEffect(() => {
-    const locale = getStoredLocale();
-    document.documentElement.lang = locale;
-    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
-  }, []);
+    const stored = getStoredLocale();
+    // Sync store — store's setLocale also sets document.lang/dir
+    setLocale(stored);
+  }, [setLocale]);
+
   return null;
 }

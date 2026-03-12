@@ -2,7 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
 import { genAI } from "@/lib/gemini";
 import sharp from "sharp";
-import { authenticateRequest, checkRateLimit } from "@/lib/api-auth";
+import { authenticateRequest, checkRateLimit, validateStringInput, MAX_STRING_LENGTH } from "@/lib/api-auth";
+
+/* ══ Constants ══ */
+const MAX_COMPANY_NAME_LEN = MAX_STRING_LENGTH;          // 500
+const MAX_INSTRUCTIONS_LEN = 2_000;
+const MAX_IMAGE_TEXT_LEN = 200;
+const MAX_BRAND_COLORS = 5;
+const MAX_IMAGES_PER_REQUEST = 4;
+const MAX_REFERENCE_IMAGES = 4;
+const LOGO_RESIZE = 256;
+const LOGO_FETCH_TIMEOUT_MS = 10_000;
+const PROMPT_TEMPERATURE = 0.75;
+const PROMPT_MAX_TOKENS = 1_800;
+
+/* ══ Content policy — reject prompts that violate platform guidelines ══ */
+const BLOCKED_PATTERNS = [
+  /\b(nude|naked|nsfw|porn|sex|erotic|gore|violen(t|ce)|weapon|gun|drug|alcohol|beer|wine|tobacco|cigarette|vape|gambling|casino)\b/i,
+  /\b(hate|racist|discriminat|terroris|extremis|nazi|supremac)\b/i,
+  /\b(child\s*(abuse|exploit)|minor|underage)\b/i,
+];
+
+function checkContentPolicy(text: string): string | null {
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(text)) {
+      return "Your prompt contains content that violates our platform guidelines. Please revise and try again.";
+    }
+  }
+  return null;
+}
 
 const PROMPT_BUILDER_SYSTEM = `You are an elite commercial photography director and art director who creates prompts for AI image generation. Your goal is to produce images that look like REAL professional photography — NOT AI-generated.
 
@@ -112,7 +140,7 @@ async function fetchLogoAsTransparentBase64(logoUrl: string): Promise<string | n
       if (!base64Part) return null;
       buffer = Buffer.from(base64Part, "base64");
     } else {
-      const res = await fetch(logoUrl, { signal: AbortSignal.timeout(10000) });
+      const res = await fetch(logoUrl, { signal: AbortSignal.timeout(LOGO_FETCH_TIMEOUT_MS) });
       if (!res.ok) return null;
       const arrayBuf = await res.arrayBuffer();
       buffer = Buffer.from(arrayBuf);
@@ -123,7 +151,7 @@ async function fetchLogoAsTransparentBase64(logoUrl: string): Promise<string | n
     // If no alpha channel (JPEG etc), make white/light pixels transparent
     if (metadata.format === "jpeg" || metadata.format === "jpg" || !metadata.hasAlpha) {
       const { data, info } = await sharp(buffer)
-        .resize(256, 256, { fit: "contain", background: { r: 255, g: 255, b: 255, alpha: 0 } })
+        .resize(LOGO_RESIZE, LOGO_RESIZE, { fit: "contain", background: { r: 255, g: 255, b: 255, alpha: 0 } })
         .ensureAlpha()
         .raw()
         .toBuffer({ resolveWithObject: true });
@@ -145,7 +173,7 @@ async function fetchLogoAsTransparentBase64(logoUrl: string): Promise<string | n
 
     // Already has alpha, just resize
     const pngBuffer = await sharp(buffer)
-      .resize(256, 256, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .resize(LOGO_RESIZE, LOGO_RESIZE, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .png()
       .toBuffer();
 
@@ -158,7 +186,9 @@ async function fetchLogoAsTransparentBase64(logoUrl: string): Promise<string | n
 
 // Try multiple Gemini model names in order of preference
 const GEMINI_MODELS = [
+  "gemini-2.0-flash-exp",
   "gemini-3-pro-image-preview",
+  "gemini-2.0-flash-preview-image-generation",
 ];
 
 async function generateImageWithGemini(
@@ -218,18 +248,25 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (typeof company.name !== "string" || company.name.length > 500) {
-      return NextResponse.json({ error: "Company name must be under 500 characters" }, { status: 400 });
+    if (typeof company.name !== "string" || company.name.length > MAX_COMPANY_NAME_LEN) {
+      return NextResponse.json({ error: `Company name must be under ${MAX_COMPANY_NAME_LEN} characters` }, { status: 400 });
     }
-    if (additionalInstructions && typeof additionalInstructions === "string" && additionalInstructions.length > 2000) {
-      return NextResponse.json({ error: "Additional instructions must be under 2000 characters" }, { status: 400 });
+    if (additionalInstructions && typeof additionalInstructions === "string" && additionalInstructions.length > MAX_INSTRUCTIONS_LEN) {
+      return NextResponse.json({ error: `Additional instructions must be under ${MAX_INSTRUCTIONS_LEN} characters` }, { status: 400 });
     }
-    if (imageText && typeof imageText === "string" && imageText.length > 200) {
-      return NextResponse.json({ error: "Image text must be under 200 characters" }, { status: 400 });
+    if (imageText && typeof imageText === "string" && imageText.length > MAX_IMAGE_TEXT_LEN) {
+      return NextResponse.json({ error: `Image text must be under ${MAX_IMAGE_TEXT_LEN} characters` }, { status: 400 });
+    }
+
+    // Content policy check on all user-provided text
+    const textToCheck = [dayContent.topic, additionalInstructions, imageText].filter(Boolean).join(" ");
+    const policyViolation = checkContentPolicy(textToCheck);
+    if (policyViolation) {
+      return NextResponse.json({ error: policyViolation }, { status: 400 });
     }
 
     // Build brand color instruction string
-    const brandColors = (company.brand_colors || []).slice(0, 5);
+    const brandColors = (company.brand_colors || []).slice(0, MAX_BRAND_COLORS);
     const colorSuggestions: Record<string, string> = {};
     const colorObjectHints = ["clothing, packaging, wall paint, furniture", "accessories, cushions, frames, stationery", "tableware, signage, textiles, rugs", "backgrounds, props, flowers, food items", "accents, jewelry, bags, ribbons"];
     brandColors.forEach((color: string, i: number) => {
@@ -271,8 +308,8 @@ export async function POST(request: NextRequest) {
         { role: "system", content: PROMPT_BUILDER_SYSTEM },
         { role: "user", content: userMsg + "\n\nReturn JSON only." },
       ],
-      temperature: 0.75,
-      max_tokens: 1800,
+      temperature: PROMPT_TEMPERATURE,
+      max_tokens: PROMPT_MAX_TOKENS,
     });
 
     const text = completion.choices[0]?.message?.content?.trim() || "{}";
@@ -299,7 +336,7 @@ export async function POST(request: NextRequest) {
       ? ` At least 2 brand colors MUST be clearly visible: ${brandColors.map((c: string, i: number) => `${c} on ${colorObjectHints[i]?.split(",")[0] || "props"}`).join(", ")}.`
       : "";
 
-    for (const p of prompts.slice(0, 4)) {
+    for (const p of prompts.slice(0, MAX_IMAGES_PER_REQUEST)) {
       const fullPrompt = p.prompt + colorReminder + realisticSuffix;
 
       // Build content parts for Gemini
@@ -319,7 +356,7 @@ export async function POST(request: NextRequest) {
         contentParts.push({
           text: "⚠️ CRITICAL REFERENCE PHOTOS — these are real photos from the client's actual place/products. You MUST replicate the same environment, setting, surfaces, lighting, and vibe as closely as possible. The generated image should look like it was taken in the SAME location during the SAME photoshoot. Match everything: wall colors, table surfaces, decor, plating style, product appearance, spatial layout. Do NOT create a generic scene — recreate THIS specific place/product:",
         });
-        for (const refUri of referenceImagesData.slice(0, 4)) {
+        for (const refUri of referenceImagesData.slice(0, MAX_REFERENCE_IMAGES)) {
           const [header, base64Data] = refUri.split(",");
           const mimeMatch = header.match(/data:(.*?);/);
           const mimeType = mimeMatch ? mimeMatch[1] : "image/jpeg";

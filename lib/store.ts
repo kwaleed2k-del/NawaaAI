@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+/* ══ Shared Types ══ */
+
 export type Company = {
   id: string;
   user_id: string;
@@ -24,23 +26,40 @@ export type Company = {
 type User = {
   id: string;
   email?: string;
-  user_metadata?: { full_name?: string; avatar_url?: string; agency_name?: string; agency_type?: string; has_seen_welcome?: boolean };
+  user_metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+    agency_name?: string;
+    agency_type?: string;
+    has_seen_welcome?: boolean;
+  };
 } | null;
 
-type Store = {
-  selectedCompany: Company | null;
-  setSelectedCompany: (c: Company | null) => void;
+/* ══ Auth Slice ══ */
+interface AuthSlice {
   user: User;
   setUser: (u: User) => void;
+}
+
+/* ══ UI Slice ══ */
+interface UISlice {
+  selectedCompany: Company | null;
+  setSelectedCompany: (c: Company | null) => void;
   locale: "en" | "ar";
   setLocale: (l: "en" | "ar") => void;
-};
+}
+
+/* ══ Combined Store ══ */
+type Store = AuthSlice & UISlice;
 
 export const useStore = create<Store>((set) => ({
-  selectedCompany: null,
-  setSelectedCompany: (c) => set({ selectedCompany: c }),
+  // Auth
   user: null,
   setUser: (u) => set({ user: u }),
+
+  // UI
+  selectedCompany: null,
+  setSelectedCompany: (c) => set({ selectedCompany: c }),
   locale: "ar",
   setLocale: (l) => {
     if (typeof window !== "undefined") {
@@ -52,4 +71,5 @@ export const useStore = create<Store>((set) => ({
   },
 }));
 
+// Convenience alias
 export const useAppStore = useStore;

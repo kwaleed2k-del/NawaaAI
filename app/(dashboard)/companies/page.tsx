@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 /* motion removed – using plain HTML + CSS transitions */
 import { Building2, Plus, Pencil, Trash2, Upload, Loader2, Sparkles, FileText, Clock, Target, Megaphone, Users, Zap, Shield, Flame, Crown, BadgeCheck, Palette, Eye, X, Globe, AlertCircle } from "lucide-react";
-import { createBrowserClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { useAppStore, type Company } from "@/lib/store";
 import { cn, truncate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -352,7 +352,7 @@ function BrandAnalysisDisplay({ data, locale }: { data: Record<string, unknown>;
 }
 
 export default function CompaniesPage() {
-  const supabase = createBrowserClient();
+  const supabase = createClient();
   const { setSelectedCompany, locale, user } = useAppStore();
   const tc = messages[locale].companies;
   const [companies, setCompanies] = useState<Company[]>([]);

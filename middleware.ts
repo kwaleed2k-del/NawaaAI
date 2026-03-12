@@ -5,7 +5,27 @@ const protectedPaths = ["/dashboard", "/companies", "/planner", "/vision-studio"
 const authPaths = ["/login", "/signup"];
 
 export async function middleware(request: NextRequest) {
+  // Handle CORS preflight for API routes
+  if (request.method === "OPTIONS" && request.nextUrl.pathname.startsWith("/api/")) {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Max-Age": "86400",
+      },
+    });
+  }
+
   let response = NextResponse.next({ request });
+
+  // Add CORS headers to API responses
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    response.headers.set("Access-Control-Allow-Origin", request.headers.get("origin") || "*");
+    response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

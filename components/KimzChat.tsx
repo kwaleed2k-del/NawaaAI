@@ -7,11 +7,7 @@ import {
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { messages } from "@/lib/i18n";
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
+import type { ChatMessage } from "@/lib/types";
 
 const QUICK_ACTIONS_EN = [
   { icon: Building2, label: "Add a company", color: "from-emerald-500 to-teal-500", msg: "How do I add a new company?" },
